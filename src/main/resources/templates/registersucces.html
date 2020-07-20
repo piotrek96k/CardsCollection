@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+	<meta charset="UTF-8">
+	<title>Cards Collector's</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body class="bg-primary text-white">
+	<div th:replace="menu :: menu"></div>
+	<div class = "container" style="margin-top:80px">
+		<h1>Account has been created successfully</h1>
+		<a href="/login" class="redirect"> Sign in</a>
+	</div>
+</body>
+</html>
