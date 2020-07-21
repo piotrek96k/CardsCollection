@@ -20,14 +20,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	@Override
 	protected void configure(AuthenticationManagerBuilder authentication) throws Exception {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		authentication.jdbcAuthentication().dataSource(dataSource)
 				.usersByUsernameQuery("SELECT USERNAME, PASSWORD, ENABLED FROM ACCOUNT WHERE USERNAME=?")
 				.authoritiesByUsernameQuery("SELECT USERNAME, ROLE FROM ACCOUNT_ROLES WHERE USERNAME=?")
-				.passwordEncoder(new BCryptPasswordEncoder());
+				.passwordEncoder(encoder);
 		authentication.jdbcAuthentication().dataSource(dataSource)
 				.usersByUsernameQuery("SELECT EMAIL, PASSWORD, ENABLED FROM ACCOUNT WHERE EMAIL=?")
 				.authoritiesByUsernameQuery("SELECT EMAIL, ROLE FROM ACCOUNT_ROLES WHERE EMAIL=?")
-				.passwordEncoder(new BCryptPasswordEncoder());
+				.passwordEncoder(encoder);
 	}
 
 	@Override

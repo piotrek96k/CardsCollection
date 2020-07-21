@@ -8,28 +8,28 @@ import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-
-import com.sun.istack.NotNull;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @IdClass(AccountId.class)
 public class Account {
 
 	@Id
-	@NotNull
+	@NotBlank
 	public String username;
-
+	
 	@Id
-	@NotNull
+	@Email
 	public String email;
 
-	@NotNull
+	@NotBlank
 	public String firstName;
 
-	@NotNull
+	@NotBlank
 	public String lastName;
 
-	@NotNull
+	@NotBlank
 	public String password;
 
 	public boolean Enabled = true;

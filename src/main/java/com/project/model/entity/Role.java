@@ -5,11 +5,13 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 public class Role {
 
 	@Id
+	@NotBlank
 	private String role;
 
 	@ManyToMany(mappedBy = "roles")
