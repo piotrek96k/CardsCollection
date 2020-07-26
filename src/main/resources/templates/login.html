@@ -7,10 +7,10 @@
 	<title>Cards Collector's</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 </head>
-<body class="bg-primary text-white">
+<body class="bg-dark text-white">
 	<div th:replace="menu :: menu"></div>
 	<div class = "container">
-		<section style="margin-top:80px">
+		<section style="margin-top:80px;">
 			<form th:action="@{/login}" method="post" class="was-validated">
 				<img th:src="@{images/user.png}" class="rounded-circle mx-auto d-block" alt="Avatar"> 
 				<div th:if="${param.error}">
@@ -24,7 +24,7 @@
 					<label for="psw"><b>Password</b></label> 
 					<input type="password" class="form-control" id="psw" placeholder="Enter Password" name="password" required>
 				</div>
-				<input type="submit" value="Login" class="btn btn-dark">
+				<input type="submit" value="Login" class="btn btn-secondary">
 			</form>
 		</section>
 	</div>

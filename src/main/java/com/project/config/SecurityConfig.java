@@ -15,26 +15,26 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
-	DataSource dataSource;
+	private DataSource dataSource;
 
 	@Autowired
 	@Override
 	protected void configure(AuthenticationManagerBuilder authentication) throws Exception {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		authentication.jdbcAuthentication().dataSource(dataSource)
-				.usersByUsernameQuery("SELECT USERNAME, PASSWORD, ENABLED FROM ACCOUNT WHERE USERNAME=?")
-				.authoritiesByUsernameQuery("SELECT USERNAME, ROLE FROM ACCOUNT_ROLES WHERE USERNAME=?")
+				.usersByUsernameQuery("select username, password, enabled from account where username=?")
+				.authoritiesByUsernameQuery("select username, role from account_roles where username=?")
 				.passwordEncoder(encoder);
 		authentication.jdbcAuthentication().dataSource(dataSource)
-				.usersByUsernameQuery("SELECT EMAIL, PASSWORD, ENABLED FROM ACCOUNT WHERE EMAIL=?")
-				.authoritiesByUsernameQuery("SELECT EMAIL, ROLE FROM ACCOUNT_ROLES WHERE EMAIL=?")
+				.usersByUsernameQuery("select email, password, enabled from account where email=?")
+				.authoritiesByUsernameQuery("select email, role from account_roles where email=?")
 				.passwordEncoder(encoder);
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable().authorizeRequests().antMatchers("/").permitAll().antMatchers("/register", "/login")
-				.anonymous().and().formLogin().loginPage("/login").defaultSuccessUrl("/").and().logout()
+				.anonymous().antMatchers("/gallery").authenticated().and().formLogin().loginPage("/login").defaultSuccessUrl("/").and().logout()
 				.logoutSuccessUrl("/").and().exceptionHandling().accessDeniedPage("/");
 	}
 

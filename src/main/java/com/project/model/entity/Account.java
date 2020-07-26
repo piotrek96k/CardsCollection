@@ -18,7 +18,7 @@ public class Account {
 	@Id
 	@NotBlank
 	public String username;
-	
+
 	@Id
 	@Email
 	public String email;
@@ -37,8 +37,14 @@ public class Account {
 	@ManyToMany
 	@JoinTable(name = "account_roles", joinColumns = {
 			@JoinColumn(referencedColumnName = "username", name = "username"),
-			@JoinColumn(referencedColumnName = "email", name = "email") }, inverseJoinColumns = @JoinColumn(referencedColumnName = "role", name = "role"))
+			@JoinColumn(referencedColumnName = "email", name = "email") }, inverseJoinColumns = @JoinColumn(name = "role"))
 	private List<Role> roles;
+
+	@ManyToMany
+	@JoinTable(name = "account_cards", joinColumns = {
+			@JoinColumn(referencedColumnName = "username", name = "username"),
+			@JoinColumn(referencedColumnName = "email", name = "email") }, inverseJoinColumns = @JoinColumn(name = "card"))
+	private List<Card> cards;
 
 	public String getUsername() {
 		return username;
@@ -94,6 +100,14 @@ public class Account {
 
 	public void setRoles(List<Role> roles) {
 		this.roles = roles;
+	}
+
+	public List<Card> getCards() {
+		return cards;
+	}
+
+	public void setCards(List<Card> cards) {
+		this.cards = cards;
 	}
 
 	@Override

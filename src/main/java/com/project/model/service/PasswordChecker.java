@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 public class PasswordChecker {
 
 	private static final char[] SPECIAL_CHARACTERS = { '+', '-', '=', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')',
-			'{', '}', '[', ']', '|', ':', '\"', ';', '\'', '<', '>', '?', ',', '.', '/', '\\' };
+			'{', '}', '[', ']', '|', ':', '\"', ';', '\'', '<', '>', '?', ',', '.', '/', '\\', '_','~','`' };
 
 	public boolean validatePassword(String password) {
 		int[] counter = new int[] { 0, 0, 0, 0 };

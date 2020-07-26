@@ -19,7 +19,7 @@ import com.project.model.service.AccountService;
 import com.project.model.service.RegistrationError;
 
 @Controller
-public class MenuController {
+public class RegisterController {
 
 	@Autowired
 	private AccountService accountService;
@@ -30,23 +30,12 @@ public class MenuController {
 		errorFields = new ArrayList<String>();
 	}
 
-	@GetMapping("/")
-	public String indexPage() {
-		return "index";
-	}
-
-	@GetMapping("/login")
-	public String loginPage(Model model) {
-		return "login";
-	}
-
 	@GetMapping("/register")
 	public String registerForm(Model model) {
 		model.addAttribute("account", new Account());
 		if (!errorFields.isEmpty()) {
-			List<String> list = new ArrayList<String>(errorFields);
-			model.addAttribute("errorFields", list);
-			errorFields.clear();
+			model.addAttribute("errorFields", errorFields);
+			errorFields = new ArrayList<String>();
 		}
 		return "register";
 	}

@@ -6,3 +6,6 @@
 .redirect {
 	color: white;
 }
+.redirect:hover{
+	color: rgba(150,150,150);
+}

@@ -15,7 +15,7 @@ public class Role {
 	private String role;
 
 	@ManyToMany(mappedBy = "roles")
-	private List<Account> users;
+	private List<Account> accounts;
 	
 	public Role() {}
 	
@@ -31,12 +31,12 @@ public class Role {
 		this.role = role;
 	}
 	
-	public List<Account> getUsers() {
-		return users;
+	public List<Account> getAccounts() {
+		return accounts;
 	}
 
-	public void setUsers(List<Account> users) {
-		this.users = users;
+	public void setAccounts(List<Account> accounts) {
+		this.accounts = accounts;
 	}
 
 	@Override
