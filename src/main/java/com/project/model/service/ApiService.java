@@ -1,7 +1,10 @@
 package com.project.model.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,40 @@ public class ApiService {
 		RESOURCE_URL = "https://api.pokemontcg.io/v1/";
 		CARDS_STRING = "cards";
 		REST_TEMPLATE = new RestTemplate();
+	}
+
+	public class ApiData {
+
+		private List<Cards.Card> cards;
+
+		private Set<String> rarities;
+
+		private ApiData(List<Cards.Card> cards, Set<String> rarities) {
+			this.cards = cards;
+			this.rarities = rarities;
+		}
+
+		public List<Cards.Card> getCards() {
+			return Collections.unmodifiableList(cards);
+		}
+
+		public Set<String> getRarities() {
+			return Collections.unmodifiableSet(rarities);
+		}
+
+	}
+
+	public ApiData getApiData() {
+		List<Cards.Card> cards = new ArrayList<Cards.Card>(getNumberOfCards());
+		Set<String> rarities = new HashSet<String>();
+		for (int i = 1; i <= getNumberOfPages(); i++)
+			cards.addAll(getCardsByPage(i));
+		for (Cards.Card card : cards) {
+			if (card.getRarity() == null || card.getRarity().isBlank())
+				card.setRarity("Common");
+			rarities.add(card.getRarity());
+		}
+		return new ApiData(cards, rarities);
 	}
 
 	public List<Cards.Card> getAllCards() {

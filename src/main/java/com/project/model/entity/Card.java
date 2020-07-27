@@ -2,11 +2,10 @@ package com.project.model.entity;
 
 import java.util.List;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -15,30 +14,62 @@ public class Card {
 
 	@Id
 	@NotNull
-	@GeneratedValue
-	private int id;
+	protected String id;
+		
+	@NotBlank
+	protected String name;
 	
 	@NotBlank
-	@Column(unique = true)
-	private String apiId;
+	protected String imageUrl;
+		
+	@NotNull
+	protected int cost;
+	
+	@NotNull
+	@ManyToOne
+	protected Rarity rarity;
 
 	@ManyToMany(mappedBy = "cards")
-	private List<Account> accounts;
+	protected List<Account> accounts;
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
-	public String getApiId() {
-		return apiId;
+	public int getCost() {
+		return cost;
 	}
 
-	public void setApiId(String apiId) {
-		this.apiId = apiId;
+	public void setCost(int cost) {
+		this.cost = cost;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public Rarity getRarity() {
+		return rarity;
+	}
+
+	public void setRarity(Rarity rarity) {
+		this.rarity = rarity;
 	}
 
 	public List<Account> getAccounts() {
@@ -49,5 +80,9 @@ public class Card {
 		this.accounts = accounts;
 	}
 
+	@Override
+	public String toString() {
+		return "Card [id=" + id + ", name=" + name + ", imageUrl=" + imageUrl + ", cost=" + cost + "]";
+	}
 	
 }

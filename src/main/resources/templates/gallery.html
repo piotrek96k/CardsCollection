@@ -5,8 +5,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Cards Collector's</title>
-<link rel="stylesheet"
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body class="bg-dark text-white">
 	<div th:replace="menu :: menu"></div>
@@ -15,8 +15,8 @@
 			<th:block th:with="counter=${4}">
     			<div th:each="row : ${#numbers.sequence(0, cards.size(), counter)}"  class="row">
        				<div th:each="column : ${#numbers.sequence(0, counter - 1)}" class="col-sm">
-       					<div class="card bg-secondary mx-auto my-3 d-block" style="width:250px; height:450px;" th:if="${row + column < cards.size()}">
-       						<img  class="card-img-top" th:alt="${cards.get(row + column).getName()}" th:src="${cards.get(row + column).getImageUrlHiRes()}"> 
+       					<div class="card bg-secondary mx-auto my-3 d-block" style="width:240px;" th:if="${row + column < cards.size()}">
+       						<img  class="card-img-top" th:alt="${cards.get(row + column).getName()}" th:src="${cards.get(row + column).getImageUrl()}"> 
   							<div class="card-body">	
   								<p class="card-text" th:text="${cards.get(row + column).getName()}"></p>
   							</div>
@@ -25,6 +25,7 @@
    				 </div>
 			</th:block>
 		</section>
+		<div th:replace="pagination :: pagination"></div>
 	</div>
 </body>
 </html>

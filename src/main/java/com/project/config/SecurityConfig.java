@@ -23,11 +23,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		authentication.jdbcAuthentication().dataSource(dataSource)
 				.usersByUsernameQuery("select username, password, enabled from account where username=?")
-				.authoritiesByUsernameQuery("select username, role from account_roles where username=?")
+				.authoritiesByUsernameQuery("select username, role_id from account_roles where username=?")
 				.passwordEncoder(encoder);
 		authentication.jdbcAuthentication().dataSource(dataSource)
 				.usersByUsernameQuery("select email, password, enabled from account where email=?")
-				.authoritiesByUsernameQuery("select email, role from account_roles where email=?")
+				.authoritiesByUsernameQuery("select email, role_id from account_roles where email=?")
 				.passwordEncoder(encoder);
 	}
 

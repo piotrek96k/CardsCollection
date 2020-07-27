@@ -16,8 +16,10 @@ public class Cards {
 
 		private String name;
 
-		private String imageUrlHiRes;
+		private String imageUrl;
 
+		private String rarity;
+		
 		public String getId() {
 			return id;
 		}
@@ -34,12 +36,20 @@ public class Cards {
 			this.name = name;
 		}
 
-		public String getImageUrlHiRes() {
-			return imageUrlHiRes;
+		public String getImageUrl() {
+			return imageUrl;
 		}
 
-		public void setImageUrl(String imageUrlHiRes) {
-			this.imageUrlHiRes = imageUrlHiRes;
+		public void setImageUrl(String imageUrl) {
+			this.imageUrl = imageUrl;
+		}
+
+		public String getRarity() {
+			return rarity;
+		}
+
+		public void setRarity(String rarity) {
+			this.rarity = rarity;
 		}
 
 	}

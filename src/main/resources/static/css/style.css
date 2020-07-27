@@ -9,3 +9,11 @@
 .redirect:hover{
 	color: rgba(150,150,150);
 }
+.page-link, .page-link:hover {
+	color: rgb(41, 43, 44);
+}
+.page-item.active .page-link {
+	color: white;
+	background-color: rgb(41, 43, 44);
+	border-color: rgb(41, 43, 44);
+}

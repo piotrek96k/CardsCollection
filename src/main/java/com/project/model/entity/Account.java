@@ -10,6 +10,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @IdClass(AccountId.class)
@@ -31,19 +32,22 @@ public class Account {
 
 	@NotBlank
 	public String password;
+	
+	@NotNull
+	public int coins;
 
-	public boolean Enabled = true;
+	public boolean enabled;
 
 	@ManyToMany
 	@JoinTable(name = "account_roles", joinColumns = {
 			@JoinColumn(referencedColumnName = "username", name = "username"),
-			@JoinColumn(referencedColumnName = "email", name = "email") }, inverseJoinColumns = @JoinColumn(name = "role"))
+			@JoinColumn(referencedColumnName = "email", name = "email") }, inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private List<Role> roles;
 
 	@ManyToMany
 	@JoinTable(name = "account_cards", joinColumns = {
 			@JoinColumn(referencedColumnName = "username", name = "username"),
-			@JoinColumn(referencedColumnName = "email", name = "email") }, inverseJoinColumns = @JoinColumn(name = "card"))
+			@JoinColumn(referencedColumnName = "email", name = "email") }, inverseJoinColumns = @JoinColumn(name = "card_id"))
 	private List<Card> cards;
 
 	public String getUsername() {
@@ -87,11 +91,19 @@ public class Account {
 	}
 
 	public boolean isEnabled() {
-		return Enabled;
+		return enabled;
 	}
 
 	public void setEnabled(boolean enabled) {
-		Enabled = enabled;
+		this.enabled = enabled;
+	}
+
+	public int getCoins() {
+		return coins;
+	}
+
+	public void setCoins(int coins) {
+		this.coins = coins;
 	}
 
 	public List<Role> getRoles() {

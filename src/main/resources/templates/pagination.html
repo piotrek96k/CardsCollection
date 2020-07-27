@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+<meta charset="UTF-8">
+<title>Cards Collector's</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body class="bg-dark text-white">
+	<div class = "container" th:fragment="pagination">
+		<section style="margin-top:50px; margin-bottom:50px;" th:if="${numberOfPages > 1}">
+			<ul class="pagination pagination-lg justify-content-center" th:with="start=${currentPage > 5 ? (currentPage < numberOfPages - 5 ? currentPage - 4 : numberOfPages - 10) : 2}">
+  				<li class="page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
+  					<a class="page-link" th:href="@{${link}(page = ${currentPage - 1})}">Previous</a>
+  				</li>
+  				<li class="page-item" th:classappend="${currentPage == 1 ? 'active' : ''}">
+  					<a class="page-link" th:text="${1}" th:href="@{${link}(page = ${1})}"></a>
+  				</li>
+  				<li class="page-item" th:if="${numberOfPages > 2}" th:each="number : ${#numbers.sequence(numberOfPages > 11 ? start : 2, numberOfPages > 11 ? start + 9 : numberOfPages - 1)}" th:classappend="${currentPage == number ? 'active' : ''}">
+  					<a class="page-link" th:text="${number}" th:href="@{${link}(page = ${number})}"></a>
+  				</li>
+  				<li class="page-item" th:classappend="${currentPage == numberOfPages ? 'active' : ''}">
+  					<a class="page-link" th:text="${numberOfPages}" th:href="@{${link}(page = ${numberOfPages})}"></a>
+  				</li>
+  				<li class="page-item" th:classappend="${currentPage == numberOfPages ? 'disabled' : ''}">
+  					<a class="page-link" th:href="@{${link}(page = ${currentPage + 1})}">Next</a>
+  				</li>
+			</ul>
+		</section>
+	</div>
+</body>
+</html>

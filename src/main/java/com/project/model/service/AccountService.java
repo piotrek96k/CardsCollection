@@ -10,8 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.project.model.api.Cards;
 import com.project.model.entity.Account;
+import com.project.model.entity.AccountId;
+import com.project.model.entity.Cards;
 import com.project.model.entity.Role;
 import com.project.model.entity.RoleEnum;
 import com.project.model.repository.AccountRepository;
@@ -28,9 +29,6 @@ public class AccountService {
 
 	@Autowired
 	private PasswordChecker passwordChecker;
-
-	@Autowired
-	private ApiService apiService;
 
 	public Optional<RegistrationError> addAccount(Account account, String pswRepeat) {
 		if (account.getUsername().length() < 4)
@@ -50,24 +48,30 @@ public class AccountService {
 		roles.add(role);
 		account.setRoles(roles);
 		account.setPassword(new BCryptPasswordEncoder().encode(account.getPassword()));
+		account.setEnabled(true);
+		account.setCoins(1000);
 		accountRepository.save(account);
 		return Optional.empty();
 	}
 
-	public List<Cards.Card> getCards() {
+	public List<Cards> getCards(int page) {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (principal instanceof UserDetails) {
 			UserDetails user = (UserDetails) principal;
-			Account account = accountRepository.findByUsername(user.getUsername());
-			if (account == null)
-				account = accountRepository.findByEmail(user.getUsername());
-			List<String> apiIds = new ArrayList<String>();
-			account.getCards().forEach(card -> apiIds.add(card.getApiId()));
-			if(apiIds.isEmpty())
-				return new ArrayList<Cards.Card>();
-			return apiService.getCardsByIds(apiIds);
+			AccountId accountId = accountRepository.getAccountId(user.getUsername());
+			return accountRepository.getAccountCardsListByPage(accountId.getUsername(), page);
 		}
-		return new ArrayList<Cards.Card>();
+		return new ArrayList<Cards>();
+	}
+	
+	public int getNumberOfPages() {
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (principal instanceof UserDetails) {
+			UserDetails user = (UserDetails) principal;
+			AccountId accountId = accountRepository.getAccountId(user.getUsername());
+			return accountRepository.getNumberOfPages(accountId.getUsername());
+		}
+		return 1;
 	}
 
 }
