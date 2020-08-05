@@ -19,8 +19,8 @@ public class IndexController {
 	@GetMapping("/")
 	public String indexPage(Model model, @RequestParam("page") Optional<Integer> page) {
 		int currentPage = page.orElse(1);
-		model.addAttribute("cards", accountService.getCards(currentPage));
-		model.addAttribute("numberOfPages", accountService.getNumberOfPages());
+		model.addAttribute("cards", accountService.getUserCards(currentPage));
+		model.addAttribute("numberOfPages", accountService.getUserCardsNumberOfPages());
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("/link", "");
 		return "index";

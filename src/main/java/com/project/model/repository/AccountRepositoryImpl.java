@@ -1,6 +1,5 @@
 package com.project.model.repository;
 
-import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +10,7 @@ import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 
 import com.project.model.entity.AccountId;
-import com.project.model.entity.Cards;
+import com.project.model.entity.QuantityCard;
 
 @Service
 public class AccountRepositoryImpl implements AccountQuery {
@@ -27,7 +26,7 @@ public class AccountRepositoryImpl implements AccountQuery {
 	}
 
 	@Override
-	public List<Cards> getAccountCardsListByPage(String username, int page) {
+	public List<QuantityCard> getAccountCardsListByPage(String username, int page) {
 		page -= 1;
 		page *= 100;
 		StringBuilder builder = new StringBuilder();
@@ -36,7 +35,7 @@ public class AccountRepositoryImpl implements AccountQuery {
 		builder.append("from card inner join account_cards on account_cards.card_id=card.id ");
 		builder.append("where username=:username group by card.id ");
 		builder.append("order by card.name, card.id asc limit(100) offset(:page)");
-		return getInstancesList(Cards.class, entityManager.createNativeQuery(builder.toString())
+		return getInstancesList(QuantityCard.class, entityManager.createNativeQuery(builder.toString())
 				.setParameter("username", username).setParameter("page", page).getResultList());
 	}
 
@@ -60,8 +59,7 @@ public class AccountRepositoryImpl implements AccountQuery {
 		for (int i = 0; i < parameters.length; i++)
 			parameterTypes[i] = parameters[i].getClass();
 		try {
-			Constructor<T> constructor = type.getConstructor(parameterTypes);
-			return constructor.newInstance(parameters);
+			return type.getConstructor(parameterTypes).newInstance(parameters);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

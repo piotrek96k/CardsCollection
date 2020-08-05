@@ -14,10 +14,22 @@ public interface AccountRepository extends JpaRepository<Account, AccountId>, Ac
 	public Account findByUsername(String username);
 
 	public Account findByEmail(String email);
-	
+
 	@Transactional
-    @Modifying
+	@Modifying
 	@Query(value = "insert into account_cards(username, email, card_id) values (:username, :email, :card_id)", nativeQuery = true)
-	public void addCard(@Param("username")String username, @Param("email") String email, @Param("card_id") String cardId);
-	
+	public void addCard(@Param("username") String username, @Param("email") String email,
+			@Param("card_id") String cardId);
+
+	@Query(value = "select count(card_id) from account_cards where username=:username and card_id = :card_id", nativeQuery = true)
+	public int countUserCardsByCardId(@Param("username") String username, @Param("card_id") String cardId);
+
+	@Query(value = "select coins from account where username=:username", nativeQuery = true)
+	public int getCoins(@Param("username") String username);
+
+	@Transactional
+	@Modifying
+	@Query(value = "update account set coins=:coins where username=:username", nativeQuery = true)
+	public void updateUserCoins(@Param("username") String username, @Param("coins") int coins);
+
 }

@@ -12,5 +12,8 @@ public interface CardRepository extends JpaRepository<Card, String>, CardQuery{
 	
 	@Query(value = "select * from card order by name, id asc limit(100) offset(((:page)-1)*100)" , nativeQuery = true)
 	public List<Card> getCardsByPageOrderByName(@Param("page")int page);
+	
+	@Query(value = "select cost from card where id=:id", nativeQuery = true)
+	public int getCost(@Param("id") String id);
 		
 }

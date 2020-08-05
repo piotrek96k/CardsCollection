@@ -111,8 +111,8 @@ public class DatabaseInitializer implements InitializingBean {
 		loadData();
 		loadRoles();
 		createAdmin();
-		for(int i =1; i<3; i++)
-			cardRepository.getCardsByPageOrderByName(i).forEach(card->accountRepository.addCard("admin", "cardsCollectorsAdmin@gmail.com", card.getId()));
+//		for(int i =1; i<3; i++)
+//			cardRepository.getCardsByPageOrderByName(i).forEach(card->accountRepository.addCard("admin", "cardsCollectorsAdmin@gmail.com", card.getId()));
 	}
 
 }
