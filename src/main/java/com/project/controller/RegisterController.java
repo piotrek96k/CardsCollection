@@ -2,7 +2,6 @@ package com.project.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,11 +11,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.project.model.entity.Account;
+import com.project.model.entity.PasswordRepeatData;
 import com.project.model.service.AccountService;
-import com.project.model.service.RegistrationError;
 
 @Controller
 public class RegisterController {
@@ -24,49 +22,25 @@ public class RegisterController {
 	@Autowired
 	private AccountService accountService;
 
-	private List<String> errorFields;
-
-	{
-		errorFields = new ArrayList<String>();
-	}
-
 	@GetMapping("/register")
 	public String registerForm(Model model) {
 		model.addAttribute("account", new Account());
-		if (!errorFields.isEmpty()) {
-			model.addAttribute("errorFields", errorFields);
-			errorFields = new ArrayList<String>();
-		}
+		model.addAttribute("pswRepeat", new PasswordRepeatData());
 		return "register";
 	}
 
 	@PostMapping("/register")
-	public String registerUser(@Validated Account account, @RequestParam(name = "pswRepeat") String pswRepeat,
-			Model model) {
-		Optional<RegistrationError> error = accountService.addAccount(account, pswRepeat);
-		if (error.isPresent()) {
-			model.addAttribute(error.get().getError(), true);
-			model.addAttribute("account", new Account());
-			return "register";
-		}
+	public String registerUser(@Validated Account account, @Validated PasswordRepeatData pswData) {
+		accountService.addAccount(account);
 		return "registersucces";
 	}
 
 	@ExceptionHandler(BindException.class)
-	public String handleValidationExceptions(BindException exception, Model model) {
-		exception.getFieldErrors().forEach(error -> errorFields.add(changeString(error.getField())));
-		return "redirect:/register";
-	}
-
-	private String changeString(String string) {
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < string.length(); i++) {
-			if (Character.isUpperCase(string.charAt(i)))
-				builder.append(" ");
-			builder.append(string.charAt(i));
-		}
-		builder.setCharAt(0, Character.toUpperCase(builder.charAt(0)));
-		return builder.toString();
+	public String handleValidationExceptions(Model model, BindException exception) {
+		List<String> errors = new ArrayList<String>();
+		exception.getAllErrors().forEach(error->errors.add(error.getDefaultMessage()));
+		model.addAttribute("errors",errors);
+		return registerForm(model);
 	}
 
 }

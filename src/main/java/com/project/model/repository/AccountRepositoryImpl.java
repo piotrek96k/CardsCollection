@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 import org.springframework.stereotype.Service;
 
@@ -41,9 +42,11 @@ public class AccountRepositoryImpl implements AccountQuery {
 
 	@Override
 	public AccountId getAccountId(String name) {
-		String query = "select username, email from account where username=:name or email=:name";
-		Object object = entityManager.createNativeQuery(query).setParameter("name", name).getSingleResult();
-		return getInstance(AccountId.class, (Object[]) object);
+		String stringQuery = "select username, email from account where username=:name or email=:name";
+		Query query = entityManager.createNativeQuery(stringQuery).setParameter("name", name);
+		if(query.getResultList().size()==0)
+			return null;
+		return getInstance(AccountId.class, (Object[]) query.getSingleResult());
 	}
 
 	private <T> List<T> getInstancesList(Class<T> type, List<?> rawList) {

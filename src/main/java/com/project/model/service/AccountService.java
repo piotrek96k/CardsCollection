@@ -2,7 +2,6 @@ package com.project.model.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -34,22 +33,7 @@ public class AccountService {
 	@Autowired
 	private CardRepository cardRepository;
 
-	@Autowired
-	private PasswordChecker passwordChecker;
-
-	public Optional<RegistrationError> addAccount(Account account, String pswRepeat) {
-		if (account.getUsername().length() < 4)
-			return Optional.of(RegistrationError.USERNAME_TOO_SHORT);
-		if (account.getPassword().length() < 8)
-			return Optional.of(RegistrationError.PASSWORD_TOO_SHORT);
-		if (!account.getPassword().equals(pswRepeat))
-			return Optional.of(RegistrationError.DIFFERENT_PASSWORDS);
-		if (!passwordChecker.validatePassword(pswRepeat))
-			return Optional.of(RegistrationError.WRONG_PASSWORD);
-		if (accountRepository.findByUsername(account.getUsername()) != null)
-			return Optional.of(RegistrationError.USERNAME_EXISTS);
-		if (accountRepository.findByEmail(account.getEmail()) != null)
-			return Optional.of(RegistrationError.EMAIL_EXISTS);
+	public void addAccount(Account account) {
 		Role role = roleRepository.getOne(RoleEnum.ROLE_USER.toString());
 		List<Role> roles = new ArrayList<Role>();
 		roles.add(role);
@@ -58,7 +42,6 @@ public class AccountService {
 		account.setEnabled(true);
 		account.setCoins(1000);
 		accountRepository.save(account);
-		return Optional.empty();
 	}
 
 	public List<QuantityCard> getUserCards(int page) {

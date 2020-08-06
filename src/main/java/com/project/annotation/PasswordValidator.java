@@ -1,14 +1,22 @@
-package com.project.model.service;
+package com.project.annotation;
 
-import org.springframework.stereotype.Service;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
-@Service
-public class PasswordChecker {
+public class PasswordValidator implements ConstraintValidator<Password, String> {
 
 	private static final char[] SPECIAL_CHARACTERS = { '+', '-', '=', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')',
-			'{', '}', '[', ']', '|', ':', '\"', ';', '\'', '<', '>', '?', ',', '.', '/', '\\', '_','~','`' };
+			'{', '}', '[', ']', '|', ':', '\"', ';', '\'', '<', '>', '?', ',', '.', '/', '\\', '_', '~', '`' };
 
-	public boolean validatePassword(String password) {
+	private boolean isSpecialCharacter(char character) {
+		for (char special : SPECIAL_CHARACTERS)
+			if (special == character)
+				return true;
+		return false;
+	}
+
+	@Override
+	public boolean isValid(String password, ConstraintValidatorContext context) {
 		int[] counter = new int[] { 0, 0, 0, 0 };
 		for (int i = 0; i < password.length(); i++) {
 			char character = password.charAt(i);
@@ -27,13 +35,6 @@ public class PasswordChecker {
 			if (i == 0)
 				return false;
 		return true;
-	}
-
-	private boolean isSpecialCharacter(char character) {
-		for (char special : SPECIAL_CHARACTERS)
-			if (special == character)
-				return true;
-		return false;
 	}
 
 }

@@ -11,28 +11,37 @@ import javax.persistence.ManyToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import com.project.annotation.Password;
+import com.project.annotation.Unique;
 
 @Entity
 @IdClass(AccountId.class)
 public class Account {
 
 	@Id
-	@NotBlank
+	@NotBlank(message = "Username can't be blank")
+	@Size(min = 4, message = "Username too short")
+	@Unique(message = "Username in use")
 	public String username;
 
 	@Id
-	@Email
+	@Email(message = "Entered e-mail must be correct")
+	@Unique(message = "E-mail in use")
 	public String email;
 
-	@NotBlank
+	@NotBlank(message = "First name can't be blank")
 	public String firstName;
 
-	@NotBlank
+	@NotBlank(message = "Lastname can't be blank")
 	public String lastName;
 
-	@NotBlank
+	@Password
+	@NotBlank(message = "Password can't be blank")
+	@Size(min = 8, message = "Password too short")
 	public String password;
-	
+
 	@NotNull
 	public int coins;
 

@@ -13,26 +13,8 @@
 			<h1>Register</h1>
 			<p>Please fill in this form to create an account</p>
 			<hr class="bg-dark">
-			<div th:if="${usernameTooShort==true}">
-				<p>Username too short</p>
-			</div>
-			<div th:if="${passwordTooShort==true}">
-				<p>Password too short</p>
-			</div>
-			<div th:if="${usernameExists==true}">
-				<p>Username in use</p>
-			</div>
-			<div th:if="${emailExists==true}">
-				<p>E-mail in use</p>
-			</div>
-			<div th:if="${differentPasswords==true}">
-				<p>Enetered passwords are different</p>
-			</div>
-			<div th:if="${wrongPassword==true}">
-				<p>Password does not match the pattern</p>
-			</div>
-			<div th:each="field : ${errorFields}">
-				<p><span>Incorrect value in column </span><span th:text="${field}"></span></p>
+			<div th:each="error : ${errors}">
+				<p th:text="${error}"></p>
 			</div>
 			<form th:action="@{/register}" th:object="${account}" method="post" class="was-validated">
 				<div class="row">
@@ -40,7 +22,6 @@
 						<div class="form-group">
 							<label for="username">
 								<b>Username</b><span class="info"> must contain at least 4 characters</span>
-								
 							</label>
 							<input type="text" class="form-control" th:field="*{username}" id="username" placeholder="Enter Username" name="username" required> 
 						</div>
@@ -67,7 +48,7 @@
 						</div>
 						<div class="form-group">
 							<label for="repeat-psw"><b>Repeat Password</b></label> 
-							<input type="password" class="form-control" th:name="pswRepeat" placeholder="Repeat Password" name="repeat-psw" required>
+							<input type="password" class="form-control" th:field="${pswRepeat.passwordRepeat}" placeholder="Repeat Password" name="repeat-psw" required>
 						</div>
 					</div>
 				</div>
