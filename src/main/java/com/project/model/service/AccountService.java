@@ -45,8 +45,11 @@ public class AccountService {
 	}
 
 	public List<QuantityCard> getUserCards(int page) {
-		Function<AccountId, List<QuantityCard>> function = accountId -> accountRepository
-				.getAccountCardsListByPage(accountId.getUsername(), page);
+		Function<AccountId, List<QuantityCard>> function = accountId -> {
+			List<QuantityCard> cards = accountRepository.getAccountCardsListByPage(accountId.getUsername(), page);
+			cards.forEach(card -> card.setCost(card.getCost() / 2));
+			return cards;
+		};
 		return operateOnAccount(function, () -> new ArrayList<QuantityCard>());
 	}
 
@@ -79,6 +82,12 @@ public class AccountService {
 		return operateOnAccount(function, () -> new QuantityCard(cardRepository.getOne(id)));
 	}
 
+	public QuantityCard getQuantityCardToSell(String id) {
+		QuantityCard card = getQuantityCard(id);
+		card.setCost(card.getCost() / 2);
+		return card;
+	}
+
 	public boolean addCard(String id) {
 		Function<AccountId, Boolean> function = accountId -> {
 			int cost = cardRepository.getCost(id);
@@ -95,14 +104,11 @@ public class AccountService {
 
 	public boolean removeCard(String id) {
 		Function<AccountId, Boolean> function = accountId -> {
-			int cost = cardRepository.getCost(id);
+			int cost = cardRepository.getCost(id) / 2;
 			int coins = accountRepository.getCoins(accountId.getUsername());
-			if (coins >= cost) {
-				accountRepository.removeCard(accountId.getUsername(), accountId.getEmail(), id);
-				accountRepository.updateUserCoins(accountId.getUsername(), coins + cost);
-				return true;
-			}
-			return false;
+			accountRepository.removeCard(accountId.getUsername(), accountId.getEmail(), id);
+			accountRepository.updateUserCoins(accountId.getUsername(), coins + cost);
+			return true;
 		};
 		return operateOnAccount(function, () -> false);
 	}
