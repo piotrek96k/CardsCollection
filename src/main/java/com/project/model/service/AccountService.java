@@ -110,6 +110,20 @@ public class AccountService {
 		return operateOnAccount(function, () -> false);
 	}
 
+	public boolean removeCard(String id) {
+		Function<AccountId, Boolean> function = accountId -> {
+			int cost = cardRepository.getCost(id);
+			int coins = accountRepository.getCoins(accountId.getUsername());
+			if (coins >= cost) {
+				accountRepository.removeCard(accountId.getUsername(), accountId.getEmail(), id);
+				accountRepository.updateUserCoins(accountId.getUsername(), coins + cost);
+				return true;
+			}
+			return false;
+		};
+		return operateOnAccount(function, () -> false);
+	}
+
 	private <T> T operateOnAccount(Function<AccountId, T> function, Supplier<T> supplier) {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (principal instanceof UserDetails) {
