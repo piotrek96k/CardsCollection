@@ -21,9 +21,24 @@ public class IndexController {
 		int currentPage = page.orElse(1);
 		model.addAttribute("cards", accountService.getUserCards(currentPage));
 		model.addAttribute("numberOfPages", accountService.getUserCardsNumberOfPages());
+		model.addAttribute("coins", accountService.getCoins());
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("/link", "");
 		return "index";
+	}
+
+	@GetMapping("/sell")
+	public String sellPage(Model model, @RequestParam("id") String id, @RequestParam("page") int page) {
+		model.addAttribute("card",accountService.getQuantityCard(id));
+		model.addAttribute("coins", accountService.getCoins());
+		model.addAttribute("page", page);
+		return "sell";
+	}
+
+	@GetMapping("/sell/sold")
+	public String boughtPage(@RequestParam("id") String id, @RequestParam("page") int page) {
+		accountService.removeCard(id);
+		return "redirect:/?page="+page;
 	}
 	
 }

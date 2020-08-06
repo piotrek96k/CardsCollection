@@ -21,6 +21,14 @@ public interface AccountRepository extends JpaRepository<Account, AccountId>, Ac
 	public void addCard(@Param("username") String username, @Param("email") String email,
 			@Param("card_id") String cardId);
 
+	@Transactional
+	@Modifying
+	@Query(value = "delete from account_cards where ctid IN (SELECT ctid FROM account_cards where username=:username and email=:email and card_id=:card_id\n" +
+			"LIMIT 1\n" +
+			")", nativeQuery = true)
+	public void removeCard(@Param("username") String username, @Param("email") String email,
+						@Param("card_id") String cardId);
+
 	@Query(value = "select count(card_id) from account_cards where username=:username and card_id = :card_id", nativeQuery = true)
 	public int countUserCardsByCardId(@Param("username") String username, @Param("card_id") String cardId);
 
