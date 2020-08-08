@@ -31,6 +31,18 @@ public class Card {
 
 	@ManyToMany(mappedBy = "cards")
 	protected List<Account> accounts;
+	
+	public Card() {
+	}
+
+	public Card(@NotNull String id, @NotBlank String name, @NotBlank String imageUrl, @NotNull int cost,
+			@NotNull Rarity rarity) {
+		this.id = id;
+		this.name = name;
+		this.imageUrl = imageUrl;
+		this.cost = cost;
+		this.rarity = rarity;
+	}
 
 	public String getId() {
 		return id;

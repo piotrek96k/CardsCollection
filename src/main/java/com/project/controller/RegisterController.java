@@ -22,14 +22,14 @@ public class RegisterController {
 	@Autowired
 	private AccountService accountService;
 
-	@GetMapping("/register")
+	@GetMapping(value = "/register")
 	public String registerForm(Model model) {
 		model.addAttribute("account", new Account());
 		model.addAttribute("pswRepeat", new PasswordRepeatData());
 		return "register";
 	}
 
-	@PostMapping("/register")
+	@PostMapping(value = "/register")
 	public String registerUser(@Validated Account account, @Validated PasswordRepeatData pswData) {
 		accountService.addAccount(account);
 		return "registersucces";

@@ -1,19 +1,72 @@
 @charset "UTF-8";
 
+body {
+	color: white;
+	background-color: #D7CEC7;
+}
+h1 {
+	font-size: 150px;
+	font-family: Comic Sans MS, cursive, sans-serif;
+	margin-top: 30px;
+	margin-bottom: 30px;
+	margin-left: 30px;
+}
+.card {
+	background-color: #565656;
+	font-size: 14px;
+}
+.navigation {
+	background-color: #565656;
+}
 .info {
 	font-size: 12px;
 }
 .redirect {
 	color: white;
 }
-.redirect:hover{
+.redirect:hover {
 	color: rgba(150,150,150);
 }
 .page-link, .page-link:hover {
-	color: rgb(41, 43, 44);
+	color: #565656;
 }
 .page-item.active .page-link {
 	color: white;
-	background-color: rgb(41, 43, 44);
-	border-color: rgb(41, 43, 44);
+	background-color: #565656;
+	border-color: #565656;
+}
+.col {
+    display: table-cell;
+}
+.col-container {
+    display: table;
+    width: 100%;
+}
+.vertical-menu-top {
+	background-color: #76323F;
+	color: white;
+	display: inline-block;
+	padding: 8px;
+}
+.vertical-menu {
+	background-color: #C09F80;
+	width: 230px;
+}
+.vertical-menu a {
+	border: none;
+	color: #565656;
+	display: inline-block;
+	padding: 8px;
+	text-decoration: none;
+	text-align: left;
+}
+
+.vertical-menu a:hover {
+	background-color: #565656;
+	color: white;
+}
+
+.vertical-menu a.active {
+	background-color: #76323F;
+	color: white;
 }

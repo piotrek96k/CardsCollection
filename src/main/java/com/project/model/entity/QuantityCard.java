@@ -6,12 +6,12 @@ public class QuantityCard extends Card {
 
 	protected int quantity;
 
-	public QuantityCard(String id, String name, Integer cost, String imageUrl, String rarity, BigInteger quantity) {
-		this.id = id;
-		this.name = name;
-		this.cost = cost;
-		this.imageUrl = imageUrl;
-		this.rarity = new Rarity(rarity);
+	public QuantityCard(String id, String name, String imageUrl, Integer cost, String rarity) {
+		super(id, name, imageUrl, cost.intValue(), new Rarity(rarity));
+	}
+
+	public QuantityCard(String id, String name, String imageUrl, Integer cost, String rarity, BigInteger quantity) {
+		this(id, name, imageUrl, cost, rarity);
 		this.quantity = quantity.intValue();
 	}
 

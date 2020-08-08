@@ -8,29 +8,82 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
-<body class="bg-dark text-white">
+<body>
 	<div th:replace="menu :: menu"></div>
-	<div class = "container">
-		<section style="margin-top:80px;">
-			<th:block th:with="counter=${4}">
-    			<div th:each="row : ${#numbers.sequence(0, cards.size(), counter)}"  class="row">
-       				<div th:each="column : ${#numbers.sequence(0, counter - 1)}" class="col-sm">
-       					<div class="card bg-secondary mx-auto my-3 d-block" style="width:240px;" th:if="${row + column < cards.size()}" th:with="card=${cards.get(row + column)}">
-       						<img  class="card-img-top" th:alt="${card.getName()}" th:src="${card.getImageUrl()}"> 
-  							<div class="card-body">	
-  								<span class="float-left" th:text="${card.getName()}"></span>
-  								<span class="float-right" th:text="${' x' + card.getQuantity()}"></span>
-  								<br>
-  							</div>
-  							<div class="card-footer">
-  								<a class="btn btn-primary btn-block card-link" th:href="@{/gallery/buy(id=${card.getId()}, page=${currentPage})}" th:text="${'Buy ' + card.getCost()}" th:classappend="${coins < card.getCost() ? 'disabled' : ''}"></a>
+	<div class = "container-fluid">
+		<div class="row" style="margin-top:56px;">
+			<div class="col-pixel-width px-0 vertical-menu">
+				<div class="btn-block vertical-menu-top">Select Rarities</div>
+				<div th:each="rarity : ${rarities}">
+					<div th:if="${rarity.value}" th:with="start=${#strings.startsWith(selectedRarities, rarity.key)}, end=${#strings.endsWith(selectedRarities, rarity.key)}">
+						<div th:if="${start or end}">
+							<div th:if="${start}">
+								<a class="btn-block" th:href="@{/gallery(rarity=${#strings.substringAfter(selectedRarities, rarity.key + ',')})}" th:text="${rarity.key}" th:classappend="${rarity.value == true ? 'active' : ''}"></a>
+							</div>
+							<div th:if="${end and !start}">
+								<a class="btn-block" th:href="@{/gallery(rarity=${#strings.substringBefore(selectedRarities, ',' + rarity.key)})}" th:text="${rarity.key}" th:classappend="${rarity.value == true ? 'active' : ''}"></a>
 							</div>
 						</div>
-       				</div>
-   				 </div>
-			</th:block>
-		</section>
-		<div th:replace="pagination :: pagination"></div>
+						<div th:unless="${start or end}">
+							<a class="btn-block" th:href="@{/gallery(rarity=${#strings.replace(selectedRarities, rarity.key + ',', '')})}" th:text="${rarity.key}" th:classappend="${rarity.value == true ? 'active' : ''}"></a>
+						</div>
+					</div>
+					<div th:unless="${rarity.value}">
+						<a class="btn-block" th:href="@{/gallery(rarity=${selectedRarities + (selectedRarities == '' ? '' : ',') + rarity.key})}" th:text="${rarity.key}"></a>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="row">
+					<h1>Gallery</h1>
+				</div>
+				<div class = "container-fluid">
+					<th:block th:with="counter=${100}">
+    					<div th:each="row : ${#numbers.sequence(0, cards.size(), counter)}"  class="row justify-content-left px-3">
+       						<div th:each="column : ${#numbers.sequence(0, counter - 1)}">
+       							<div class="card mx-2 my-3 d-block" style="width:240px;" th:if="${row + column < cards.size()}" th:with="card=${cards.get(row + column)}">
+       								<img  class="card-img-top" th:alt="${card.getName()}" th:src="${card.getImageUrl()}"> 
+  									<div class="card-body">	
+  										<span class="float-left" th:text="${card.getName()}"></span>
+  										<span class="float-right" th:text="${' x' + card.getQuantity()}"></span>
+  										<br>
+  										<span class="float-left" th:text="${'Rarity '}"></span>
+  										<span class="float-right" th:text="${card.getRarity().getId()}"></span>
+  										<br>
+  									</div>
+  									<div class="card-footer">
+  										<a class="btn btn-primary btn-block card-link" th:href="@{/gallery/buy(id=${card.getId()}, page=${currentPage})}" th:text="${'Buy ' + card.getCost()}" th:classappend="${coins < card.getCost() ? 'disabled' : ''}"></a>
+									</div>
+								</div>
+       						</div>
+   						 </div>
+					</th:block>
+				</div>
+				<div class="row justify-content-center" style="margin-top:50px; margin-bottom:50px;" th:if="${numberOfPages > 1}">
+					<div class="col-auto">
+						<table class="table table-responsive">
+							<tr class="pagination pagination-lg" th:with="start=${currentPage > 5 ? (currentPage < numberOfPages - 5 ? currentPage - 4 : numberOfPages - 10) : 2}">
+  								<td class="px-0 page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
+  									<a class="page-link" th:href="@{${link}(page = ${currentPage - 1}, rarity = ${selectedRarities})}">Previous</a>
+  								</td>
+  								<td class="px-0 page-item" th:classappend="${currentPage == 1 ? 'active' : ''}">
+  									<a class="page-link" th:text="${1}" th:href="@{${link}(page = ${1}, rarity = ${selectedRarities})}"></a>
+  								</td>
+  								<td class="px-0 page-item" th:if="${numberOfPages > 2}" th:each="number : ${#numbers.sequence(numberOfPages > 11 ? start : 2, numberOfPages > 11 ? start + 9 : numberOfPages - 1)}" th:classappend="${currentPage == number ? 'active' : ''}">
+  									<a class="page-link" th:text="${number}" th:href="@{${link}(page = ${number}, rarity = ${selectedRarities})}"></a>
+  								</td>
+  								<td class="px-0 page-item" th:classappend="${currentPage == numberOfPages ? 'active' : ''}">
+  									<a class="page-link" th:text="${numberOfPages}" th:href="@{${link}(page = ${numberOfPages}, rarity = ${selectedRarities})}"></a>			
+  								</td>
+  								<td class="px-0 page-item" th:classappend="${currentPage == numberOfPages ? 'disabled' : ''}">
+  									<a class="page-link" th:href="@{${link}(page = ${currentPage + 1}, rarity = ${selectedRarities})}">Next</a>
+  								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </body>
 </html>

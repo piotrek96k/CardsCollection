@@ -16,7 +16,7 @@ public class IndexController {
 	@Autowired
 	private AccountService accountService;
 	
-	@GetMapping("/")
+	@GetMapping(value = "/")
 	public String indexPage(Model model, @RequestParam("page") Optional<Integer> page) {
 		int currentPage = page.orElse(1);
 		model.addAttribute("cards", accountService.getUserCards(currentPage));
@@ -27,7 +27,7 @@ public class IndexController {
 		return "index";
 	}
 
-	@GetMapping("/sell")
+	@GetMapping(value = "/sell")
 	public String sellPage(Model model, @RequestParam("id") String id, @RequestParam("page") int page) {
 		model.addAttribute("card",accountService.getQuantityCardToSell(id));
 		model.addAttribute("coins", accountService.getCoins());
@@ -35,7 +35,7 @@ public class IndexController {
 		return "sell";
 	}
 
-	@GetMapping("/sell/sold")
+	@GetMapping(value = "/sell/sold")
 	public String boughtPage(@RequestParam("id") String id, @RequestParam("page") int page) {
 		accountService.removeCard(id);
 		return "redirect:/?page="+page;

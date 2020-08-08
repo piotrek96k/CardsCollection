@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import com.project.model.entity.Account;
 import com.project.model.entity.AccountId;
-import com.project.model.entity.Card;
 import com.project.model.entity.QuantityCard;
 import com.project.model.entity.Role;
 import com.project.model.entity.RoleEnum;
@@ -58,13 +57,20 @@ public class AccountService {
 	}
 
 	public List<QuantityCard> getGalleryCards(int page) {
+		return getGalleryCards(() -> cardRepository.getQuantityCardsByPageOrderByName(page));
+	}
+
+	public List<QuantityCard> getGalleryCardsWithSelectedRarities(int page, List<String> rarities) {
+		return getGalleryCards(
+				() -> cardRepository.getQuantityCardsByPageOrderByNameWithSelectedRarities(page, rarities));
+	}
+
+	private List<QuantityCard> getGalleryCards(Supplier<List<QuantityCard>> supplier) {
 		Function<AccountId, List<QuantityCard>> function = accountId -> {
-			List<QuantityCard> quantityCards = new ArrayList<QuantityCard>();
-			List<Card> cards = cardRepository.getCardsByPageOrderByName(page);
-			for (Card card : cards)
-				quantityCards.add(new QuantityCard(card,
-						accountRepository.countUserCardsByCardId(accountId.getUsername(), card.getId())));
-			return quantityCards;
+			List<QuantityCard> cards = supplier.get();
+			for (QuantityCard card : cards)
+				card.setQuantity(accountRepository.countUserCardsByCardId(accountId.getUsername(), card.getId()));
+			return cards;
 		};
 		return operateOnAccount(function, () -> new ArrayList<QuantityCard>());
 	}
@@ -106,7 +112,7 @@ public class AccountService {
 		Function<AccountId, Boolean> function = accountId -> {
 			int cost = cardRepository.getCost(id) / 2;
 			int coins = accountRepository.getCoins(accountId.getUsername());
-			accountRepository.removeCard(accountId.getUsername(), accountId.getEmail(), id);
+			accountRepository.removeCard(accountId.getUsername(), id);
 			accountRepository.updateUserCoins(accountId.getUsername(), coins + cost);
 			return true;
 		};
