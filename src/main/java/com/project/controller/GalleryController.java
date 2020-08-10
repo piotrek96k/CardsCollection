@@ -8,18 +8,24 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.project.model.component.SessionData;
 import com.project.model.entity.QuantityCard;
 import com.project.model.entity.Rarity;
 import com.project.model.repository.CardRepository;
 import com.project.model.repository.RarityRepository;
 import com.project.model.service.AccountService;
+import com.project.model.service.SortType;
 
 @Controller
+@Scope(value = "session")
 public class GalleryController {
 
 	@Autowired
@@ -31,19 +37,104 @@ public class GalleryController {
 	@Autowired
 	private AccountService accountService;
 
+	@Autowired
+	private SessionData sessionData;
+
+	public static class StringWrapper {
+
+		public String string;
+
+		public String getString() {
+			return string;
+		}
+
+		public void setString(String string) {
+			this.string = string;
+		}
+
+	}
+
+	public static class SearchWrapper {
+
+		public String search;
+
+		public String getSearch() {
+			return search;
+		}
+
+		public void setSearch(String search) {
+			this.search = search;
+		}
+
+	}
+
 	@GetMapping("/gallery")
 	public String galleryPage(Model model, @RequestParam(value = "page") Optional<Integer> page,
-			@RequestParam(value = "rarity") Optional<String> rarities) {
+			@RequestParam(value = "rarity") Optional<String> rarities,
+			@RequestParam(value = "search") Optional<String> search) {
 		int currentPage = page.orElse(1);
 		List<String> selectedRarities = getSelectedRaritiesAsList(rarities);
-		model.addAttribute("cards", getCards(currentPage, selectedRarities));
+		model.addAttribute("cards", getCards(currentPage, selectedRarities, search));
 		model.addAttribute("coins", accountService.getCoins());
-		model.addAttribute("numberOfPages", getNumberOfPages(selectedRarities));
+		model.addAttribute("numberOfPages", getNumberOfPages(selectedRarities, search));
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("link", "/gallery");
 		model.addAttribute("rarities", getSelectedRarities(rarities));
 		model.addAttribute("selectedRarities", rarities.orElse(""));
+		model.addAttribute("sortOptions", SortType.values());
+		model.addAttribute("sessionData", sessionData);
+		model.addAttribute("selectedSortOption", new StringWrapper());
+		model.addAttribute("selectedOrderOption", new StringWrapper());
+		model.addAttribute("searchInput", new SearchWrapper());
+		model.addAttribute("enteredSearch", search.orElse(""));
 		return "gallery";
+	}
+
+	@PostMapping("/gallery")
+	public String sortSelection(@RequestParam(value = "page") Optional<Integer> page,
+			@RequestParam(value = "rarity") Optional<String> rarities, @ModelAttribute StringWrapper selectedOption,
+			@ModelAttribute SearchWrapper search) {
+		if (selectedOption.getString() != null) {
+			SortType.OrderType orderType = sessionData.getSortType().getOrderType(selectedOption.getString());
+			if (orderType == null)
+				sessionData.setSortType(SortType.valueOf(selectedOption.getString()));
+			else
+				sessionData.setOrderType(orderType);
+		}
+		Optional<String> searchResult = search.getSearch() == null || search.getSearch().isEmpty()
+				|| search.getSearch().isBlank() ? Optional.empty() : Optional.of(search.getSearch());
+		return getGalleryRedirectString(page, rarities, searchResult);
+	}
+
+	private String getGalleryRedirectString(Optional<Integer> page, Optional<String> rarities,
+			Optional<String> search) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("redirect:/gallery");
+		boolean added = false;
+		if (page.isPresent()) {
+			builder.append("?page=");
+			builder.append(page.get());
+			added = true;
+		}
+		if (rarities.isPresent()) {
+			appendSign(builder, added);
+			builder.append("rarity=");
+			builder.append(rarities.get());
+			added = true;
+		}
+		if (search.isPresent()) {
+			appendSign(builder, added);
+			builder.append("search=");
+			builder.append(search.get());
+		}
+		return builder.toString();
+	}
+	
+	private void appendSign(StringBuilder builder, boolean added) {
+		if (added)
+			builder.append('&');
+		else
+			builder.append('?');
 	}
 
 	private List<String> getSelectedRaritiesAsList(Optional<String> rarities) {
@@ -52,16 +143,29 @@ public class GalleryController {
 		return Arrays.asList(rarities.get().split(","));
 	}
 
-	private List<QuantityCard> getCards(int page, List<String> rarities) {
-		if (rarities.isEmpty())
-			return accountService.getGalleryCards(page);
-		return accountService.getGalleryCardsWithSelectedRarities(page, rarities);
+	private List<QuantityCard> getCards(int page, List<String> rarities, Optional<String> search) {
+		SortType sortType = sessionData.getSortType();
+		SortType.OrderType orderType = sessionData.getOrderType();
+		if (rarities.isEmpty()) {
+			if (search.isEmpty())
+				return accountService.getGalleryCards(page, sortType, orderType);
+			return accountService.getGalleryCardsWithSearch(page, sortType, orderType, search.get());
+		}
+		if (search.isEmpty())
+			return accountService.getGalleryCardsWithSelectedRarities(page, sortType, orderType, rarities);
+		return accountService.getGalleryCardsWithSelectedRaritiesWithSearch(page, sortType, orderType, rarities,
+				search.get());
 	}
 
-	private int getNumberOfPages(List<String> rarities) {
-		if (rarities.isEmpty())
-			return cardRepository.getNumberOfPages();
-		return cardRepository.getNumberOfPagesWithSelectedRarities(rarities);
+	private int getNumberOfPages(List<String> rarities, Optional<String> search) {
+		if (rarities.isEmpty()) {
+			if (search.isEmpty())
+				return cardRepository.getNumberOfPages();
+			return cardRepository.getNumberOfPagesWithSearch(search.get());
+		}
+		if (search.isEmpty())
+			return cardRepository.getNumberOfPagesWithSelectedRarities(rarities);
+		return cardRepository.getNumberOfPagesWithSelectedRaritiesWithSearch(rarities, search.get());
 	}
 
 	private Map<String, Boolean> getSelectedRarities(Optional<String> rarityString) {
@@ -76,19 +180,28 @@ public class GalleryController {
 			result.put(rarity.getId(), selectedRarities.contains(rarity.getId()));
 		return result;
 	}
-
+	
 	@GetMapping(value = "/gallery/buy")
-	public String buyPage(Model model, @RequestParam("id") String id, @RequestParam("page") int page) {
-		model.addAttribute("card", accountService.getQuantityCard(id));
-		model.addAttribute("coins", accountService.getCoins());
-		model.addAttribute("page", page);
-		return "buy";
+	public String buyCard(@RequestParam(value = "page") Optional<Integer> page,
+			@RequestParam(value = "rarity") Optional<String> rarities,
+			@RequestParam(value = "search") Optional<String> search,
+			@RequestParam(value="id") String id) {
+		accountService.addCard(id);
+		return getGalleryRedirectString(page, rarities, search);
 	}
 
-	@GetMapping(value = "/gallery/bought")
-	public String boughtPage(@RequestParam("id") String id, @RequestParam("page") int page) {
-		accountService.addCard(id);
-		return "redirect:/gallery?page=" + page;
-	}
+//	@GetMapping(value = "/gallery/buy")
+//	public String buyPage(Model model, @RequestParam("id") String id, @RequestParam("page") int page) {
+//		model.addAttribute("card", accountService.getQuantityCard(id));
+//		model.addAttribute("coins", accountService.getCoins());
+//		model.addAttribute("page", page);
+//		return "buy";
+//	}
+
+//	@GetMapping(value = "/gallery/bought")
+//	public String boughtPage(@RequestParam("id") String id, @RequestParam("page") int page) {
+//		accountService.addCard(id);
+//		return "redirect:/gallery?page=" + page;
+//	}
 
 }

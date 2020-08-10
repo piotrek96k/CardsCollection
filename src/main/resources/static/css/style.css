@@ -9,7 +9,9 @@ h1 {
 	font-family: Comic Sans MS, cursive, sans-serif;
 	margin-top: 30px;
 	margin-bottom: 30px;
-	margin-left: 30px;
+}
+hr {
+	background-color:white;
 }
 .card {
 	background-color: #565656;
@@ -43,10 +45,11 @@ h1 {
     width: 100%;
 }
 .vertical-menu-top {
-	background-color: #76323F;
+	background-color: #612833;
 	color: white;
 	display: inline-block;
 	padding: 8px;
+	font-size: 20px;
 }
 .vertical-menu {
 	background-color: #C09F80;
@@ -60,13 +63,112 @@ h1 {
 	text-decoration: none;
 	text-align: left;
 }
-
-.vertical-menu a:hover {
+.vertical-menu-selected a{
+	border: none;
+	background-color: #76323F;
+	color: white;
+}
+.vertical-menu a:hover, .vertical-menu-selected a:hover {
 	background-color: #565656;
 	color: white;
 }
-
-.vertical-menu a.active {
-	background-color: #76323F;
+.topnav {
+	overflow: hidden;
+	background-color: #969390;
+}
+.topnav button, .topnav a {
+	float: left;
+	display: block;
 	color: white;
+	background-color: #969390;
+	text-align: center;
+	padding: 11px 16px;
+	text-decoration: none;
+	font-size: 16px;
+	border: none;
+}
+.topnav button:hover, .topnav a:hover {
+	background-color: #565656;
+	color: white;
+}
+.topnav select {
+	display: block;
+	float: left;
+	width: 120px;
+	border: none;
+	font-size: 16px;
+	margin: 4px 10px;
+}
+.topnav option {
+	color: white;
+	background-color: #969390;
+}
+.topnav button.active {
+	background-color: #565656;
+	color: white;
+}
+.topnav a.active {
+	background-color: #454545;
+	color: white;
+}
+.topnav .search-container {
+	float: right;
+	margin-right: 0px;
+}
+.topnav input[type=text] {
+	padding: 6px;
+	margin-top: 4px;
+	font-size: 16px;
+	border: none;
+}
+.topnav .search-container button {
+	float: right;
+	padding: 6px 10px;
+	margin-top: 4px;
+	margin-right: 5px;
+	background: #EEEEEE;
+	cursor: pointer;
+}
+.topnav .search-container button:hover {
+	background: #CCCCCC;
+}
+.dropdown {
+	margin-left: 20px;
+	position: absolute;
+	display: inline-block;
+}
+.dropdown button {
+	background-color: white;
+	color: #545454;
+	margin-top:4px;
+	padding: 7px 0px;
+	width:100px;
+}
+.dropdown-content {
+	display: none;
+	position: absolute;
+	background-color: black;
+	margin-top:46px;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	z-index: 1;
+}
+.dropdown-content button {
+	color: #545454;
+	text-decoration: none;
+	white-space: nowrap;
+	text-align: center;
+	margin: 0;
+}
+.dropdown-content a:hover {
+	background-color: #ddd;
+}
+.dropdown:hover .dropdown-content {
+	display: block;
+}
+.dropdown:hover .dropdown-button {
+	background-color: #545454;
+	color:white;
+}
+.dropdown button.active{
+	background-color: #454545;
 }

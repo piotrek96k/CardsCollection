@@ -19,6 +19,7 @@ import com.project.model.entity.RoleEnum;
 import com.project.model.repository.AccountRepository;
 import com.project.model.repository.CardRepository;
 import com.project.model.repository.RoleRepository;
+import com.project.model.service.SortType.OrderType;
 
 @Service
 public class AccountService {
@@ -56,13 +57,26 @@ public class AccountService {
 		return operateOnAccount(accountId -> accountRepository.getNumberOfPages(accountId.getUsername()), () -> 1);
 	}
 
-	public List<QuantityCard> getGalleryCards(int page) {
-		return getGalleryCards(() -> cardRepository.getQuantityCardsByPageOrderByName(page));
+	public List<QuantityCard> getGalleryCards(int page, SortType sortType, OrderType orderType) {
+		return getGalleryCards(() -> cardRepository.getQuantityCardsByPageOrderByValue(page, sortType, orderType));
 	}
 
-	public List<QuantityCard> getGalleryCardsWithSelectedRarities(int page, List<String> rarities) {
+	public List<QuantityCard> getGalleryCardsWithSelectedRarities(int page, SortType sortType, OrderType orderType,
+			List<String> rarities) {
+		return getGalleryCards(() -> cardRepository.getQuantityCardsByPageOrderByValueWithSelectedRarities(page,
+				sortType, orderType, rarities));
+	}
+
+	public List<QuantityCard> getGalleryCardsWithSearch(int page, SortType sortType, OrderType orderType,
+			String search) {
 		return getGalleryCards(
-				() -> cardRepository.getQuantityCardsByPageOrderByNameWithSelectedRarities(page, rarities));
+				() -> cardRepository.getQuantityCardsByPageOrderByValueWithSearch(page, sortType, orderType, search));
+	}
+
+	public List<QuantityCard> getGalleryCardsWithSelectedRaritiesWithSearch(int page, SortType sortType,
+			OrderType orderType, List<String> rarities, String search) {
+		return getGalleryCards(() -> cardRepository.getQuantityCardsByPageOrderByValueWithSelectedRaritiesWithSearch(
+				page, sortType, orderType, rarities, search));
 	}
 
 	private List<QuantityCard> getGalleryCards(Supplier<List<QuantityCard>> supplier) {
