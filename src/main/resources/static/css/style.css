@@ -75,8 +75,12 @@ hr {
 	font-size: 20px;
 }
 .vertical-menu {
+	position: fixed;
+	display:block;
+	overflow-y:scroll;
 	background-color: #C09F80;
 	width: 230px;
+	height: calc(100% - 56px);
 }
 .vertical-menu a {
 	border: none;
@@ -194,4 +198,27 @@ hr {
 }
 .dropdown button.active{
 	background-color: #454545;
+}
+.scroller {
+  scrollbar-color: #76323F #9C7C5F;
+  scrollbar-width: thin;
+}
+::-webkit-scrollbar {
+  width: 12px;
+}
+.vertical-menu::-webkit-scrollbar-track {
+  background: #9C7C5F;
+}
+.vertical-menu::-webkit-scrollbar-thumb {
+  background-color: #76323F;
+  border-radius: 20px;
+  border: 3px solid #9C7C5F;
+}
+::-webkit-scrollbar-track {
+  background: #A6A3A0;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #D7CEC7;
+  border-radius: 20px;
+  border: 3px solid #A6A3A0;
 }

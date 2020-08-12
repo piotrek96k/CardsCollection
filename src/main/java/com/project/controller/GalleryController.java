@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.project.model.component.SessionData;
-import com.project.model.entity.QuantityCard;
 import com.project.model.entity.Rarity;
 import com.project.model.repository.CardRepository;
 import com.project.model.repository.RarityRepository;
@@ -73,8 +72,9 @@ public class GalleryController {
 			@RequestParam(value = "rarity") Optional<String> rarities,
 			@RequestParam(value = "search") Optional<String> search) {
 		int currentPage = page.orElse(1);
-		List<String> selectedRarities = getSelectedRaritiesAsList(rarities);
-		model.addAttribute("cards", getCards(currentPage, selectedRarities, search));
+		List<Rarity> selectedRarities = getSelectedRaritiesAsList(rarities);
+		model.addAttribute("cards", accountService.getGalleryCards(currentPage, sessionData.getSortType(),
+				sessionData.getOrderType(), selectedRarities, search));
 		model.addAttribute("coins", accountService.getCoins());
 		model.addAttribute("numberOfPages", getNumberOfPages(selectedRarities, search));
 		model.addAttribute("currentPage", currentPage);
@@ -106,6 +106,14 @@ public class GalleryController {
 		return getGalleryRedirectString(page, rarities, searchResult);
 	}
 
+	@GetMapping(value = "/gallery/buy")
+	public String buyCard(@RequestParam(value = "page") Optional<Integer> page,
+			@RequestParam(value = "rarity") Optional<String> rarities,
+			@RequestParam(value = "search") Optional<String> search, @RequestParam(value = "id") String id) {
+		accountService.addCard(id);
+		return getGalleryRedirectString(page, rarities, search);
+	}
+	
 	private String getGalleryRedirectString(Optional<Integer> page, Optional<String> rarities,
 			Optional<String> search) {
 		StringBuilder builder = new StringBuilder();
@@ -129,7 +137,7 @@ public class GalleryController {
 		}
 		return builder.toString();
 	}
-	
+
 	private void appendSign(StringBuilder builder, boolean added) {
 		if (added)
 			builder.append('&');
@@ -137,27 +145,16 @@ public class GalleryController {
 			builder.append('?');
 	}
 
-	private List<String> getSelectedRaritiesAsList(Optional<String> rarities) {
+	private List<Rarity> getSelectedRaritiesAsList(Optional<String> rarities) {
 		if (rarities.isEmpty() || rarities.get().isBlank())
-			return new ArrayList<String>();
-		return Arrays.asList(rarities.get().split(","));
+			return new ArrayList<Rarity>();
+		List<Rarity> raritiesList = new ArrayList<Rarity>();
+		for (String rarity : rarities.get().split(","))
+			raritiesList.add(new Rarity(rarity));
+		return raritiesList;
 	}
 
-	private List<QuantityCard> getCards(int page, List<String> rarities, Optional<String> search) {
-		SortType sortType = sessionData.getSortType();
-		SortType.OrderType orderType = sessionData.getOrderType();
-		if (rarities.isEmpty()) {
-			if (search.isEmpty())
-				return accountService.getGalleryCards(page, sortType, orderType);
-			return accountService.getGalleryCardsWithSearch(page, sortType, orderType, search.get());
-		}
-		if (search.isEmpty())
-			return accountService.getGalleryCardsWithSelectedRarities(page, sortType, orderType, rarities);
-		return accountService.getGalleryCardsWithSelectedRaritiesWithSearch(page, sortType, orderType, rarities,
-				search.get());
-	}
-
-	private int getNumberOfPages(List<String> rarities, Optional<String> search) {
+	private int getNumberOfPages(List<Rarity> rarities, Optional<String> search) {
 		if (rarities.isEmpty()) {
 			if (search.isEmpty())
 				return cardRepository.getNumberOfPages();
@@ -180,28 +177,5 @@ public class GalleryController {
 			result.put(rarity.getId(), selectedRarities.contains(rarity.getId()));
 		return result;
 	}
-	
-	@GetMapping(value = "/gallery/buy")
-	public String buyCard(@RequestParam(value = "page") Optional<Integer> page,
-			@RequestParam(value = "rarity") Optional<String> rarities,
-			@RequestParam(value = "search") Optional<String> search,
-			@RequestParam(value="id") String id) {
-		accountService.addCard(id);
-		return getGalleryRedirectString(page, rarities, search);
-	}
-
-//	@GetMapping(value = "/gallery/buy")
-//	public String buyPage(Model model, @RequestParam("id") String id, @RequestParam("page") int page) {
-//		model.addAttribute("card", accountService.getQuantityCard(id));
-//		model.addAttribute("coins", accountService.getCoins());
-//		model.addAttribute("page", page);
-//		return "buy";
-//	}
-
-//	@GetMapping(value = "/gallery/bought")
-//	public String boughtPage(@RequestParam("id") String id, @RequestParam("page") int page) {
-//		accountService.addCard(id);
-//		return "redirect:/gallery?page=" + page;
-//	}
 
 }

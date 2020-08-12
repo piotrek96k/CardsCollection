@@ -29,7 +29,7 @@ public class IndexController {
 
 	@GetMapping(value = "/sell")
 	public String sellPage(Model model, @RequestParam("id") String id, @RequestParam("page") int page) {
-		model.addAttribute("card",accountService.getQuantityCardToSell(id));
+		model.addAttribute("card",accountService.getCardToSell(id));
 		model.addAttribute("coins", accountService.getCoins());
 		model.addAttribute("page", page);
 		return "sell";

@@ -63,5 +63,10 @@ public class AccountId implements Serializable{
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "AccountId [username=" + username + ", email=" + email + "]";
+	}
 	
 }

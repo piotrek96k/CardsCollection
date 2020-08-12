@@ -2,7 +2,7 @@ package com.project.model.service;
 
 public enum SortType {
 
-	NAME("Name", "name"), RARITY("Rarity", "rarity_id"), SET("Set","set_id"), COST("Cost","cost", "Low - High", "High - Low");
+	NAME("Name", "name"), RARITY("Rarity", "rarity"), SET("Set","set"), COST("Cost","cost", "Low - High", "High - Low");
 
 	private String name;
 	
@@ -46,7 +46,44 @@ public enum SortType {
 		public String toString() {
 			return order;
 		}
-		
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getEnclosingInstance().hashCode();
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			OrderType other = (OrderType) obj;
+			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
+				return false;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			if (order == null) {
+				if (other.order != null)
+					return false;
+			} else if (!order.equals(other.order))
+				return false;
+			return true;
+		}
+
+		private SortType getEnclosingInstance() {
+			return SortType.this;
+		}
+				
 	}
 	
 	public OrderType getOrderType(String arg) {

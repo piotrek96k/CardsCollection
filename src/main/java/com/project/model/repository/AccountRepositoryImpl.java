@@ -1,57 +1,70 @@
 package com.project.model.repository;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Service;
 
+import com.project.model.entity.Account;
 import com.project.model.entity.AccountId;
-import com.project.model.entity.QuantityCard;
+import com.project.model.entity.Card;
 
 @Service
-public class AccountRepositoryImpl extends RepositoryImpl implements AccountQuery {
+public class AccountRepositoryImpl implements AccountQuery {
 
 	@PersistenceContext
 	private EntityManager entityManager;
 
 	@Override
 	public int countDistinctCardsByUsername(String username) {
-		String query = "select count(distinct card_id) from account_cards where username=:username";
-		return ((BigInteger) entityManager.createNativeQuery(query).setParameter("username", username)
-				.getSingleResult()).intValue();
+		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
+		Root<Account> account = query.from(Account.class);
+		query.select(criteriaBuilder.countDistinct(account.join("cards")));
+		return entityManager.createQuery(query).getSingleResult().intValue();
 	}
 
 	@Override
-	public List<QuantityCard> getAccountCardsListByPage(String username, int page) {
-		page -= 1;
-		page *= 100;
-		StringBuilder builder = new StringBuilder();
-		builder.append(
-				"select id, name, image_url, cost, rarity_id, count(card.id)");
-		builder.append("from card inner join account_cards on account_cards.card_id=card.id ");
-		builder.append("where username=:username group by card.id ");
-		builder.append("order by card.name, card.id asc limit(100) offset(:page)");
-		return getInstancesList(QuantityCard.class, entityManager.createNativeQuery(builder.toString())
-				.setParameter("username", username).setParameter("page", page).getResultList());
+	public List<Card> getAccountCardsListByPage(String username, int page) {
+		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Card> query = criteriaBuilder.createQuery(Card.class);
+		Root<Account> account = query.from(Account.class);
+		query.where(criteriaBuilder.equal(account.get("username"), username));
+		Join<Account, Card> card = account.join("cards");
+		query.groupBy(card.get("id"));
+		query.multiselect(card, criteriaBuilder.count(card));
+		query.orderBy(criteriaBuilder.asc(card.get("name")), criteriaBuilder.asc(card.get("id")));
+		TypedQuery<Card> typedQuery = entityManager.createQuery(query);
+		typedQuery.setFirstResult((page - 1) * PAGE_SIZE);
+		typedQuery.setMaxResults(PAGE_SIZE);
+		return typedQuery.getResultList();
 	}
 
 	@Override
 	public AccountId getAccountId(String name) {
-		String stringQuery = "select username, email from account where username=:name or email=:name";
-		Query query = entityManager.createNativeQuery(stringQuery).setParameter("name", name);
-		if(query.getResultList().size()==0)
+		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<AccountId> query = criteriaBuilder.createQuery(AccountId.class);
+		Root<Account> account = query.from(Account.class);
+		query.where(criteriaBuilder.or(criteriaBuilder.equal(account.get("username"), name),
+				criteriaBuilder.equal(account.get("email"), name)));
+		query.multiselect(account.get("username"), account.get("email"));
+		List<AccountId> list = entityManager.createQuery(query).getResultList();
+		if (list.isEmpty())
 			return null;
-		return getInstance(AccountId.class, (Object[]) query.getSingleResult());
+		return list.get(0);
 	}
 
 	@Override
 	public int getNumberOfPages(String username) {
 		int cards = countDistinctCardsByUsername(username);
-		return cards / 100 + (cards % 100 == 0 ? 0 : 1);
+		return getNumberOfPagesFromNumberOfCards(cards);
 	}
 
 }

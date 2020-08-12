@@ -2,6 +2,7 @@ package com.project.model.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -13,7 +14,8 @@ import org.springframework.stereotype.Service;
 
 import com.project.model.entity.Account;
 import com.project.model.entity.AccountId;
-import com.project.model.entity.QuantityCard;
+import com.project.model.entity.Card;
+import com.project.model.entity.Rarity;
 import com.project.model.entity.Role;
 import com.project.model.entity.RoleEnum;
 import com.project.model.repository.AccountRepository;
@@ -44,66 +46,59 @@ public class AccountService {
 		accountRepository.save(account);
 	}
 
-	public List<QuantityCard> getUserCards(int page) {
-		Function<AccountId, List<QuantityCard>> function = accountId -> {
-			List<QuantityCard> cards = accountRepository.getAccountCardsListByPage(accountId.getUsername(), page);
+	public List<Card> getUserCards(int page) {
+		Function<AccountId, List<Card>> function = accountId -> {
+			List<Card> cards = accountRepository.getAccountCardsListByPage(accountId.getUsername(), page);
 			cards.forEach(card -> card.setCost(card.getCost() / 2));
 			return cards;
 		};
-		return operateOnAccount(function, () -> new ArrayList<QuantityCard>());
+		return operateOnAccount(function, () -> new ArrayList<Card>());
 	}
 
 	public int getUserCardsNumberOfPages() {
 		return operateOnAccount(accountId -> accountRepository.getNumberOfPages(accountId.getUsername()), () -> 1);
 	}
 
-	public List<QuantityCard> getGalleryCards(int page, SortType sortType, OrderType orderType) {
-		return getGalleryCards(() -> cardRepository.getQuantityCardsByPageOrderByValue(page, sortType, orderType));
+	public List<Card> getGalleryCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities,
+			Optional<String> search) {
+		if (rarities.isEmpty()) {
+			if (search.isEmpty())
+				return getGalleryCards(() -> cardRepository.getCardsByPageOrderByValue(page, sortType, orderType));
+			return getGalleryCards(
+					() -> cardRepository.getCardsByPageOrderByValueWithSearch(page, sortType, orderType, search.get()));
+		}
+		if (search.isEmpty())
+			return getGalleryCards(() -> cardRepository.getCardsByPageOrderByValueWithSelectedRarities(page, sortType,
+					orderType, rarities));
+		return getGalleryCards(() -> cardRepository.getCardsByPageOrderByValueWithSelectedRaritiesWithSearch(page,
+				sortType, orderType, rarities, search.get()));
 	}
 
-	public List<QuantityCard> getGalleryCardsWithSelectedRarities(int page, SortType sortType, OrderType orderType,
-			List<String> rarities) {
-		return getGalleryCards(() -> cardRepository.getQuantityCardsByPageOrderByValueWithSelectedRarities(page,
-				sortType, orderType, rarities));
-	}
-
-	public List<QuantityCard> getGalleryCardsWithSearch(int page, SortType sortType, OrderType orderType,
-			String search) {
-		return getGalleryCards(
-				() -> cardRepository.getQuantityCardsByPageOrderByValueWithSearch(page, sortType, orderType, search));
-	}
-
-	public List<QuantityCard> getGalleryCardsWithSelectedRaritiesWithSearch(int page, SortType sortType,
-			OrderType orderType, List<String> rarities, String search) {
-		return getGalleryCards(() -> cardRepository.getQuantityCardsByPageOrderByValueWithSelectedRaritiesWithSearch(
-				page, sortType, orderType, rarities, search));
-	}
-
-	private List<QuantityCard> getGalleryCards(Supplier<List<QuantityCard>> supplier) {
-		Function<AccountId, List<QuantityCard>> function = accountId -> {
-			List<QuantityCard> cards = supplier.get();
-			for (QuantityCard card : cards)
+	private List<Card> getGalleryCards(Supplier<List<Card>> supplier) {
+		Function<AccountId, List<Card>> function = accountId -> {
+			List<Card> cards = supplier.get();
+			for (Card card : cards)
 				card.setQuantity(accountRepository.countUserCardsByCardId(accountId.getUsername(), card.getId()));
 			return cards;
 		};
-		return operateOnAccount(function, () -> new ArrayList<QuantityCard>());
+		return operateOnAccount(function, () -> new ArrayList<Card>());
 	}
 
 	public int getCoins() {
 		return operateOnAccount(accountId -> accountRepository.getCoins(accountId.getUsername()), () -> 0);
 	}
 
-	public QuantityCard getQuantityCard(String id) {
-		Function<AccountId, QuantityCard> function = accountId -> {
-			QuantityCard card = new QuantityCard(cardRepository.getOne(id));
+	public Card getCard(String id) {
+		Function<AccountId, Card> function = accountId -> {
+			Card card = cardRepository.getOne(id);
 			card.setQuantity(accountRepository.countUserCardsByCardId(accountId.getUsername(), id));
 			return card;
 		};
-		return operateOnAccount(function, () -> new QuantityCard(cardRepository.getOne(id)));
+		return operateOnAccount(function, () -> cardRepository.getOne(id));
 	}
 
-	public QuantityCard getQuantityCardToSell(String id) {
-		QuantityCard card = getQuantityCard(id);
+	public Card getCardToSell(String id) {
+		Card card = getCard(id);
 		card.setCost(card.getCost() / 2);
 		return card;
 	}
@@ -133,7 +128,7 @@ public class AccountService {
 		return operateOnAccount(function, () -> false);
 	}
 
-	private <T> T operateOnAccount(Function<AccountId, T> function, Supplier<T> supplier) {
+	public <T> T operateOnAccount(Function<AccountId, T> function, Supplier<T> supplier) {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (principal instanceof UserDetails) {
 			UserDetails user = (UserDetails) principal;

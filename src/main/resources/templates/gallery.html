@@ -8,8 +8,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
-<body>
-	<div th:replace="menu :: menu"></div>
+<body class="scroller">
 	<div class = "container-fluid">
 		<div class="row" style="margin-top:56px;">
 			<div class="col-pixel-width vertical-menu">
@@ -33,10 +32,12 @@
 					</div>
 				</div>
 			</div>
+		</div>
+		<div class="row" style="margin-left:215px;">
 			<div class="col">
 				<div class="row">
-					<div class="col px-0">
-						<div class="topnav">
+					<div class="col fixed-top px-0">
+						<div class="topnav" style="margin-left:230px; margin-top:56px;">
 							<a class="disabled active"> Sort By</a>
 					  		<div th:each="sortOption : ${sortOptions}">
 					  			<form th:action="@{/gallery(page=${currentPage},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:object="${selectedSortOption}" method="post">
@@ -67,7 +68,7 @@
 						</div>
 					</div>
 				</div>
-				<div class = "container-fluid">
+				<div class = "container-fluid" style="margin-top:44px;">
 					<div class="row">
 						<div class ="col px-3">
 							<h1>Gallery</h1>
@@ -131,5 +132,6 @@
 			</div>
 		</div>
 	</div>
+	<div th:replace="menu :: menu"></div>
 </body>
 </html>
