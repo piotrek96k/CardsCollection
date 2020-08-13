@@ -20,7 +20,7 @@
   					<br>
   				</div>
   				<div class="card-footer d-flex justify-content-center">
-  					<a class="btn btn-primary card-link flex-fill" th:href="@{/sell/sold(id=${card.getId()}, page=${page})}" th:text="${'Sell ' + card.getCost()}" ></a>
+  					<a class="btn btn-primary card-link flex-fill" th:href="@{/sell/sold(id=${card.getId()}, page=${page})}" th:text="${'Sell ' + card.getRarity().getCost()}" ></a>
 				  	<a class="btn btn-success card-link flex-fill" th:href="@{/(page=${page})}" th:text="${'Return'}"></a>
 				</div>
 			</div>

@@ -15,23 +15,24 @@ public class Card {
 
 	@Id
 	@NotNull
-	protected String id;
+	private String id;
 
 	@NotBlank
-	protected String name;
+	private String name;
 
 	@NotBlank
-	protected String imageUrl;
-
-	@NotNull
-	protected int cost;
+	private String imageUrl;
 
 	@NotNull
 	@ManyToOne
-	protected Rarity rarity;
+	private Rarity rarity;
+	
+	@NotNull
+	@ManyToOne
+	private Set set;
 
 	@Transient
-	protected int quantity;
+	private int quantity;
 
 	@ManyToMany(mappedBy = "cards")
 	protected List<Account> accounts;
@@ -39,19 +40,18 @@ public class Card {
 	public Card() {
 	}
 
-	public Card(String id, String name, String imageUrl, int cost, Rarity rarity) {
-		this(id, name, imageUrl, cost, rarity, 0);
+	public Card(String id, String name, String imageUrl, Rarity rarity) {
+		this(id, name, imageUrl, rarity, 0);
 	}
 	
 	public Card (Card card, long quantity) {
-		this(card.id, card.name, card.imageUrl, card.cost, card.rarity, quantity);
+		this(card.id, card.name, card.imageUrl, card.rarity, quantity);
 	}
 
-	public Card(String id, String name, String imageUrl, int cost, Rarity rarity, long quantity) {
+	public Card(String id, String name, String imageUrl, Rarity rarity, long quantity) {
 		this.id = id;
 		this.name = name;
 		this.imageUrl = imageUrl;
-		this.cost = cost;
 		this.rarity = rarity;
 		this.quantity = (int)quantity;
 	}
@@ -62,14 +62,6 @@ public class Card {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public int getCost() {
-		return cost;
-	}
-
-	public void setCost(int cost) {
-		this.cost = cost;
 	}
 
 	public String getName() {
@@ -96,6 +88,14 @@ public class Card {
 		this.rarity = rarity;
 	}
 
+	public Set getSet() {
+		return set;
+	}
+
+	public void setSet(Set set) {
+		this.set = set;
+	}
+
 	public int getQuantity() {
 		return quantity;
 	}
@@ -114,7 +114,7 @@ public class Card {
 
 	@Override
 	public String toString() {
-		return "Card [id=" + id + ", name=" + name + ", imageUrl=" + imageUrl + ", cost=" + cost + "]";
+		return "Card [id=" + id + ", name=" + name + ", imageUrl=" + imageUrl + "]";
 	}
 
 }

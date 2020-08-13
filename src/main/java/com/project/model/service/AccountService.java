@@ -1,8 +1,10 @@
 package com.project.model.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -49,7 +51,9 @@ public class AccountService {
 	public List<Card> getUserCards(int page) {
 		Function<AccountId, List<Card>> function = accountId -> {
 			List<Card> cards = accountRepository.getAccountCardsListByPage(accountId.getUsername(), page);
-			cards.forEach(card -> card.setCost(card.getCost() / 2));
+			Set<Rarity> rarities = new HashSet<Rarity>();
+			cards.forEach(card -> rarities.add(card.getRarity()));
+			rarities.forEach(rarity->rarity.setCost(rarity.getCost()/2));
 			return cards;
 		};
 		return operateOnAccount(function, () -> new ArrayList<Card>());
@@ -59,29 +63,15 @@ public class AccountService {
 		return operateOnAccount(accountId -> accountRepository.getNumberOfPages(accountId.getUsername()), () -> 1);
 	}
 
-	public List<Card> getGalleryCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities,
+	public List<Card> getGalleryCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities, List<com.project.model.entity.Set> sets,
 			Optional<String> search) {
-		if (rarities.isEmpty()) {
-			if (search.isEmpty())
-				return getGalleryCards(() -> cardRepository.getCardsByPageOrderByValue(page, sortType, orderType));
-			return getGalleryCards(
-					() -> cardRepository.getCardsByPageOrderByValueWithSearch(page, sortType, orderType, search.get()));
-		}
-		if (search.isEmpty())
-			return getGalleryCards(() -> cardRepository.getCardsByPageOrderByValueWithSelectedRarities(page, sortType,
-					orderType, rarities));
-		return getGalleryCards(() -> cardRepository.getCardsByPageOrderByValueWithSelectedRaritiesWithSearch(page,
-				sortType, orderType, rarities, search.get()));
-	}
-
-	private List<Card> getGalleryCards(Supplier<List<Card>> supplier) {
 		Function<AccountId, List<Card>> function = accountId -> {
-			List<Card> cards = supplier.get();
+			List<Card> cards = cardRepository.getCards(page, sortType, orderType, rarities,sets, search);
 			for (Card card : cards)
 				card.setQuantity(accountRepository.countUserCardsByCardId(accountId.getUsername(), card.getId()));
 			return cards;
 		};
-		return operateOnAccount(function, () -> new ArrayList<Card>());
+		return operateOnAccount(function, () -> cardRepository.getCards(page, sortType, orderType, rarities,sets, search));
 	}
 
 	public int getCoins() {
@@ -99,13 +89,13 @@ public class AccountService {
 
 	public Card getCardToSell(String id) {
 		Card card = getCard(id);
-		card.setCost(card.getCost() / 2);
+		card.getRarity().setCost(card.getRarity().getCost() / 2);
 		return card;
 	}
 
 	public boolean addCard(String id) {
 		Function<AccountId, Boolean> function = accountId -> {
-			int cost = cardRepository.getCost(id);
+			int cost = cardRepository.getCardCost(id);
 			int coins = accountRepository.getCoins(accountId.getUsername());
 			if (coins >= cost) {
 				accountRepository.addCard(accountId.getUsername(), accountId.getEmail(), id);
@@ -119,7 +109,7 @@ public class AccountService {
 
 	public boolean removeCard(String id) {
 		Function<AccountId, Boolean> function = accountId -> {
-			int cost = cardRepository.getCost(id) / 2;
+			int cost = cardRepository.getCardCost(id) / 2;
 			int coins = accountRepository.getCoins(accountId.getUsername());
 			accountRepository.removeCard(accountId.getUsername(), id);
 			accountRepository.updateUserCoins(accountId.getUsername(), coins + cost);

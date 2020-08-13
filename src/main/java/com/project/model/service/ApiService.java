@@ -11,15 +11,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.project.model.api.Cards;
+import com.project.model.api.Sets;
 
 @Service
 public class ApiService {
 
-	public static final String RESOURCE_URL;
+	private static final String RESOURCE_URL;
 
 	private static final RestTemplate REST_TEMPLATE;
 
-	private static final String CARDS_STRING;
+	private static final String CARDS;
+
+	private static final String SETS;
 
 	private static int numberOfCards;
 
@@ -27,7 +30,8 @@ public class ApiService {
 
 	static {
 		RESOURCE_URL = "https://api.pokemontcg.io/v1/";
-		CARDS_STRING = "cards";
+		CARDS = "cards";
+		SETS = "sets";
 		REST_TEMPLATE = new RestTemplate();
 	}
 
@@ -37,9 +41,12 @@ public class ApiService {
 
 		private Set<String> rarities;
 
-		private ApiData(List<Cards.Card> cards, Set<String> rarities) {
+		private List<Sets.Set> sets;
+
+		private ApiData(List<Cards.Card> cards, Set<String> rarities, List<Sets.Set> sets) {
 			this.cards = cards;
 			this.rarities = rarities;
+			this.sets = sets;
 		}
 
 		public List<Cards.Card> getCards() {
@@ -50,43 +57,44 @@ public class ApiService {
 			return Collections.unmodifiableSet(rarities);
 		}
 
+		public List<Sets.Set> getSets() {
+			return Collections.unmodifiableList(sets);
+		}
+
 	}
 
 	public ApiData getApiData() {
-		List<Cards.Card> cards = new ArrayList<Cards.Card>(getNumberOfCards());
-		Set<String> rarities = new HashSet<String>();
-		for (int i = 1; i <= getNumberOfPages(); i++)
-			cards.addAll(getCardsByPage(i));
-		for (Cards.Card card : cards) {
-			if (card.getRarity() == null || card.getRarity().isBlank())
-				card.setRarity("Common");
-			rarities.add(card.getRarity());
-		}
-		return new ApiData(cards, rarities);
+		List<Cards.Card> cards = getAllCards();
+		Set<String> rarities = getAllRarities(cards);
+		List<Sets.Set> sets = getAllSets();
+		return new ApiData(cards, rarities, sets);
 	}
 
-	public List<Cards.Card> getAllCards() {
+	private List<Cards.Card> getAllCards() {
 		List<Cards.Card> cards = new ArrayList<Cards.Card>(getNumberOfCards());
 		for (int i = 1; i <= getNumberOfPages(); i++)
 			cards.addAll(getCardsByPage(i));
 		return cards;
 	}
 
-	public List<Cards.Card> getCardsByIds(List<String> ids) {
-		StringBuilder builder = new StringBuilder(RESOURCE_URL);
-		builder.append(CARDS_STRING);
-		builder.append("?id=");
-		String idsString = ids.toString();
-		for (int i = 1; i < idsString.length() - 1; i++)
-			if (idsString.charAt(i) != ' ')
-				builder.append(idsString.charAt(i) == ',' ? '|' : idsString.charAt(i));
-		Cards cards = REST_TEMPLATE.getForObject(builder.toString(), Cards.class);
-		return cards.getCards();
+	private Set<String> getAllRarities(List<Cards.Card> cards) {
+		Set<String> rarities = new HashSet<String>();
+		for (Cards.Card card : cards) {
+			if (card.getRarity() == null || card.getRarity().isBlank())
+				card.setRarity("Common");
+			rarities.add(card.getRarity());
+		}
+		return rarities;
+	}
+
+	private List<Sets.Set> getAllSets() {
+		ResponseEntity<Sets> setsEntity = REST_TEMPLATE.getForEntity(RESOURCE_URL + SETS, Sets.class);
+		return setsEntity.getBody().getSets();
 	}
 
 	public List<Cards.Card> getCardsByPage(int page) {
 		StringBuilder builder = new StringBuilder(RESOURCE_URL);
-		builder.append(CARDS_STRING);
+		builder.append(CARDS);
 		builder.append("?page=");
 		builder.append(page);
 		ResponseEntity<Cards> cardsEntity = REST_TEMPLATE.getForEntity(builder.toString(), Cards.class);
@@ -106,7 +114,7 @@ public class ApiService {
 	}
 
 	private void readNumberOfCardsAndPages() {
-		ResponseEntity<Cards> cardsEntity = REST_TEMPLATE.getForEntity(RESOURCE_URL + CARDS_STRING, Cards.class);
+		ResponseEntity<Cards> cardsEntity = REST_TEMPLATE.getForEntity(RESOURCE_URL + CARDS, Cards.class);
 		numberOfCards = Integer.parseInt(cardsEntity.getHeaders().get("Total-Count").get(0));
 		numberOfPages = numberOfCards / 100 + (numberOfCards % 100 == 0 ? 0 : 1);
 	}

@@ -1,7 +1,9 @@
 package com.project.model.component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.project.model.api.Cards;
+import com.project.model.api.Sets;
 import com.project.model.entity.Account;
 import com.project.model.entity.Card;
 import com.project.model.entity.Rarity;
@@ -21,6 +24,7 @@ import com.project.model.repository.AccountRepository;
 import com.project.model.repository.CardRepository;
 import com.project.model.repository.RarityRepository;
 import com.project.model.repository.RoleRepository;
+import com.project.model.repository.SetRepository;
 import com.project.model.service.ApiService;
 
 @Component
@@ -39,6 +43,9 @@ public class DatabaseInitializer implements InitializingBean {
 
 	@Autowired
 	private RarityRepository rarityRepository;
+	
+	@Autowired
+	private SetRepository setRepository;
 
 	@Autowired
 	private ApiService apiService;
@@ -48,7 +55,9 @@ public class DatabaseInitializer implements InitializingBean {
 			LOGGER.log(Level.INFO, "Loading Data");
 			ApiService.ApiData data = apiService.getApiData();
 			loadRarities(data.getRarities());
+			loadSets(data.getSets());
 			loadCards(data.getCards());
+			setRaritiesCost();
 		}
 	}
 
@@ -60,9 +69,19 @@ public class DatabaseInitializer implements InitializingBean {
 				card.setName(apiCard.getName());
 				card.setImageUrl(apiCard.getImageUrl());
 				card.setRarity(rarityRepository.findById(apiCard.getRarity()).get());
-				card.setCost(100);
+				card.setSet(setRepository.findById(apiCard.getSet()).get());
 				cardRepository.save(card);
 			}
+	}
+	
+	private void loadSets(List<Sets.Set> sets) {
+		for(Sets.Set apiSet: sets) {
+			if(setRepository.findById(apiSet.getName()).isEmpty()) {
+				com.project.model.entity.Set set = new com.project.model.entity.Set();
+				set.setId(apiSet.getName());
+				setRepository.save(set);
+			}
+		}
 	}
 
 	private void loadRarities(Set<String> rarities) {
@@ -72,6 +91,39 @@ public class DatabaseInitializer implements InitializingBean {
 				rarity.setId(apiRarity);
 				rarityRepository.save(rarity);
 			}
+	}
+
+	private void setRaritiesCost() {
+		Map<String, Integer> costs = getDefaultCosts();
+		List<Rarity> rarities = rarityRepository.findAllRaritiesOrderById();
+		for (Rarity rarity : rarities)
+			if (rarity.getCost() == 0) {
+				int cost = costs.get(rarity.getId()) == null ? 25_000 : costs.get(rarity.getId());
+				rarityRepository.setRarityCost(rarity.getId(), cost);
+			}
+	}
+
+	private Map<String, Integer> getDefaultCosts() {
+		Map<String, Integer> costs = new HashMap<String, Integer>();
+		costs.put("Common", 100);
+		costs.put("Uncommon", 150);
+		costs.put("Rare", 250);
+		costs.put("Rare Holo", 300);
+		costs.put("Rare Ultra", 500);
+		costs.put("Rare Holo EX", 750);
+		costs.put("Rare Secret", 1_000);
+		costs.put("Rare Holo GX", 1_500);
+		costs.put("Rare Holo Lv.X", 2_000);
+		costs.put("Rare BREAK", 2_500);
+		costs.put("Rare Prime", 3_000);
+		costs.put("LEGEND", 5_000);
+		costs.put("V", 7_500);
+		costs.put("Rare Promo", 10_000);
+		costs.put("Rare ACE", 12_500);
+		costs.put("Shining", 15_000);
+		costs.put("VM", 20_000);
+		costs.put("Rare Rainbow", 100_000);
+		return costs;
 	}
 
 	private void loadRoles() {
@@ -97,7 +149,7 @@ public class DatabaseInitializer implements InitializingBean {
 			admin.setLastName(adminString);
 			admin.setPassword(new BCryptPasswordEncoder().encode(adminString));
 			admin.setEnabled(true);
-			admin.setCoins(-1);
+			admin.setCoins(1_000_000);
 			List<Role> roles = new ArrayList<Role>();
 			for (RoleEnum roleEnum : RoleEnum.values())
 				roles.add(roleRepository.getOne(roleEnum.toString()));

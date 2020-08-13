@@ -1,7 +1,6 @@
 package com.project.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -9,6 +8,7 @@ import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.project.model.component.SessionData;
 import com.project.model.entity.Rarity;
+import com.project.model.entity.Set;
 import com.project.model.repository.CardRepository;
 import com.project.model.repository.RarityRepository;
+import com.project.model.repository.SetRepository;
 import com.project.model.service.AccountService;
 import com.project.model.service.SortType;
 
@@ -32,6 +34,9 @@ public class GalleryController {
 
 	@Autowired
 	private RarityRepository rarityRepository;
+
+	@Autowired
+	private SetRepository setRepository;
 
 	@Autowired
 	private AccountService accountService;
@@ -70,17 +75,21 @@ public class GalleryController {
 	@GetMapping("/gallery")
 	public String galleryPage(Model model, @RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
+			@RequestParam(value = "set") Optional<String> sets,
 			@RequestParam(value = "search") Optional<String> search) {
 		int currentPage = page.orElse(1);
-		List<Rarity> selectedRarities = getSelectedRaritiesAsList(rarities);
+		List<Rarity> selectedRarities = getSelectedObjectsAsList(rarities, rarityRepository);
+		List<Set> selectedSets = getSelectedObjectsAsList(sets, setRepository);
 		model.addAttribute("cards", accountService.getGalleryCards(currentPage, sessionData.getSortType(),
-				sessionData.getOrderType(), selectedRarities, search));
+				sessionData.getOrderType(), selectedRarities, selectedSets, search));
 		model.addAttribute("coins", accountService.getCoins());
-		model.addAttribute("numberOfPages", getNumberOfPages(selectedRarities, search));
+		model.addAttribute("numberOfPages", cardRepository.getNumberOfPages(selectedRarities, selectedSets, search));
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("link", "/gallery");
-		model.addAttribute("rarities", getSelectedRarities(rarities));
+		model.addAttribute("rarities", getSelectedObjectsMap(selectedRarities, rarityRepository));
 		model.addAttribute("selectedRarities", rarities.orElse(""));
+		model.addAttribute("sets", getSelectedObjectsMap(selectedSets, setRepository));
+		model.addAttribute("selectedSets", sets.orElse(""));
 		model.addAttribute("sortOptions", SortType.values());
 		model.addAttribute("sessionData", sessionData);
 		model.addAttribute("selectedSortOption", new StringWrapper());
@@ -92,7 +101,8 @@ public class GalleryController {
 
 	@PostMapping("/gallery")
 	public String sortSelection(@RequestParam(value = "page") Optional<Integer> page,
-			@RequestParam(value = "rarity") Optional<String> rarities, @ModelAttribute StringWrapper selectedOption,
+			@RequestParam(value = "rarity") Optional<String> rarities,
+			@RequestParam(value = "set") Optional<String> sets, @ModelAttribute StringWrapper selectedOption,
 			@ModelAttribute SearchWrapper search) {
 		if (selectedOption.getString() != null) {
 			SortType.OrderType orderType = sessionData.getSortType().getOrderType(selectedOption.getString());
@@ -103,18 +113,19 @@ public class GalleryController {
 		}
 		Optional<String> searchResult = search.getSearch() == null || search.getSearch().isEmpty()
 				|| search.getSearch().isBlank() ? Optional.empty() : Optional.of(search.getSearch());
-		return getGalleryRedirectString(page, rarities, searchResult);
+		return getGalleryRedirectString(page, rarities, sets, searchResult);
 	}
 
 	@GetMapping(value = "/gallery/buy")
 	public String buyCard(@RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
-			@RequestParam(value = "search") Optional<String> search, @RequestParam(value = "id") String id) {
+			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "search") Optional<String> search,
+			@RequestParam(value = "id") String id) {
 		accountService.addCard(id);
-		return getGalleryRedirectString(page, rarities, search);
+		return getGalleryRedirectString(page, rarities, sets, search);
 	}
-	
-	private String getGalleryRedirectString(Optional<Integer> page, Optional<String> rarities,
+
+	private String getGalleryRedirectString(Optional<Integer> page, Optional<String> rarities, Optional<String> sets,
 			Optional<String> search) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("redirect:/gallery");
@@ -128,6 +139,12 @@ public class GalleryController {
 			appendSign(builder, added);
 			builder.append("rarity=");
 			builder.append(rarities.get());
+			added = true;
+		}
+		if (sets.isPresent()) {
+			appendSign(builder, added);
+			builder.append("set=");
+			builder.append(sets.get());
 			added = true;
 		}
 		if (search.isPresent()) {
@@ -145,36 +162,26 @@ public class GalleryController {
 			builder.append('?');
 	}
 
-	private List<Rarity> getSelectedRaritiesAsList(Optional<String> rarities) {
-		if (rarities.isEmpty() || rarities.get().isBlank())
-			return new ArrayList<Rarity>();
-		List<Rarity> raritiesList = new ArrayList<Rarity>();
-		for (String rarity : rarities.get().split(","))
-			raritiesList.add(new Rarity(rarity));
-		return raritiesList;
+	private <T, U extends JpaRepository<T, ? super String>> List<T> getSelectedObjectsAsList(
+			Optional<String> selectedString, U repository) {
+		if (selectedString.isEmpty() || selectedString.get().isBlank())
+			return new ArrayList<T>();
+		List<T> selectedObjects = new ArrayList<T>();
+		for (String id : selectedString.get().split(","))
+			selectedObjects.add(repository.findById(id).get());
+		return selectedObjects;
 	}
 
-	private int getNumberOfPages(List<Rarity> rarities, Optional<String> search) {
-		if (rarities.isEmpty()) {
-			if (search.isEmpty())
-				return cardRepository.getNumberOfPages();
-			return cardRepository.getNumberOfPagesWithSearch(search.get());
-		}
-		if (search.isEmpty())
-			return cardRepository.getNumberOfPagesWithSelectedRarities(rarities);
-		return cardRepository.getNumberOfPagesWithSelectedRaritiesWithSearch(rarities, search.get());
-	}
-
-	private Map<String, Boolean> getSelectedRarities(Optional<String> rarityString) {
-		Map<String, Boolean> result = new TreeMap<String, Boolean>();
-		if (rarityString.isEmpty()) {
-			for (Rarity rarity : rarityRepository.findAll())
-				result.put(rarity.getId(), false);
+	private <T extends Comparable<? super T>, U extends JpaRepository<T, ?>> Map<T, Boolean> getSelectedObjectsMap(
+			List<T> selectedObjects, U repository) {
+		Map<T, Boolean> result = new TreeMap<T, Boolean>();
+		if (selectedObjects.isEmpty()) {
+			for (T object : repository.findAll())
+				result.put(object, false);
 			return result;
 		}
-		List<String> selectedRarities = Arrays.asList(rarityString.get().split(","));
-		for (Rarity rarity : rarityRepository.findAll())
-			result.put(rarity.getId(), selectedRarities.contains(rarity.getId()));
+		for (T object : repository.findAll())
+			result.put(object, selectedObjects.contains(object));
 		return result;
 	}
 

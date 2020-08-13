@@ -2,7 +2,7 @@ package com.project.model.service;
 
 public enum SortType {
 
-	NAME("Name", "name"), RARITY("Rarity", "rarity"), SET("Set","set"), COST("Cost","cost", "Low - High", "High - Low");
+	NAME("Name", "name"), RARITY("Rarity", "id"), SET("Set","set"), COST("Cost","cost", "Low - High", "High - Low");
 
 	private String name;
 	

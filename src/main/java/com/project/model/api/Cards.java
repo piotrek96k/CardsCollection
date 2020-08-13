@@ -20,6 +20,8 @@ public class Cards {
 
 		private String rarity;
 		
+		private String set;
+		
 		public String getId() {
 			return id;
 		}
@@ -50,6 +52,14 @@ public class Cards {
 
 		public void setRarity(String rarity) {
 			this.rarity = rarity;
+		}
+
+		public String getSet() {
+			return set;
+		}
+
+		public void setSet(String set) {
+			this.set = set;
 		}
 
 	}

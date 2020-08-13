@@ -2,29 +2,14 @@ package com.project.model.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
-public class Rarity implements Comparable<Rarity>{
+public class Set implements Comparable<Set>{
 
 	@Id
-	@NotNull
+	@NotEmpty
 	private String id;
-	
-	@NotNull
-	private int cost;
-
-	public Rarity(String id, int cost) {
-		this.id = id;
-		this.cost = cost;
-	}
-	
-	public Rarity(String id) {
-		this(id, 0);
-	}
-
-	public Rarity() {
-	}
 
 	public String getId() {
 		return id;
@@ -32,14 +17,6 @@ public class Rarity implements Comparable<Rarity>{
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public int getCost() {
-		return cost;
-	}
-
-	public void setCost(int cost) {
-		this.cost = cost;
 	}
 
 	@Override
@@ -58,7 +35,7 @@ public class Rarity implements Comparable<Rarity>{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Rarity other = (Rarity) obj;
+		Set other = (Set) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -68,7 +45,7 @@ public class Rarity implements Comparable<Rarity>{
 	}
 
 	@Override
-	public int compareTo(Rarity other) {
+	public int compareTo(Set other) {
 		return id.compareTo(other.id);
 	}
 	
@@ -76,5 +53,5 @@ public class Rarity implements Comparable<Rarity>{
 	public String toString() {
 		return id;
 	}
-
+	
 }

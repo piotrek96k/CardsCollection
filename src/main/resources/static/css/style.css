@@ -13,12 +13,31 @@ h1 {
 hr {
 	background-color:white;
 }
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background: #A6A3A0;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #D7CEC7;
+  border-radius: 20px;
+  border: 3px solid #A6A3A0;
+}
+.scroller {
+	scrollbar-color: #D7CEC7 #A6A3A0;
+	scrollbar-width: thin;
+}
 .card {
 	background-color: #565656;
 	font-size: 14px;
 }
 .navigation {
+	position:fixed;
 	background-color: #565656;
+	height:56px;
+	white-space: nowrap;
 }
 .info {
 	font-size: 12px;
@@ -67,28 +86,39 @@ hr {
     display: table;
     width: 100%;
 }
-.vertical-menu-top {
+.vertical-menu-top button{
 	background-color: #612833;
 	color: white;
 	display: inline-block;
-	padding: 8px;
-	font-size: 20px;
+	padding: 10px 8px;
+	font-size:17px;
+	border:none;
+	text-align: left;
+}
+.vertical-menu-top button:hover {
+	background-color: #454545;
+}
+.vertical-menu-top img{
+	float:right;
 }
 .vertical-menu {
 	position: fixed;
 	display:block;
-	overflow-y:scroll;
+	overflow-y:auto;
 	background-color: #C09F80;
 	width: 230px;
 	height: calc(100% - 56px);
+	scrollbar-color: #76323F #9C7C5F;
+  	scrollbar-width: thin;
 }
 .vertical-menu a {
 	border: none;
 	color: #565656;
 	display: inline-block;
-	padding: 8px;
+	padding: 7px;
 	text-decoration: none;
 	text-align: left;
+	font-size:14px;
 }
 .vertical-menu-selected a{
 	border: none;
@@ -99,9 +129,19 @@ hr {
 	background-color: #565656;
 	color: white;
 }
+.vertical-menu::-webkit-scrollbar-track {
+  background: #9C7C5F;
+}
+.vertical-menu::-webkit-scrollbar-thumb {
+  background-color: #76323F;
+  border: 3px solid #9C7C5F;
+}
 .topnav {
-	overflow: hidden;
+	position:static;
+  	overflow: auto;
+    white-space: nowrap;
 	background-color: #969390;
+	height:46px;
 }
 .topnav button, .topnav a {
 	float: left;
@@ -118,18 +158,6 @@ hr {
 	background-color: #565656;
 	color: white;
 }
-.topnav select {
-	display: block;
-	float: left;
-	width: 120px;
-	border: none;
-	font-size: 16px;
-	margin: 4px 10px;
-}
-.topnav option {
-	color: white;
-	background-color: #969390;
-}
 .topnav button.active {
 	background-color: #565656;
 	color: white;
@@ -141,17 +169,16 @@ hr {
 .topnav .search-container {
 	float: right;
 	margin-right: 0px;
+	margin-top: 4px;
 }
 .topnav input[type=text] {
 	padding: 6px;
-	margin-top: 4px;
 	font-size: 16px;
 	border: none;
 }
 .topnav .search-container button {
 	float: right;
 	padding: 6px 10px;
-	margin-top: 4px;
 	margin-right: 5px;
 	background: #EEEEEE;
 	cursor: pointer;
@@ -160,14 +187,17 @@ hr {
 	background: #CCCCCC;
 }
 .dropdown {
+	float:left;
 	margin-left: 20px;
-	position: absolute;
+	margin-right: 20px;
+	position: static;
+	margin-top:4px;
 	display: inline-block;
+  	white-space: nowrap;
 }
 .dropdown button {
 	background-color: white;
 	color: #545454;
-	margin-top:4px;
 	padding: 7px 0px;
 	width:100px;
 }
@@ -199,26 +229,9 @@ hr {
 .dropdown button.active{
 	background-color: #454545;
 }
-.scroller {
-  scrollbar-color: #76323F #9C7C5F;
-  scrollbar-width: thin;
+.card-link {
+	color:white;
 }
-::-webkit-scrollbar {
-  width: 12px;
-}
-.vertical-menu::-webkit-scrollbar-track {
-  background: #9C7C5F;
-}
-.vertical-menu::-webkit-scrollbar-thumb {
-  background-color: #76323F;
-  border-radius: 20px;
-  border: 3px solid #9C7C5F;
-}
-::-webkit-scrollbar-track {
-  background: #A6A3A0;
-}
-::-webkit-scrollbar-thumb {
-  background-color: #D7CEC7;
-  border-radius: 20px;
-  border: 3px solid #A6A3A0;
+.card-link:hover {
+	color:#428BCA;
 }

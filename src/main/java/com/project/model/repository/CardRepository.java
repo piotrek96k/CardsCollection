@@ -13,7 +13,10 @@ public interface CardRepository extends JpaRepository<Card, String>, CardQuery{
 	@Query(value = "select * from card order by name, id asc limit(100) offset(((:page)-1)*100)" , nativeQuery = true)
 	public List<Card> getCardsByPageOrderByName(@Param("page")int page);
 	
-	@Query(value = "select cost from card where id=:id", nativeQuery = true)
-	public int getCost(@Param("id") String id);
+	@Query(value = "select count(rarity_id) from card where rarity_id=:rarity_id", nativeQuery = true)
+	public int countCardsByRarity(@Param("rarity_id") String rarityId);
+	
+	@Query(value = "select rarity.cost from card inner join rarity on card.rarity_id=rarity.id where card.id=:id", nativeQuery = true)
+	public int getCardCost(@Param("id")String id);
 		
 }
