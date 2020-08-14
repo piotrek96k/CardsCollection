@@ -188,50 +188,47 @@ hr {
 }
 .dropdown {
 	float:left;
-	margin-left: 20px;
-	margin-right: 20px;
 	position: static;
-	margin-top:4px;
 	display: inline-block;
   	white-space: nowrap;
 }
+.dropdown img {
+	float:right;
+}
 .dropdown button {
-	background-color: white;
-	color: #545454;
-	padding: 7px 0px;
-	width:100px;
+	width:108px;
+	display: inline-block;
 }
 .dropdown-content {
 	display: none;
 	position: absolute;
-	background-color: black;
 	margin-top:46px;
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 	z-index: 1;
 }
 .dropdown-content button {
-	color: #545454;
+	color: white;
 	text-decoration: none;
 	white-space: nowrap;
 	text-align: center;
 	margin: 0;
 }
-.dropdown-content a:hover {
-	background-color: #ddd;
-}
 .dropdown:hover .dropdown-content {
 	display: block;
 }
-.dropdown:hover .dropdown-button {
-	background-color: #545454;
-	color:white;
-}
-.dropdown button.active{
-	background-color: #454545;
+.dropdown button.active {
+	background-color:#454545;
 }
 .card-link {
 	color:white;
 }
 .card-link:hover {
 	color:#428BCA;
+}
+.card-p p {
+	margin-top:0px;
+	margin-bottom:0px;
+}
+.card-p-width {
+	width:175px;
 }

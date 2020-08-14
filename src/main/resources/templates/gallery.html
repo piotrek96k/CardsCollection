@@ -7,9 +7,10 @@
 <title>Cards Collector's</title>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="css/style.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="javascript/style.js"></script>
 </head>
-<body onload="expand();">
+<body onload="installExpandListener();">
 	<div class = "container-fluid scroller">
 		<div class="row" style="margin-top:56px;">
 			<div class="col-pixel-width vertical-menu">
@@ -38,7 +39,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="vertical-menu-top" th:style="'margin-bottom: '+ ${selectedRarities == '' ? '10px' : '0px'}">
+				<div class="vertical-menu-top" th:style="'margin-bottom: '+ ${selectedSets == '' ? '10px' : '0px'}">
 					<button type="button" class="btn-block">Sets
 						<img th:src="@{${selectedSets == '' ? 'images/expand.png' : 'images/hide.png'}}">
 					</button>
@@ -77,8 +78,10 @@
 					 	 				<button type="submit" th:name="string" th:value="${sortOption}" th:text="${sortOption.getName()}" th:classappend="${sessionData.getSortType() == sortOption ? 'active' : ''}"></button>
 					 	 			</form>
 					 	 		</div>
-					  			<div class="dropdown">
-  									<button class="btn dropdown-button">Order</button>
+					  			<div onmouseover="changeDropdownColor();" onmouseout="returnDropdownColor();" class="dropdown">
+  									<button id="dropdown">Order
+  										<img src="images/expand.png">
+  									</button>
 									<div class="dropdown-content">
  										<form th:action="@{/gallery(page=${currentPage},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:object="${selectedOrderOption}" th:each="orderType : ${sessionData.getSortType().orderTypeValues()}" method="post">
 						  					<button type="submit" th:name="string" th:value="${orderType}" th:text="${orderType.getName()}" th:classappend="${sessionData.getOrderType() == orderType ? 'active' : ''}"></button>
@@ -116,29 +119,32 @@
        						<div th:each="column : ${#numbers.sequence(0, counter - 1)}">
        							<div class="card mx-2 my-3 d-block" style="width:240px;" th:if="${row + column < cards.size()}" th:with="card=${cards.get(row + column)}">
        								<img  class="card-img-top" th:alt="${card.getName()}" th:src="${card.getImageUrl()}"> 
-  									<div class="card-body">	
-  										<span th:text="${card.getName()}"></span>
-  										<span class="float-right" th:text="${' x' + card.getQuantity()}"></span>
-  										<br>
-  										<span th:text="${'Rarity '}"></span>
-  										<span class="float-right">
-  											<a class="card-link" th:if="${rarities.get(card.getRarity()) == false}" th:href="@{/gallery(rarity=${card.getRarity()},__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${card.getRarity().getId()}"></a>
-  											<span th:text="${card.getRarity().getId()}" th:if="${rarities.get(card.getRarity()) == true}"></span>
-  										</span>
-  										<br>
-  										<span th:text="${'Set '}"></span>
-  										<span class="float-right">
-  											<a class="card-link" th:if="${sets.get(card.getSet()) == false}" th:text="${card.getSet().getId()}" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,set=${card.getSet()},__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}"></a>
-  											<span th:text="${card.getSet().getId()}" th:if="${sets.get(card.getSet()) == true}"></span>
-  										</span>
-  										<br>
+  									<div class="card-body card-p">
+  										<div>
+  											<p th:id="'quantity' + ${card.getId()}" class="float-right" th:text="${' x' + card.getQuantity()}"></p>
+  											<p class="card-p-width" th:text="${card.getName()}"></p>
+  										</div>
+  										<div>
+  											<p class="float-right">
+  												<a class="card-link" th:if="${rarities.get(card.getRarity()) == false}" th:href="@{/gallery(rarity=${card.getRarity()},__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${card.getRarity().getId()}"></a>
+  												<span th:text="${card.getRarity().getId()}" th:if="${rarities.get(card.getRarity()) == true}"></span>
+  											</p>
+  											<p th:text="${'Rarity '}"></p>
+  										</div>
+  										<div>
+  											<p class="float-right">
+  												<a class="card-link" th:if="${sets.get(card.getSet()) == false}" th:text="${card.getSet().getId()}" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,set=${card.getSet()},__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}"></a>
+  												<span th:text="${card.getSet().getId()}" th:if="${sets.get(card.getSet()) == true}"></span>
+  											</p>
+  											<p th:text="${'Set '}"></p>
+  										</div>
   									</div>
   									<div class="card-footer">
-  										<a class="btn btn-primary btn-block card-link" th:href="@{/gallery/buy(id=${card.getId()}, page=${currentPage},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:classappend="${coins < card.getRarity().getCost() ? 'disabled' : ''}">
+  										<button name="buybutton" th:id="${card.getId()}" class="btn btn-primary btn-block card-link" th:onclick="buyCard([[${card.getId()}]])" th:classappend="${coins < card.getRarity().getCost() ? 'disabled' : ''}">
   											<span class="float-left">Buy</span>
-  											<span style="margin-left:5px;" th:text="${#numbers.formatInteger(card.getRarity().getCost(), 3, 'WHITESPACE')}"></span>
+  											<span th:id="${'cost' + card.getId()}" style="margin-left:5px;" th:text="${#numbers.formatInteger(card.getRarity().getCost(), 3, 'WHITESPACE')}"></span>
   											<img style="margin-left:5px;" th:src="@{images/coins.png}" width="30" alt="Coins">
-  										</a>  										
+  										</button>  
 									</div>
 								</div>
        						</div>

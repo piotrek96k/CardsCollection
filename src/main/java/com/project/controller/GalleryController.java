@@ -11,10 +11,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.project.model.component.SessionData;
 import com.project.model.entity.Rarity;
@@ -72,6 +74,12 @@ public class GalleryController {
 
 	}
 
+	@PostMapping("/test")
+	public ModelAndView testPost(ModelMap model, @ModelAttribute(value = "data") SearchWrapper data1) {
+		System.out.println(data1.getSearch());
+		return redirectToGallery(model, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+	}
+
 	@GetMapping("/gallery")
 	public String galleryPage(Model model, @RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
@@ -100,9 +108,10 @@ public class GalleryController {
 	}
 
 	@PostMapping("/gallery")
-	public String sortSelection(@RequestParam(value = "page") Optional<Integer> page,
+	public ModelAndView sortSelection(ModelMap model, @RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
-			@RequestParam(value = "set") Optional<String> sets, @ModelAttribute StringWrapper selectedOption,
+			@RequestParam(value = "set") Optional<String> sets,
+			@ModelAttribute(name = "selectedOption") StringWrapper selectedOption,
 			@ModelAttribute SearchWrapper search) {
 		if (selectedOption.getString() != null) {
 			SortType.OrderType orderType = sessionData.getSortType().getOrderType(selectedOption.getString());
@@ -113,53 +122,20 @@ public class GalleryController {
 		}
 		Optional<String> searchResult = search.getSearch() == null || search.getSearch().isEmpty()
 				|| search.getSearch().isBlank() ? Optional.empty() : Optional.of(search.getSearch());
-		return getGalleryRedirectString(page, rarities, sets, searchResult);
+		return redirectToGallery(model, page, rarities, sets, searchResult);
 	}
 
-	@GetMapping(value = "/gallery/buy")
-	public String buyCard(@RequestParam(value = "page") Optional<Integer> page,
-			@RequestParam(value = "rarity") Optional<String> rarities,
-			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "search") Optional<String> search,
-			@RequestParam(value = "id") String id) {
-		accountService.addCard(id);
-		return getGalleryRedirectString(page, rarities, sets, search);
-	}
-
-	private String getGalleryRedirectString(Optional<Integer> page, Optional<String> rarities, Optional<String> sets,
-			Optional<String> search) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("redirect:/gallery");
-		boolean added = false;
-		if (page.isPresent()) {
-			builder.append("?page=");
-			builder.append(page.get());
-			added = true;
-		}
-		if (rarities.isPresent()) {
-			appendSign(builder, added);
-			builder.append("rarity=");
-			builder.append(rarities.get());
-			added = true;
-		}
-		if (sets.isPresent()) {
-			appendSign(builder, added);
-			builder.append("set=");
-			builder.append(sets.get());
-			added = true;
-		}
-		if (search.isPresent()) {
-			appendSign(builder, added);
-			builder.append("search=");
-			builder.append(search.get());
-		}
-		return builder.toString();
-	}
-
-	private void appendSign(StringBuilder builder, boolean added) {
-		if (added)
-			builder.append('&');
-		else
-			builder.append('?');
+	private ModelAndView redirectToGallery(ModelMap model, Optional<Integer> page, Optional<String> rarities,
+			Optional<String> sets, Optional<String> search) {
+		if (page.isPresent())
+			model.addAttribute("page", page.get());
+		if (rarities.isPresent())
+			model.addAttribute("rarity", rarities.get());
+		if (sets.isPresent())
+			model.addAttribute("set", sets.get());
+		if (search.isPresent())
+			model.addAttribute("search", search.get());
+		return new ModelAndView("redirect:/gallery", model);
 	}
 
 	private <T, U extends JpaRepository<T, ? super String>> List<T> getSelectedObjectsAsList(

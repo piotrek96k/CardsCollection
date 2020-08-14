@@ -2,6 +2,7 @@ package com.project.model.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -13,7 +14,15 @@ public class Rarity implements Comparable<Rarity>{
 	
 	@NotNull
 	private int cost;
+	
+	@Transient
+	private int quantity;
 
+	public Rarity(Rarity rarity, long quantity) {
+		this(rarity.id, rarity.cost);
+		this.quantity = (int)quantity;
+	}
+	
 	public Rarity(String id, int cost) {
 		this.id = id;
 		this.cost = cost;
@@ -40,6 +49,14 @@ public class Rarity implements Comparable<Rarity>{
 
 	public void setCost(int cost) {
 		this.cost = cost;
+	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 
 	@Override

@@ -77,6 +77,10 @@ public class AccountService {
 	public int getCoins() {
 		return operateOnAccount(accountId -> accountRepository.getCoins(accountId.getUsername()), () -> 0);
 	}
+	
+	public int countUserCardsByCardId(String id) {
+		return operateOnAccount(accountId->accountRepository.countUserCardsByCardId(accountId.getUsername(), id), ()->0);
+	}
 
 	public Card getCard(String id) {
 		Function<AccountId, Card> function = accountId -> {
