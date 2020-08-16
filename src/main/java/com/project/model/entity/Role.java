@@ -8,7 +8,7 @@ import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotBlank;
 
 @Entity
-public class Role {
+public class Role implements Identifiable<String>{
 
 	@Id
 	@NotBlank
@@ -23,10 +23,12 @@ public class Role {
 		this.id = id;
 	}
 
+	@Override
 	public String getId() {
 		return id;
 	}
 
+	@Override
 	public void setId(String id) {
 		this.id = id;
 	}

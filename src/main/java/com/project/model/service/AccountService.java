@@ -20,6 +20,7 @@ import com.project.model.entity.Card;
 import com.project.model.entity.Rarity;
 import com.project.model.entity.Role;
 import com.project.model.entity.RoleEnum;
+import com.project.model.entity.Type;
 import com.project.model.repository.AccountRepository;
 import com.project.model.repository.CardRepository;
 import com.project.model.repository.RoleRepository;
@@ -53,7 +54,7 @@ public class AccountService {
 			List<Card> cards = accountRepository.getAccountCardsListByPage(accountId.getUsername(), page);
 			Set<Rarity> rarities = new HashSet<Rarity>();
 			cards.forEach(card -> rarities.add(card.getRarity()));
-			rarities.forEach(rarity->rarity.setCost(rarity.getCost()/2));
+			rarities.forEach(rarity -> rarity.setCost(rarity.getCost() / 2));
 			return cards;
 		};
 		return operateOnAccount(function, () -> new ArrayList<Card>());
@@ -63,23 +64,25 @@ public class AccountService {
 		return operateOnAccount(accountId -> accountRepository.getNumberOfPages(accountId.getUsername()), () -> 1);
 	}
 
-	public List<Card> getGalleryCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities, List<com.project.model.entity.Set> sets,
-			Optional<String> search) {
+	public List<Card> getGalleryCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities,
+			List<com.project.model.entity.Set> sets, List<Type> types, Optional<String> search) {
 		Function<AccountId, List<Card>> function = accountId -> {
-			List<Card> cards = cardRepository.getCards(page, sortType, orderType, rarities,sets, search);
+			List<Card> cards = cardRepository.getCards(page, sortType, orderType, rarities, sets, types, search);
 			for (Card card : cards)
 				card.setQuantity(accountRepository.countUserCardsByCardId(accountId.getUsername(), card.getId()));
 			return cards;
 		};
-		return operateOnAccount(function, () -> cardRepository.getCards(page, sortType, orderType, rarities,sets, search));
+		return operateOnAccount(function,
+				() -> cardRepository.getCards(page, sortType, orderType, rarities, sets, types, search));
 	}
 
 	public int getCoins() {
 		return operateOnAccount(accountId -> accountRepository.getCoins(accountId.getUsername()), () -> 0);
 	}
-	
+
 	public int countUserCardsByCardId(String id) {
-		return operateOnAccount(accountId->accountRepository.countUserCardsByCardId(accountId.getUsername(), id), ()->0);
+		return operateOnAccount(accountId -> accountRepository.countUserCardsByCardId(accountId.getUsername(), id),
+				() -> 0);
 	}
 
 	public Card getCard(String id) {

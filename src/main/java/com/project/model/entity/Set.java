@@ -5,16 +5,18 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
 
 @Entity
-public class Set implements Comparable<Set>{
+public class Set implements Comparable<Set>, Identifiable<String>{
 
 	@Id
 	@NotEmpty
 	private String id;
 
+	@Override
 	public String getId() {
 		return id;
 	}
 
+	@Override
 	public void setId(String id) {
 		this.id = id;
 	}

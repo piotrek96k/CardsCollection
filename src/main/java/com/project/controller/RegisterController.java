@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.project.model.component.PasswordRepeatData;
 import com.project.model.entity.Account;
-import com.project.model.entity.PasswordRepeatData;
 import com.project.model.service.AccountService;
 
 @Controller

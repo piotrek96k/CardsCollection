@@ -1,8 +1,10 @@
 package com.project.model.api;
 
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Cards {
@@ -21,6 +23,15 @@ public class Cards {
 		private String rarity;
 		
 		private String set;
+		
+		private Set<String> types;
+		
+		@JsonProperty("nationalPokedexNumber")
+		private Integer pokedexNumber;
+		
+		private String evolvesFrom;
+		
+		private String hp;
 		
 		public String getId() {
 			return id;
@@ -60,6 +71,38 @@ public class Cards {
 
 		public void setSet(String set) {
 			this.set = set;
+		}
+
+		public Set<String> getTypes() {
+			return types;
+		}
+
+		public void setTypes(Set<String> types) {
+			this.types = types;
+		}
+
+		public Integer getPokedexNumber() {
+			return pokedexNumber;
+		}
+
+		public void setPokedexNumber(Integer pokedexNumber) {
+			this.pokedexNumber = pokedexNumber;
+		}
+
+		public String getEvolvesFrom() {
+			return evolvesFrom;
+		}
+
+		public void setEvolvesFrom(String evolvesFrom) {
+			this.evolvesFrom = evolvesFrom;
+		}
+
+		public String getHp() {
+			return hp;
+		}
+
+		public void setHp(String hp) {
+			this.hp = hp;
 		}
 
 	}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+<meta charset="UTF-8">
+<title>Cards Collector's</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="css/style.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="javascript/style.js"></script>
+</head>
+<body onload="installListeners();">
+	<div th:fragment="cards" id="cardpage">
+		<div class = "container-fluid" style="margin-top:44px; overflow:hidden;">
+			<div class="row">
+				<div class ="col px-3">
+					<h1>Gallery</h1>
+				</div>
+			</div>
+			<div>
+				<hr>
+			</div>
+			<div style="margin-bottom:40px;" th:with="counter=${100}">
+    			<div th:each="row : ${#numbers.sequence(0, cards.size(), counter)}"  class="row justify-content-left px-3">
+       				<div th:each="column : ${#numbers.sequence(0, counter - 1)}">
+       					<div class="card mx-2 my-3 d-block" th:if="${row + column < cards.size()}" th:with="card=${cards.get(row + column)}">
+       						<div class="tool-tip">
+       							<img  class="card-img-top" th:alt="${card.getName()}" th:src="${card.getImageUrl()}"> 
+       							<div class="tooltip-table">
+     	  							<table>
+       									<tr>
+       										<td>Name</td>
+       										<td th:text="${card.getName()}"></td>
+       									</tr>
+       									<tr>
+       										<td>Type</td>
+       										<td>
+       											<span th:text="'None'" th:if="${card.getTypes().isEmpty()}"></span>
+       											<span th:each="type : ${card.getTypes()}">
+       												<span th:text="${type.getId() + ' '}"></span>
+       											</span>
+       										</td>
+       									</tr>
+       									<tr>
+       										<td>Evolves from</td>
+       										<td th:text="${card.getEvolvesFrom() == null ? 'None' : card.getEvolvesFrom()}"></td>
+       									</tr>
+    	   								<tr>
+    	   									<td>Pokedex number</td>
+       										<td th:text="${card.getPokedexNumber() == null ? 'None' : card.getPokedexNumber()}"></td>
+       									</tr>
+       									<tr>
+       										<td>Hp</td>
+											<td th:text="${card.getHp() == null ? 'None' : card.getHp()}"></td>
+       									</tr>
+       									<tr>
+       										<td>Rarity</td>
+       										<td th:text="${card.getRarity()}"></td>
+       									</tr>
+       									<tr>
+       										<td>Set</td>
+       										<td th:text="${card.getSet()}"></td>
+       									</tr>
+     								</table>
+       							</div>
+  							</div>
+ 							<div class="card-body card-p">
+  								<div>
+  									<p th:id="'quantity' + ${card.getId()}" class="float-right" th:text="${' x' + card.getQuantity()}"></p>
+  									<p class="card-p-width" th:text="${card.getName()}"></p>
+  								</div>
+  								<div>
+  									<p class="float-right">
+  									<a class="card-link" th:if="${rarities.get(card.getRarity()) == false}" th:href="@{/gallery(rarity=${card.getRarity()},__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${card.getRarity().getId()}"></a>
+  										<span th:text="${card.getRarity().getId()}" th:if="${rarities.get(card.getRarity()) == true}"></span>
+  									</p>
+  									<p th:text="${'Rarity '}"></p>
+  								</div>
+  								<div>
+  									<p class="float-right">
+  										<a class="card-link" th:if="${sets.get(card.getSet()) == false}" th:text="${card.getSet().getId()}" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,set=${card.getSet()},__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}"></a>
+  										<span th:text="${card.getSet().getId()}" th:if="${sets.get(card.getSet()) == true}"></span>
+  									</p>
+  									<p th:text="${'Set '}"></p>
+  								</div>
+  							</div>
+ 							<div class="card-footer">
+  								<button name="buybutton" th:id="${card.getId()}" class="btn btn-primary btn-block card-link" th:onclick="buyCard([[${card.getId()}]])" th:classappend="${coins < card.getRarity().getCost() ? 'disabled' : ''}">
+  									<span class="float-left">Buy</span>
+  									<span th:id="${'cost' + card.getId()}" style="margin-left:5px;" th:text="${#numbers.formatInteger(card.getRarity().getCost(), 3, 'WHITESPACE')}"></span>
+  									<img style="margin-left:5px;" th:src="@{images/coins.png}" width="30" alt="Coins">
+  								</button>  
+							</div>
+						</div>
+       				</div>
+   				 </div>
+			</div>
+		</div>
+		<div th:replace="pagination :: pagination"></div>
+	</div>
+</body>
+</html>

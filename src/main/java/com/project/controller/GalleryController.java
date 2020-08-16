@@ -21,9 +21,11 @@ import org.springframework.web.servlet.ModelAndView;
 import com.project.model.component.SessionData;
 import com.project.model.entity.Rarity;
 import com.project.model.entity.Set;
+import com.project.model.entity.Type;
 import com.project.model.repository.CardRepository;
 import com.project.model.repository.RarityRepository;
 import com.project.model.repository.SetRepository;
+import com.project.model.repository.TypeRepository;
 import com.project.model.service.AccountService;
 import com.project.model.service.SortType;
 
@@ -39,6 +41,9 @@ public class GalleryController {
 
 	@Autowired
 	private SetRepository setRepository;
+
+	@Autowired
+	private TypeRepository typeRepository;
 
 	@Autowired
 	private AccountService accountService;
@@ -74,30 +79,28 @@ public class GalleryController {
 
 	}
 
-	@PostMapping("/test")
-	public ModelAndView testPost(ModelMap model, @ModelAttribute(value = "data") SearchWrapper data1) {
-		System.out.println(data1.getSearch());
-		return redirectToGallery(model, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
-	}
-
 	@GetMapping("/gallery")
 	public String galleryPage(Model model, @RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
-			@RequestParam(value = "set") Optional<String> sets,
+			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
 			@RequestParam(value = "search") Optional<String> search) {
 		int currentPage = page.orElse(1);
 		List<Rarity> selectedRarities = getSelectedObjectsAsList(rarities, rarityRepository);
 		List<Set> selectedSets = getSelectedObjectsAsList(sets, setRepository);
+		List<Type> selectedTypes = getSelectedObjectsAsList(types, typeRepository);
 		model.addAttribute("cards", accountService.getGalleryCards(currentPage, sessionData.getSortType(),
-				sessionData.getOrderType(), selectedRarities, selectedSets, search));
+				sessionData.getOrderType(), selectedRarities, selectedSets, selectedTypes, search));
 		model.addAttribute("coins", accountService.getCoins());
-		model.addAttribute("numberOfPages", cardRepository.getNumberOfPages(selectedRarities, selectedSets, search));
+		model.addAttribute("numberOfPages",
+				cardRepository.getNumberOfPages(selectedRarities, selectedSets, selectedTypes, search));
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("link", "/gallery");
 		model.addAttribute("rarities", getSelectedObjectsMap(selectedRarities, rarityRepository));
 		model.addAttribute("selectedRarities", rarities.orElse(""));
 		model.addAttribute("sets", getSelectedObjectsMap(selectedSets, setRepository));
 		model.addAttribute("selectedSets", sets.orElse(""));
+		model.addAttribute("selectedTypes", types.orElse(""));
+		model.addAttribute("types", getSelectedObjectsMap(selectedTypes, typeRepository));
 		model.addAttribute("sortOptions", SortType.values());
 		model.addAttribute("sessionData", sessionData);
 		model.addAttribute("selectedSortOption", new StringWrapper());
@@ -110,7 +113,7 @@ public class GalleryController {
 	@PostMapping("/gallery")
 	public ModelAndView sortSelection(ModelMap model, @RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
-			@RequestParam(value = "set") Optional<String> sets,
+			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
 			@ModelAttribute(name = "selectedOption") StringWrapper selectedOption,
 			@ModelAttribute SearchWrapper search) {
 		if (selectedOption.getString() != null) {
@@ -122,11 +125,11 @@ public class GalleryController {
 		}
 		Optional<String> searchResult = search.getSearch() == null || search.getSearch().isEmpty()
 				|| search.getSearch().isBlank() ? Optional.empty() : Optional.of(search.getSearch());
-		return redirectToGallery(model, page, rarities, sets, searchResult);
+		return redirectToGallery(model, page, rarities, sets, types, searchResult);
 	}
 
 	private ModelAndView redirectToGallery(ModelMap model, Optional<Integer> page, Optional<String> rarities,
-			Optional<String> sets, Optional<String> search) {
+			Optional<String> sets, Optional<String> types, Optional<String> search) {
 		if (page.isPresent())
 			model.addAttribute("page", page.get());
 		if (rarities.isPresent())
@@ -135,6 +138,8 @@ public class GalleryController {
 			model.addAttribute("set", sets.get());
 		if (search.isPresent())
 			model.addAttribute("search", search.get());
+		if (types.isPresent())
+			model.addAttribute("type", types.get());
 		return new ModelAndView("redirect:/gallery", model);
 	}
 

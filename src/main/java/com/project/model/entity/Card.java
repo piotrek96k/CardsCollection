@@ -4,14 +4,17 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Entity
-public class Card {
+public class Card implements Identifiable<String> {
 
 	@Id
 	@NotNull
@@ -26,10 +29,24 @@ public class Card {
 	@NotNull
 	@ManyToOne
 	private Rarity rarity;
-	
+
 	@NotNull
 	@ManyToOne
 	private Set set;
+
+	private Integer pokedexNumber;
+
+	private String evolvesFrom;
+
+	private Integer hp;
+
+	@ManyToMany
+	@JoinTable(name = "card_types", joinColumns = @JoinColumn(referencedColumnName = "id", name = "card_id"), inverseJoinColumns = @JoinColumn(name = "type_id"))
+	@OrderBy("id ASC")
+	private List<Type> types;
+	
+	@ManyToOne
+	private Type firstType;
 
 	@Transient
 	private int quantity;
@@ -43,8 +60,8 @@ public class Card {
 	public Card(String id, String name, String imageUrl, Rarity rarity) {
 		this(id, name, imageUrl, rarity, 0);
 	}
-	
-	public Card (Card card, long quantity) {
+
+	public Card(Card card, long quantity) {
 		this(card.id, card.name, card.imageUrl, card.rarity, quantity);
 	}
 
@@ -53,13 +70,15 @@ public class Card {
 		this.name = name;
 		this.imageUrl = imageUrl;
 		this.rarity = rarity;
-		this.quantity = (int)quantity;
+		this.quantity = (int) quantity;
 	}
 
+	@Override
 	public String getId() {
 		return id;
 	}
 
+	@Override
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -96,6 +115,30 @@ public class Card {
 		this.set = set;
 	}
 
+	public Integer getPokedexNumber() {
+		return pokedexNumber;
+	}
+
+	public void setPokedexNumber(Integer pokedexNumber) {
+		this.pokedexNumber = pokedexNumber;
+	}
+
+	public String getEvolvesFrom() {
+		return evolvesFrom;
+	}
+
+	public void setEvolvesFrom(String evolvesFrom) {
+		this.evolvesFrom = evolvesFrom;
+	}
+
+	public Integer getHp() {
+		return hp;
+	}
+
+	public void setHp(Integer hp) {
+		this.hp = hp;
+	}
+
 	public int getQuantity() {
 		return quantity;
 	}
@@ -104,12 +147,28 @@ public class Card {
 		this.quantity = quantity;
 	}
 
+	public Type getFirstType() {
+		return firstType;
+	}
+
+	public void setFirstType(Type firstType) {
+		this.firstType = firstType;
+	}
+
 	public List<Account> getAccounts() {
 		return accounts;
 	}
 
 	public void setAccounts(List<Account> accounts) {
 		this.accounts = accounts;
+	}
+
+	public List<Type> getTypes() {
+		return types;
+	}
+
+	public void setTypes(List<Type> types) {
+		this.types = types;
 	}
 
 	@Override

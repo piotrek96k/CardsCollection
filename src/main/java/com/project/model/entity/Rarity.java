@@ -6,7 +6,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 @Entity
-public class Rarity implements Comparable<Rarity>{
+public class Rarity implements Comparable<Rarity>, Identifiable<String>{
 
 	@Id
 	@NotNull
@@ -34,11 +34,13 @@ public class Rarity implements Comparable<Rarity>{
 
 	public Rarity() {
 	}
-
+	
+	@Override
 	public String getId() {
 		return id;
 	}
 
+	@Override
 	public void setId(String id) {
 		this.id = id;
 	}

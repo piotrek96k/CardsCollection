@@ -1,15 +1,18 @@
 package com.project.model.component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -17,14 +20,18 @@ import com.project.model.api.Cards;
 import com.project.model.api.Sets;
 import com.project.model.entity.Account;
 import com.project.model.entity.Card;
+import com.project.model.entity.Identifiable;
 import com.project.model.entity.Rarity;
 import com.project.model.entity.Role;
 import com.project.model.entity.RoleEnum;
+import com.project.model.entity.Set;
+import com.project.model.entity.Type;
 import com.project.model.repository.AccountRepository;
 import com.project.model.repository.CardRepository;
 import com.project.model.repository.RarityRepository;
 import com.project.model.repository.RoleRepository;
 import com.project.model.repository.SetRepository;
+import com.project.model.repository.TypeRepository;
 import com.project.model.service.ApiService;
 
 @Component
@@ -43,9 +50,12 @@ public class DatabaseInitializer implements InitializingBean {
 
 	@Autowired
 	private RarityRepository rarityRepository;
-	
+
 	@Autowired
 	private SetRepository setRepository;
+
+	@Autowired
+	private TypeRepository typeRepository;
 
 	@Autowired
 	private ApiService apiService;
@@ -54,8 +64,9 @@ public class DatabaseInitializer implements InitializingBean {
 		if (apiService.getNumberOfCards() != cardRepository.count()) {
 			LOGGER.log(Level.INFO, "Loading Data");
 			ApiService.ApiData data = apiService.getApiData();
-			loadRarities(data.getRarities());
-			loadSets(data.getSets());
+			loadObjects(data.getRarities(), rarityRepository, rarity -> rarity, Rarity::new);
+			loadObjects(data.getSets(), setRepository, Sets.Set::getName, Set::new);
+			loadObjects(data.getTypes(), typeRepository, type -> type, Type::new);
 			loadCards(data.getCards());
 			setRaritiesCost();
 		}
@@ -70,26 +81,27 @@ public class DatabaseInitializer implements InitializingBean {
 				card.setImageUrl(apiCard.getImageUrl());
 				card.setRarity(rarityRepository.findById(apiCard.getRarity()).get());
 				card.setSet(setRepository.findById(apiCard.getSet()).get());
+				card.setPokedexNumber(apiCard.getPokedexNumber());
+				card.setEvolvesFrom(apiCard.getEvolvesFrom());
+				card.setHp(apiCard.getHp() == null ? null : Integer.valueOf(apiCard.getHp()));
+				List<Type> types = new ArrayList<Type>();
+				if (apiCard.getTypes() != null) {
+					apiCard.getTypes().forEach(type -> types.add(typeRepository.findById(type).get()));
+				}
+				Collections.sort(types);
+				card.setFirstType(types.isEmpty() ? null : types.get(0));
+				card.setTypes(types);
 				cardRepository.save(card);
 			}
 	}
-	
-	private void loadSets(List<Sets.Set> sets) {
-		for(Sets.Set apiSet: sets) {
-			if(setRepository.findById(apiSet.getName()).isEmpty()) {
-				com.project.model.entity.Set set = new com.project.model.entity.Set();
-				set.setId(apiSet.getName());
-				setRepository.save(set);
-			}
-		}
-	}
 
-	private void loadRarities(Set<String> rarities) {
-		for (String apiRarity : rarities)
-			if (rarityRepository.findById(apiRarity).isEmpty()) {
-				Rarity rarity = new Rarity();
-				rarity.setId(apiRarity);
-				rarityRepository.save(rarity);
+	private <T, U, V extends Identifiable<U>> void loadObjects(Iterable<T> objects, JpaRepository<V, U> repository,
+			Function<T, U> idExtractor, Supplier<V> constructor) {
+		for (T object : objects)
+			if (repository.findById(idExtractor.apply(object)).isEmpty()) {
+				V entity = constructor.get();
+				entity.setId(idExtractor.apply(object));
+				repository.save(entity);
 			}
 	}
 

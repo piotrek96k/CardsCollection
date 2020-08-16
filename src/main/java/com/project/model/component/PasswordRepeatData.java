@@ -1,4 +1,4 @@
-package com.project.model.entity;
+package com.project.model.component;
 
 import com.project.annotation.PasswordRepeat;
 

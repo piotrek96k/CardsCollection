@@ -3,7 +3,7 @@ package com.project.annotation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import com.project.model.entity.PasswordRepeatData;
+import com.project.model.component.PasswordRepeatData;
 
 public class PasswordRepeatValidator implements ConstraintValidator<PasswordRepeat, PasswordRepeatData>{
 
