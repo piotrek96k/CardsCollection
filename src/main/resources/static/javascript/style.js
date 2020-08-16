@@ -2,18 +2,18 @@ function buyCard(id) {
 	var xhttp = new XMLHttpRequest();
 	var url = "/gallery/buy?id=" + id;
 	xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-	var data = JSON.parse(this.responseText);
-		document.getElementById("coins").innerHTML = data.coins;
-		document.getElementById("quantity" + id).innerHTML = "x" + data.quantity;
-		disableButtonsIfNeed(parseInt(data.coins.replaceAll(" ", "")));
+  		if (this.readyState == 4 && this.status == 200) {
+			var data = JSON.parse(this.responseText);
+			document.getElementById("coins").innerHTML = data.coins;
+			document.getElementById("quantity" + id).innerHTML = "x" + data.quantity;
+			disableButtonsIfNeed(parseInt(data.coins.replaceAll(" ", "")));
     }
   };
 	xhttp.open("GET", url, true);
 	xhttp.send();
 }
 
-function disableButtonsIfNeed(coins){
+function disableButtonsIfNeed(coins) {
 	var buttons = document.getElementsByName("buybutton");
 	for (let i = 0; i < buttons.length; i++){
 		let id = buttons[i].id;
@@ -22,12 +22,13 @@ function disableButtonsIfNeed(coins){
 	}
 }
 
-function installListeners(){
+function installListeners(scroll) {
+	installScrollListener(scroll);
 	installExpandListeners();
 	installTooltipListeners();
 }
 
-function installTooltipListeners(){
+function installTooltipListeners() {
 	var coll = document.getElementsByClassName("tool-tip");
 	for (let i = 0; i<coll.length; i++) {
 		coll[i].addEventListener("mouseenter", item=>{
@@ -43,7 +44,22 @@ function installTooltipListeners(){
 	}
 }
 
-function installExpandListeners(){
+function installScrollListener(scroll) {
+	var verticalMenu = document.getElementById("verticalmenu");
+	verticalMenu.scrollTop = scroll;
+	verticalMenu.addEventListener("scroll", item=>{
+		var scroll = verticalMenu.scrollTop;
+		$.ajax({
+			type:"post",
+			data: {scroll : scroll},
+			url:"/scroll",
+			async: true,
+			dataType: "text",
+		});
+	});
+}
+
+function installExpandListeners() {
 	var coll = document.getElementsByClassName("vertical-menu-top");
 	for (let i = 0; i < coll.length; i++) {
 		let element = coll[i];
@@ -56,18 +72,29 @@ function installExpandListeners(){
 				element.getElementsByTagName("img")[0].src = "images/expand.png";
 				content.style.display = "none";
 			}
+			sendExpandData(element.getElementsByTagName("button")[0].id);
 		});
 	}
 }
 
-function changeDropdownColor(){
+function sendExpandData(id) {
+	$.ajax({
+		type:"post",
+		data: {expand : id},
+		url:"/expand",
+		async: true,
+		dataType: "text",
+	});
+}
+
+function changeDropdownColor() {
 	document.getElementById("dropdown").style.backgroundColor = "#565656";
 }
 
-function returnDropdownColor(){
+function returnDropdownColor() {
 	document.getElementById("dropdown").style.backgroundColor = "#969390";
 }
 
-function eraseSearch(){
+function eraseSearch() {
 	document.getElementById("search").value = "";
 }

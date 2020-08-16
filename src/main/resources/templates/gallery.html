@@ -9,29 +9,30 @@
 <link rel="stylesheet" type="text/css" href="css/style.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="javascript/style.js"></script>
+<link rel="shortcut icon" href="#">
 </head>
-<body onload="installListeners();">
+<body th:onload="installListeners([[${sessionData.getScrollPosition()}]]);">
 	<div class = "container-fluid scroller">
 		<div class="row" style="margin-top:56px;">
-			<div class="col-pixel-width vertical-menu">
+			<div id="verticalmenu" class="col-pixel-width vertical-menu">
 				<div class="vertical-menu-top">
-					<button type="button" class="btn-block">Rarities
-						<img th:src="@{${selectedRarities == '' ? 'images/expand.png' : 'images/hide.png'}}">
+					<button id="rarities" type="button" class="btn-block">Rarities
+						<img th:src="@{${sessionData.getExpanders().get('rarities') ? 'images/hide.png' : 'images/expand.png'}}">
 					</button>
 				</div>
-				<div th:style="'display: ' + ${selectedRarities == '' ? 'none;' : 'block;'}">
+				<div th:style="'display: ' + ${sessionData.getExpanders().get('rarities') ? 'block' : 'none;'}">
 					<div th:each="rarity : ${rarities}">
 						<div th:if="${rarity.value}" th:with="start=${#strings.startsWith(selectedRarities, rarity.key.getId())}, end=${#strings.endsWith(selectedRarities, rarity.key.getId())}">
 							<div th:if="${start or end}">
-								<div th:if="${start}" th:classappend="${rarity.value == true ? 'vertical-menu-selected' : ''}">
-									<a class="btn-block" th:href="@{/gallery(rarity=${#strings.substringAfter(selectedRarities, rarity.key + ',')},__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${rarity.key.getId()}"></a>
+								<div th:if="${start}" th:classappend="${rarity.value == true ? 'vertical-menu-selected' : ''}" th:with="replace=${#strings.substringAfter(selectedRarities, rarity.key + ',')}">
+									<a class="btn-block" th:href="@{/gallery(__${#strings.isEmpty(replace) ? ',' : 'rarity=${replace}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${rarity.key.getId()}"></a>
 								</div>
-								<div th:if="${end and !start}" th:classappend="${rarity.value == true ? 'vertical-menu-selected' : ''}">
-									<a class="btn-block" th:href="@{/gallery(rarity=${#strings.substringBefore(selectedRarities, ',' + rarity.key)},__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${rarity.key.getId()}"></a>
+								<div th:if="${end and !start}" th:classappend="${rarity.value == true ? 'vertical-menu-selected' : ''}" th:with="replace=${#strings.substringBefore(selectedRarities, ',' + rarity.key)}">
+									<a class="btn-block" th:href="@{/gallery(__${#strings.isEmpty(replace) ? ',' : 'rarity=${replace}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${rarity.key.getId()}"></a>
 								</div>
 							</div>
-							<div th:unless="${start or end}"  th:classappend="${rarity.value == true ? 'vertical-menu-selected' : ''}">
-								<a class="btn-block" th:href="@{/gallery(rarity=${#strings.replace(selectedRarities, rarity.key + ',', '')},__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${rarity.key.getId()}"></a>
+							<div th:unless="${start or end}"  th:classappend="${rarity.value == true ? 'vertical-menu-selected' : ''}" th:with="replace=${#strings.replace(selectedRarities, rarity.key + ',', '')}">
+								<a class="btn-block" th:href="@{/gallery(__${#strings.isEmpty(replace) ? ',' : 'rarity=${replace}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${rarity.key.getId()}"></a>
 							</div>
 						</div>
 						<div th:unless="${rarity.value}">
@@ -40,23 +41,23 @@
 					</div>
 				</div>
 				<div class="vertical-menu-top">
-					<button type="button" class="btn-block">Sets
-						<img th:src="@{${selectedSets == '' ? 'images/expand.png' : 'images/hide.png'}}">
+					<button id="sets" type="button" class="btn-block">Sets
+						<img th:src="@{${sessionData.getExpanders().get('sets') ? 'images/hide.png' : 'images/expand.png'}}">
 					</button>
 				</div>
-				<div th:style="'display: ' + ${selectedSets == '' ? 'none;' : 'block;'}">
+				<div th:style="'display: ' + ${sessionData.getExpanders().get('sets') ? 'block' : 'none;'}">
 					<div th:each="set : ${sets}">
 						<div th:if="${set.value}" th:with="start=${#strings.startsWith(selectedSets, set.key.getId())}, end=${#strings.endsWith(selectedSets, set.key.getId())}">
 							<div th:if="${start or end}">
-								<div th:if="${start}" th:classappend="${set.value == true ? 'vertical-menu-selected' : ''}">
-									<a class="btn-block" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,set=${#strings.substringAfter(selectedSets, set.key + ',')},__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${set.key.getId()}"></a>
+								<div th:if="${start}" th:classappend="${set.value == true ? 'vertical-menu-selected' : ''}" th:with="replace=${#strings.substringAfter(selectedSets, set.key + ',')}">
+									<a class="btn-block" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${#strings.isEmpty(replace) ? ',' : 'set=${replace}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${set.key.getId()}"></a>
 								</div>
-								<div th:if="${end and !start}" th:classappend="${set.value == true ? 'vertical-menu-selected' : ''}">
-									<a class="btn-block" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,set=${#strings.substringBefore(selectedSets, ',' + set.key)},__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${set.key.getId()}"></a>
+								<div th:if="${end and !start}" th:classappend="${set.value == true ? 'vertical-menu-selected' : ''}" th:with="replace=${#strings.substringBefore(selectedSets, ',' + set.key)}">
+									<a class="btn-block" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${#strings.isEmpty(replace) ? ',' : 'set=${replace}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${set.key.getId()}"></a>
 								</div>
 							</div>
-							<div th:unless="${start or end}"  th:classappend="${set.value == true ? 'vertical-menu-selected' : ''}">
-								<a class="btn-block" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,set=${#strings.replace(selectedSets, set.key + ',', '')},__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${set.key.getId()}"></a>
+							<div th:unless="${start or end}"  th:classappend="${set.value == true ? 'vertical-menu-selected' : ''}" th:with="replace=${#strings.replace(selectedSets, set.key + ',', '')}">
+								<a class="btn-block" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${#strings.isEmpty(replace) ? ',' : 'set=${replace}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${set.key.getId()}"></a>
 							</div>
 						</div>
 						<div th:unless="${set.value}">
@@ -65,23 +66,23 @@
 					</div>
 				</div>
 				<div class="vertical-menu-top">
-					<button type="button" class="btn-block">Types
-						<img th:src="@{${selectedTypes == '' ? 'images/expand.png' : 'images/hide.png'}}">
+					<button id="types" type="button" class="btn-block">Types
+						<img th:src="@{${sessionData.getExpanders().get('types') ? 'images/hide.png' : 'images/expand.png'}}">
 					</button>
 				</div>
-				<div th:style="'display: ' + ${selectedTypes == '' ? 'none;' : 'block;'}">
+				<div th:style="'display: ' + ${sessionData.getExpanders().get('types') ? 'block' : 'none'}">
 					<div th:each="type : ${types}">
 						<div th:if="${type.value}" th:with="start=${#strings.startsWith(selectedTypes, type.key.getId())}, end=${#strings.endsWith(selectedTypes, type.key.getId())}">
 							<div th:if="${start or end}">
-								<div th:if="${start}" th:classappend="${type.value == true ? 'vertical-menu-selected' : ''}">
-									<a class="btn-block" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,type=${#strings.substringAfter(selectedTypes, type.key + ',')},__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${type.key.getId()}"></a>
+								<div th:if="${start}" th:classappend="${type.value == true ? 'vertical-menu-selected' : ''}" th:with="replace=${#strings.substringAfter(selectedTypes, type.key + ',')}">
+									<a class="btn-block" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${#strings.isEmpty(replace) ? ',' : 'type=${replace}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${type.key.getId()}"></a>
 								</div>
-								<div th:if="${end and !start}" th:classappend="${type.value == true ? 'vertical-menu-selected' : ''}">
-									<a class="btn-block" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,type=${#strings.substringBefore(selectedTypes, ',' + type.key)},__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${type.key.getId()}"></a>
+								<div th:if="${end and !start}" th:classappend="${type.value == true ? 'vertical-menu-selected' : ''}" th:with="replace=${#strings.substringBefore(selectedTypes, ',' + type.key)}">
+									<a class="btn-block" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${#strings.isEmpty(replace) ? ',' : 'type=${replace}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${type.key.getId()}"></a>
 								</div>
 							</div>
-							<div th:unless="${start or end}"  th:classappend="${type.value == true ? 'vertical-menu-selected' : ''}">
-								<a class="btn-block" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,type=${#strings.replace(selectedTypes, type.key + ',', '')},__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${type.key.getId()}"></a>
+							<div th:unless="${start or end}"  th:classappend="${type.value == true ? 'vertical-menu-selected' : ''}" th:with="replace=${#strings.replace(selectedTypes, type.key + ',', '')}">
+								<a class="btn-block" th:href="@{/gallery(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${#strings.isEmpty(replace) ? ',' : 'type=${replace}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${type.key.getId()}"></a>
 							</div>
 						</div>
 						<div th:unless="${type.value}">
@@ -99,8 +100,8 @@
 							<div class="topnav">
 								<a class="disabled active"> Sort By</a>
 					  			<div th:each="sortOption : ${sortOptions}">
-					 	 			<form th:action="@{/gallery(page=${currentPage},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:object="${selectedSortOption}" method="post">
-					 	 				<button type="submit" th:name="string" th:value="${sortOption}" th:text="${sortOption.getName()}" th:classappend="${sessionData.getSortType() == sortOption ? 'active' : ''}"></button>
+					 	 			<form th:action="@{/sort(page=${currentPage},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" method="post">
+					 	 				<button type="submit" th:name="sort" th:value="${sortOption}" th:text="${sortOption.getName()}" th:classappend="${sessionData.getSortType() == sortOption ? 'active' : ''}"></button>
 					 	 			</form>
 					 	 		</div>
 					  			<div onmouseover="changeDropdownColor();" onmouseout="returnDropdownColor();" class="dropdown">
@@ -108,8 +109,8 @@
   										<img src="images/expand.png">
   									</button>
 									<div class="dropdown-content">
- 										<form th:action="@{/gallery(page=${currentPage},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:object="${selectedOrderOption}" th:each="orderType : ${sessionData.getSortType().orderTypeValues()}" method="post">
-						  					<button type="submit" th:name="string" th:value="${orderType}" th:text="${orderType.getName()}" th:classappend="${sessionData.getOrderType() == orderType ? 'active' : ''}"></button>
+ 										<form th:action="@{/order(page=${currentPage},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:each="orderType : ${sessionData.getSortType().orderTypeValues()}" method="post">
+						  					<button type="submit" th:name="order" th:value="${orderType}" th:text="${orderType.getName()}" th:classappend="${sessionData.getOrderType() == orderType ? 'active' : ''}"></button>
 					  					</form>
 									</div>
 								</div> 
