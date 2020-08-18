@@ -1,10 +1,12 @@
 package com.project.model.service;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -20,6 +22,7 @@ import com.project.model.entity.Card;
 import com.project.model.entity.Rarity;
 import com.project.model.entity.Role;
 import com.project.model.entity.RoleEnum;
+import com.project.model.entity.Set;
 import com.project.model.entity.Type;
 import com.project.model.repository.AccountRepository;
 import com.project.model.repository.CardRepository;
@@ -49,23 +52,22 @@ public class AccountService {
 		accountRepository.save(account);
 	}
 
-	public List<Card> getUserCards(int page) {
-		Function<AccountId, List<Card>> function = accountId -> {
-			List<Card> cards = accountRepository.getAccountCardsListByPage(accountId.getUsername(), page);
-			Set<Rarity> rarities = new HashSet<Rarity>();
-			cards.forEach(card -> rarities.add(card.getRarity()));
-			rarities.forEach(rarity -> rarity.setCost(rarity.getCost() / 2));
-			return cards;
-		};
+	public List<Card> getUserCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities,
+			List<Set> sets, List<Type> types, Optional<String> search) {
+		Function<AccountId, List<Card>> function = accountId -> 
+			 accountRepository.getCards(accountId.getUsername(), page, sortType, orderType, rarities, sets, types, search);
 		return operateOnAccount(function, () -> new ArrayList<Card>());
 	}
 
-	public int getUserCardsNumberOfPages() {
-		return operateOnAccount(accountId -> accountRepository.getNumberOfPages(accountId.getUsername()), () -> 1);
+	public int getUserCardsNumberOfPages(List<Rarity> rarities, List<Set> sets,
+			List<Type> types, Optional<String> search) {
+		return operateOnAccount(
+				accountId -> accountRepository.getNumberOfPages(accountId.getUsername(), rarities, sets, types, search),
+				() -> 1);
 	}
 
-	public List<Card> getGalleryCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities,
-			List<com.project.model.entity.Set> sets, List<Type> types, Optional<String> search) {
+	public List<Card> getCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities,
+			List<Set> sets, List<Type> types, Optional<String> search) {
 		Function<AccountId, List<Card>> function = accountId -> {
 			List<Card> cards = cardRepository.getCards(page, sortType, orderType, rarities, sets, types, search);
 			for (Card card : cards)
@@ -79,12 +81,21 @@ public class AccountService {
 	public int getCoins() {
 		return operateOnAccount(accountId -> accountRepository.getCoins(accountId.getUsername()), () -> 0);
 	}
+	
+	public String getFormattedInteger(int value) {
+		DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.getDefault());
+		DecimalFormatSymbols symbols = formatter.getDecimalFormatSymbols();
+		symbols.setGroupingSeparator(' ');
+		formatter.setDecimalFormatSymbols(symbols);
+		return formatter.format(value);
+	}
 
 	public int countUserCardsByCardId(String id) {
 		return operateOnAccount(accountId -> accountRepository.countUserCardsByCardId(accountId.getUsername(), id),
 				() -> 0);
 	}
 
+	/*do usunięcia*/
 	public Card getCard(String id) {
 		Function<AccountId, Card> function = accountId -> {
 			Card card = cardRepository.getOne(id);
@@ -94,6 +105,7 @@ public class AccountService {
 		return operateOnAccount(function, () -> cardRepository.getOne(id));
 	}
 
+	/*do usunięcia*/
 	public Card getCardToSell(String id) {
 		Card card = getCard(id);
 		card.getRarity().setCost(card.getRarity().getCost() / 2);
@@ -116,11 +128,14 @@ public class AccountService {
 
 	public boolean removeCard(String id) {
 		Function<AccountId, Boolean> function = accountId -> {
-			int cost = cardRepository.getCardCost(id) / 2;
-			int coins = accountRepository.getCoins(accountId.getUsername());
-			accountRepository.removeCard(accountId.getUsername(), id);
-			accountRepository.updateUserCoins(accountId.getUsername(), coins + cost);
-			return true;
+			if(accountRepository.countUserCardsByCardId(accountId.getUsername(), id)>0) {
+				int cost = cardRepository.getCardSellCost(id);
+				int coins = accountRepository.getCoins(accountId.getUsername());
+				accountRepository.removeCard(accountId.getUsername(), id);
+				accountRepository.updateUserCoins(accountId.getUsername(), coins + cost);
+				return true;
+			}
+			return false;
 		};
 		return operateOnAccount(function, () -> false);
 	}

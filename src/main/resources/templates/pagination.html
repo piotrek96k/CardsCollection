@@ -6,35 +6,37 @@
 <meta charset="UTF-8">
 </head>
 <body>
-	<div th:fragment="pagination" class="row justify-content-center" style="margin-top:50px; margin-bottom:75px;" th:if="${numberOfPages > 1}">
-		<div class="col-auto">
-			<table class="table table-responsive">
-				<tr class="pagination page-table" th:with="start=${currentPage > 5 ? (currentPage < numberOfPages - 5 ? currentPage - 4 : numberOfPages - 9) : 1}">
-  					<td class="px-2 page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
-  						<a class="page-link" th:href="@{${link}(page = ${1},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}">
-  							<img th:alt="F" th:src="@{images/first.png}">
-  						</a>
-  					</td>
-  					<td class="px-2 page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
-  						<a class="page-link" th:href="@{${link}(page = ${currentPage - 1},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}">
-  							<img th:alt="P" th:src="@{images/previous.png}"> 
-  						</a>
- 	 				</td>
-  					<td class="px-2 page-item" th:if="${numberOfPages > 1}" th:each="number : ${#numbers.sequence(numberOfPages > 11 ? start : 1, numberOfPages > 11 ? start + 9 : numberOfPages)}" th:classappend="${currentPage == number ? 'active' : ''}">
-  						<a class="page-link" th:text="${number}" th:href="@{${link}(page = ${number},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}"></a>
-  					</td> 								
-  					<td class="px-2 page-item" th:classappend="${currentPage == numberOfPages ? 'disabled' : ''}">
-  						<a class="page-link" th:href="@{${link}(page = ${currentPage + 1},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}">
-  							<img th:alt="N" th:src="@{images/next.png}">
-  						</a>
-  					</td>
-  					<td class="px-2 page-item" th:classappend="${currentPage == numberOfPages ? 'disabled' : ''}">
-  						<a class="page-link" th:href="@{${link}(page = ${numberOfPages},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}">
-  							<img th:alt="L" th:src="@{images/last.png}"> 
-  						</a>			
-  					</td>
-				</tr>
-			</table>
+	<div id="pagination" th:fragment="pagination">
+		<div class="row justify-content-center" style="margin-top:50px; margin-bottom:75px;" th:if="${numberOfPages > 1}">
+			<div class="col-auto">
+				<table class="table table-responsive">
+					<tr class="pagination page-table" th:with="start=${currentPage > 5 ? (currentPage < numberOfPages - 5 ? currentPage - 4 : numberOfPages - 9) : 1}">
+  						<td class="px-2 page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
+  							<a class="page-link" th:href="@{${link}(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}">
+  								<img th:alt="F" th:src="@{images/first.png}">
+  							</a>
+  						</td>
+  						<td class="px-2 page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
+  							<a class="page-link" th:href="@{${link}(__${currentPage == 2 ? ',' : 'page = ${currentPage - 1}'}__,__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}">
+  								<img th:alt="P" th:src="@{images/previous.png}"> 
+  							</a>
+ 		 				</td>
+  						<td class="px-2 page-item" th:if="${numberOfPages > 1}" th:each="number : ${#numbers.sequence(numberOfPages > 11 ? start : 1, numberOfPages > 11 ? start + 9 : numberOfPages)}" th:classappend="${currentPage == number ? 'active' : ''}">
+  							<a class="page-link" th:text="${number}" th:href="@{${link}(__${number == 1 ? ',' : 'page = ${number}'}__,__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}"></a>
+  						</td> 								
+  						<td class="px-2 page-item" th:classappend="${currentPage == numberOfPages ? 'disabled' : ''}">
+  							<a class="page-link" th:href="@{${link}(page = ${currentPage + 1},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}">
+  								<img th:alt="N" th:src="@{images/next.png}">
+  							</a>
+  						</td>
+  						<td class="px-2 page-item" th:classappend="${currentPage == numberOfPages ? 'disabled' : ''}">
+  							<a class="page-link" th:href="@{${link}(page = ${numberOfPages},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}">
+  								<img th:alt="L" th:src="@{images/last.png}"> 
+  							</a>			
+  						</td>
+					</tr>
+				</table>
+			</div>
 		</div>
 	</div>
 </body>

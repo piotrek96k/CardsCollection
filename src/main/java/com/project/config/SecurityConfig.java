@@ -34,8 +34,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable().authorizeRequests().antMatchers("/").permitAll().antMatchers("/register", "/login")
-				.anonymous().antMatchers("/gallery").authenticated().and().formLogin().loginPage("/login").defaultSuccessUrl("/").and().logout()
-				.logoutSuccessUrl("/").and().exceptionHandling().accessDeniedPage("/");
+				.anonymous().antMatchers("/buy/**", "/sell/**", "/mycards/**").authenticated().and().formLogin()
+				.loginPage("/login").defaultSuccessUrl("/").and().logout().logoutSuccessUrl("/").and()
+				.exceptionHandling().accessDeniedPage("/");
 	}
 
 }

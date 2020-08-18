@@ -235,6 +235,11 @@ hr {
 .card-p-width {
 	width:175px;
 }
+.card-p img {
+	margin-left:5px;
+	margin-top:3px;
+	width:14px;
+}
 .tool-tip .tooltip-table {
 	display:inline;
 	visibility: hidden;

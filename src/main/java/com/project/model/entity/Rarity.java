@@ -1,5 +1,6 @@
 package com.project.model.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Transient;
@@ -14,6 +15,10 @@ public class Rarity implements Comparable<Rarity>, Identifiable<String>{
 	
 	@NotNull
 	private int cost;
+	
+	@NotNull
+	@Column(name = "sell_cost")
+	private int sellCost;
 	
 	@Transient
 	private int quantity;
@@ -51,6 +56,14 @@ public class Rarity implements Comparable<Rarity>, Identifiable<String>{
 
 	public void setCost(int cost) {
 		this.cost = cost;
+	}
+
+	public int getSellCost() {
+		return sellCost;
+	}
+
+	public void setSellCost(int sellCost) {
+		this.sellCost = sellCost;
 	}
 
 	public int getQuantity() {

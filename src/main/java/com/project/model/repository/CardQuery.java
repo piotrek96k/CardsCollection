@@ -10,7 +10,7 @@ import com.project.model.entity.Type;
 import com.project.model.service.SortType;
 import com.project.model.service.SortType.OrderType;
 
-public interface CardQuery extends Query {
+public interface CardQuery {
 
 	public int getNumberOfPages(List<Rarity> rarities, List<Set> sets, List<Type> types, Optional<String> search);
 

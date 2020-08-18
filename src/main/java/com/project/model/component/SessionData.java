@@ -19,11 +19,17 @@ public class SessionData {
 	private Map<String, Boolean> expanders;
 	
 	private int scrollPosition;
+	
+	private String lastVisited;
 
 	{
 		sortType = SortType.NAME;
 		orderType = SortType.NAME.ASC;
 		expanders = new HashMap<String, Boolean>();
+		resetExpanders();
+	}
+	
+	public void resetExpanders() {
 		for (Expander expander : Expander.values())
 			expanders.put(expander.getExpand(), false);
 		scrollPosition = 0;
@@ -64,6 +70,14 @@ public class SessionData {
 
 	public void setExpanders(Map<String, Boolean> expanders) {
 		this.expanders = expanders;
+	}
+
+	public String getLastVisited() {
+		return lastVisited;
+	}
+
+	public void setLastVisited(String lastVisited) {
+		this.lastVisited = lastVisited;
 	}
 	
 }

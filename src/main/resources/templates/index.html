@@ -25,7 +25,7 @@
   								<br>
   							</div>
 							<div class="card-footer">
-								<a class="btn btn-primary btn-block card-link" th:href="@{/sell(id=${card.getId()}, page=${currentPage})}" th:text="${'Sell ' + card.getRarity().getCost()}"></a>
+								<a class="btn btn-primary btn-block card-link" th:href="@{/sold(id=${card.getId()}, page=${currentPage})}" th:text="${'Sell ' + card.getRarity().getCost()}"></a>
 							</div>
 						</div>
        				</div>

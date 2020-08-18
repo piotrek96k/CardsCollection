@@ -112,6 +112,7 @@ public class DatabaseInitializer implements InitializingBean {
 			if (rarity.getCost() == 0) {
 				int cost = costs.get(rarity.getId()) == null ? 25_000 : costs.get(rarity.getId());
 				rarityRepository.setRarityCost(rarity.getId(), cost);
+				rarityRepository.setRaritySellCost(rarity.getId(), cost/2);
 			}
 	}
 
@@ -175,8 +176,8 @@ public class DatabaseInitializer implements InitializingBean {
 		loadData();
 		loadRoles();
 		createAdmin();
-//		for(int i =1; i<3; i++)
-//			cardRepository.getCardsByPageOrderByName(i).forEach(card->accountRepository.addCard("admin", "cardsCollectorsAdmin@gmail.com", card.getId()));
+//		for(int i =1; i<200; i++)
+//			cardRepository.getCards(i, SortType.NAME, SortType.NAME.ASC, new ArrayList<Rarity>(), new ArrayList<Set>(), new ArrayList<Type>(), Optional.empty()).forEach(card->accountRepository.addCard("admin", "cardsCollectorsAdmin@gmail.com", card.getId()));
 	}
 
 }

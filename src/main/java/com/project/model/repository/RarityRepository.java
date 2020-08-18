@@ -19,5 +19,10 @@ public interface RarityRepository extends JpaRepository<Rarity, String>{
 	@Modifying
 	@Query(value = "update rarity set cost=:cost where id=:id", nativeQuery = true)
 	public void setRarityCost(@Param(value = "id") String id, @Param(value = "cost") int cost);
+
+	@Transactional
+	@Modifying
+	@Query(value = "update rarity set sell_cost=:sell_cost where id=:id", nativeQuery = true)
+	public void setRaritySellCost(@Param(value = "id") String id, @Param(value = "sell_cost") int sellCost);
 	
 }

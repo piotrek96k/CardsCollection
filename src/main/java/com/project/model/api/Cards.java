@@ -18,21 +18,22 @@ public class Cards {
 
 		private String name;
 
+		@JsonProperty(value = "imageUrlHiRes")
 		private String imageUrl;
 
 		private String rarity;
-		
+
 		private String set;
-		
+
 		private Set<String> types;
-		
-		@JsonProperty("nationalPokedexNumber")
+
+		@JsonProperty(value = "nationalPokedexNumber")
 		private Integer pokedexNumber;
-		
+
 		private String evolvesFrom;
-		
+
 		private String hp;
-		
+
 		public String getId() {
 			return id;
 		}

@@ -22,13 +22,13 @@
 				<div class = "container-fluid" style="margin-top:44px; overflow:hidden;">
 					<div class="row">
 						<div class ="col px-3">
-							<h1>Sell</h1>
+							<h1>Buy</h1>
 						</div>
 					</div>
 					<div>
 						<hr>
 					</div>
-					<div th:with="addButton=true, fragment='sellbutton :: sellbutton'" th:insert="cards :: cards"></div>
+					<div th:with="addButton=true, fragment='buybutton :: buybutton'" th:insert="cards :: cards"></div>
 				</div>
 				<div th:insert="pagination :: pagination"></div>
 			</div>			

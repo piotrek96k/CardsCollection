@@ -57,19 +57,26 @@ public class Card implements Identifiable<String> {
 	public Card() {
 	}
 
-	public Card(String id, String name, String imageUrl, Rarity rarity) {
-		this(id, name, imageUrl, rarity, 0);
+	public Card(String id, String name, String imageUrl, Rarity rarity, Set set, List<Type> types, 
+			Integer pokedexNumber, String evolvesFrom, Integer hp) {
+		this(id, name, imageUrl, rarity,set, types, pokedexNumber, evolvesFrom, hp, 0);
 	}
 
 	public Card(Card card, long quantity) {
-		this(card.id, card.name, card.imageUrl, card.rarity, quantity);
+		this(card.id, card.name, card.imageUrl, card.rarity, card.set, card.types, card.pokedexNumber, card.evolvesFrom, card.hp, quantity);
 	}
 
-	public Card(String id, String name, String imageUrl, Rarity rarity, long quantity) {
+	public Card(String id, String name, String imageUrl, Rarity rarity,Set set, List<Type> types, 
+			Integer pokedexNumber, String evolvesFrom, Integer hp, long quantity) {
 		this.id = id;
 		this.name = name;
 		this.imageUrl = imageUrl;
 		this.rarity = rarity;
+		this.set = set;
+		this.types=types;
+		this.pokedexNumber=pokedexNumber;
+		this.evolvesFrom=evolvesFrom;
+		this.hp=hp;
 		this.quantity = (int) quantity;
 	}
 
@@ -173,7 +180,9 @@ public class Card implements Identifiable<String> {
 
 	@Override
 	public String toString() {
-		return "Card [id=" + id + ", name=" + name + ", imageUrl=" + imageUrl + "]";
+		return "Card [id=" + id + ", name=" + name + ", imageUrl=" + imageUrl + ", rarity=" + rarity + ", set=" + set
+				+ ", pokedexNumber=" + pokedexNumber + ", evolvesFrom=" + evolvesFrom + ", hp=" + hp + ", types="
+				+ types + ", firstType=" + firstType + ", quantity=" + quantity + "]";
 	}
 
 }
