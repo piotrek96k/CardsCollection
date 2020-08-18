@@ -1,2 +1,2 @@
-# CardsCollection
-Card collection website
+# Pokemon Cards
+Web service for collecting pokemon cards

@@ -11,11 +11,11 @@
 		<relativePath />
 	</parent>
 
-	<groupId>com.project</groupId>
-	<artifactId>CardsCollection</artifactId>
+	<groupId>com.pokemoncards</groupId>
+	<artifactId>PokemonCards</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Cards Collection Website</name>
-	<description>Cards collecion system website</description>
+	<name>Pokemon Cards</name>
+	<description>pokemon cards collecting site</description>
 
 	<properties>
 		<java.version>12</java.version>
