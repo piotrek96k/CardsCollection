@@ -52,22 +52,26 @@ public class AccountService {
 		accountRepository.save(account);
 	}
 
+	public AccountId getAccountId() {
+		return operateOnAccount(accountId -> accountId, () -> new AccountId());
+	}
+
 	public List<Card> getUserCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities,
 			List<Set> sets, List<Type> types, Optional<String> search) {
-		Function<AccountId, List<Card>> function = accountId -> 
-			 accountRepository.getCards(accountId.getUsername(), page, sortType, orderType, rarities, sets, types, search);
+		Function<AccountId, List<Card>> function = accountId -> accountRepository.getCards(accountId.getUsername(),
+				page, sortType, orderType, rarities, sets, types, search);
 		return operateOnAccount(function, () -> new ArrayList<Card>());
 	}
 
-	public int getUserCardsNumberOfPages(List<Rarity> rarities, List<Set> sets,
-			List<Type> types, Optional<String> search) {
+	public int getUserCardsNumberOfPages(List<Rarity> rarities, List<Set> sets, List<Type> types,
+			Optional<String> search) {
 		return operateOnAccount(
 				accountId -> accountRepository.getNumberOfPages(accountId.getUsername(), rarities, sets, types, search),
 				() -> 1);
 	}
 
-	public List<Card> getCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities,
-			List<Set> sets, List<Type> types, Optional<String> search) {
+	public List<Card> getCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities, List<Set> sets,
+			List<Type> types, Optional<String> search) {
 		Function<AccountId, List<Card>> function = accountId -> {
 			List<Card> cards = cardRepository.getCards(page, sortType, orderType, rarities, sets, types, search);
 			for (Card card : cards)
@@ -81,7 +85,7 @@ public class AccountService {
 	public int getCoins() {
 		return operateOnAccount(accountId -> accountRepository.getCoins(accountId.getUsername()), () -> 0);
 	}
-	
+
 	public String getFormattedInteger(int value) {
 		DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.getDefault());
 		DecimalFormatSymbols symbols = formatter.getDecimalFormatSymbols();
@@ -93,23 +97,6 @@ public class AccountService {
 	public int countUserCardsByCardId(String id) {
 		return operateOnAccount(accountId -> accountRepository.countUserCardsByCardId(accountId.getUsername(), id),
 				() -> 0);
-	}
-
-	/*do usunięcia*/
-	public Card getCard(String id) {
-		Function<AccountId, Card> function = accountId -> {
-			Card card = cardRepository.getOne(id);
-			card.setQuantity(accountRepository.countUserCardsByCardId(accountId.getUsername(), id));
-			return card;
-		};
-		return operateOnAccount(function, () -> cardRepository.getOne(id));
-	}
-
-	/*do usunięcia*/
-	public Card getCardToSell(String id) {
-		Card card = getCard(id);
-		card.getRarity().setCost(card.getRarity().getCost() / 2);
-		return card;
 	}
 
 	public boolean addCard(String id) {
@@ -128,7 +115,7 @@ public class AccountService {
 
 	public boolean removeCard(String id) {
 		Function<AccountId, Boolean> function = accountId -> {
-			if(accountRepository.countUserCardsByCardId(accountId.getUsername(), id)>0) {
+			if (accountRepository.countUserCardsByCardId(accountId.getUsername(), id) > 0) {
 				int cost = cardRepository.getCardSellCost(id);
 				int coins = accountRepository.getCoins(accountId.getUsername());
 				accountRepository.removeCard(accountId.getUsername(), id);

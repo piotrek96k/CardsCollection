@@ -16,5 +16,19 @@ public interface CardQuery {
 
 	public List<Card> getCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities, List<Set> sets,
 			List<Type> types, Optional<String> search);
+	
+	public Card getCardByRowNumber(int row, Rarity rarity);
 
+	public Card getFirstCard(Rarity rarity);
+	
+	public Card getNextCard(Rarity rarity, String id);
+	
+	public Card getFirstCard(String search);
+	
+	public Card getNextCard(String search, String id);
+	
+	public Card getCardByRowNumber(int row, String search);
+	
+	public int countCardsBySearch(String search);
+	
 }

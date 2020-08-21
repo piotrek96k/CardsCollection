@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableAutoConfiguration
@@ -17,7 +18,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private DataSource dataSource;
 
-	@Autowired
 	@Override
 	protected void configure(AuthenticationManagerBuilder authentication) throws Exception {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -33,10 +33,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable().authorizeRequests().antMatchers("/").permitAll().antMatchers("/register", "/login")
-				.anonymous().antMatchers("/buy/**", "/sell/**", "/mycards/**").authenticated().and().formLogin()
-				.loginPage("/login").defaultSuccessUrl("/").and().logout().logoutSuccessUrl("/").and()
-				.exceptionHandling().accessDeniedPage("/");
+		http.authorizeRequests().antMatchers("/").permitAll().antMatchers("/register").anonymous()
+				.antMatchers("/buy/**", "/sell/**", "/mycards/**").authenticated().and().formLogin().loginPage("/")
+				.defaultSuccessUrl("/").and().logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+				.logoutSuccessUrl("/").and().exceptionHandling().accessDeniedPage("/");
 	}
 
 }

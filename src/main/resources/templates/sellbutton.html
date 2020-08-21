@@ -6,7 +6,7 @@
 </head>
 <body>
 	<div th:fragment="sellbutton" class="card-footer">
-  		<button name="sellbutton" class="btn btn-primary btn-block card-link" th:id="${card.getId()}" th:rarity="${selectedRarities}" th:set="${selectedSets}" th:type="${selectedTypes}" th:search="${enteredSearch}" th:onclick="|sellCard(this.getAttribute('id'), ${currentPage}, this.getAttribute('rarity'), this.getAttribute('set'), this.getAttribute('type'), this.getAttribute('search'))|" th:classappend="${coins < card.getRarity().getCost() ? 'disabled' : ''}">
+  		<button name="sellbutton" class="btn btn-success btn-block card-link" th:id="${card.getId()}" th:rarity="${selectedRarities}" th:set="${selectedSets}" th:type="${selectedTypes}" th:search="${enteredSearch}" th:onclick="|sellCard(this.getAttribute('id'), ${currentPage}, this.getAttribute('rarity'), this.getAttribute('set'), this.getAttribute('type'), this.getAttribute('search'))|">
   			<span class="float-left">Sell</span>
   			<span style="margin-left:5px;" th:text="${#numbers.formatInteger(card.getRarity().getSellCost(), 1, 'WHITESPACE')}"></span>
   			<img style="margin-left:5px;" src="images/coins.png" width="30" alt="Coins">

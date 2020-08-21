@@ -16,4 +16,5 @@ public interface CardRepository extends JpaRepository<Card, String>, CardQuery {
 
 	@Query(value = "select rarity.sell_cost from card inner join rarity on card.rarity_id=rarity.id where card.id=:id", nativeQuery = true)
 	public int getCardSellCost(@Param("id") String id);
+
 }

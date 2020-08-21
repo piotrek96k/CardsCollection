@@ -27,8 +27,11 @@
 					</div> 
 					<div class="search-container">
 					  	<div class="form-inline">
-   							<form id="search-form" th:action="@{${link}(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__)}" method="post">
+   							<form class="search-tool-tip" id="search-form" th:action="@{${link}(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__)}" method="post">
    								<input type="text" class="form-control mr-2" id="search" th:name="search" th:value="${enteredSearch == '' ? '' : enteredSearch}" placeholder="Search ...">
+ 								<div class="search-tooltip-table">
+ 									<p>In order to find results which fields are equal to the given phrase add ! at the beginning of the phrase</p>
+ 								</div>
  							</form>
  							<button onclick="eraseSearch();" class="btn">
  								<img th:src="@{images/cancel.png}" class="center" width="18" height="20" alt="C">

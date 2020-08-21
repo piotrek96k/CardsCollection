@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -43,10 +44,9 @@ public class AccountRepositoryImpl extends RepositoryImpl implements AccountQuer
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Card> criteriaQuery = criteriaBuilder.createQuery(Card.class);
 		Root<Account> account = criteriaQuery.from(Account.class);
-		criteriaQuery.where(getAccountPredicate(criteriaBuilder, account, username));
 		Join<Account, Card> card = account.join("cards");
 		criteriaQuery.groupBy(card.get("id"));
-		setWhereQueryPart(criteriaBuilder, criteriaQuery, card, rarities, sets, types, search);
+		setWhereQueryPart(criteriaBuilder, criteriaQuery, account, card, rarities, sets, types, search, username);
 		criteriaQuery.multiselect(card, criteriaBuilder.count(card));
 		return getOrderByQueryPart(criteriaBuilder, criteriaQuery, card, page, sortType, orderType).getResultList();
 	}
@@ -57,14 +57,25 @@ public class AccountRepositoryImpl extends RepositoryImpl implements AccountQuer
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 		Root<Account> account = criteriaQuery.from(Account.class);
-		Join<Account,Card> card = account.join("cards");
+		Join<Account, Card> card = account.join("cards");
 		criteriaQuery.select(criteriaBuilder.countDistinct(card));
 		criteriaQuery.where(getAccountPredicate(criteriaBuilder, account, username));
 		setWhereQueryPart(criteriaBuilder, criteriaQuery, card, rarities, sets, types, search);
 		return getNumberOfPagesFromNumberOfCards(entityManager.createQuery(criteriaQuery).getSingleResult().intValue());
 	}
 
-	private Predicate getAccountPredicate(CriteriaBuilder criteriaBuilder, Root<Account> account, String username) {
+	protected <T> void setWhereQueryPart(CriteriaBuilder criteriaBuilder, CriteriaQuery<T> criteriaQuery,
+			From<?, Account> account, From<?, Card> card, List<Rarity> rarities, List<Set> sets, List<Type> types,
+			Optional<String> search, String username) {
+		Predicate predicate = getWhereQueryPart(criteriaBuilder, criteriaQuery, card, rarities, sets, types, search);
+		Predicate userPredicate = getAccountPredicate(criteriaBuilder, account, username);
+		if (predicate == null)
+			criteriaQuery.where(userPredicate);
+		else
+			criteriaQuery.where(criteriaBuilder.and(userPredicate, predicate));
+	}
+
+	private Predicate getAccountPredicate(CriteriaBuilder criteriaBuilder, From<?, Account> account, String username) {
 		return criteriaBuilder.equal(account.get("username"), username);
 	}
 

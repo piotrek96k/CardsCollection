@@ -39,6 +39,13 @@ public abstract class RepositoryImpl {
 
 	protected <T> void setWhereQueryPart(CriteriaBuilder criteriaBuilder, CriteriaQuery<T> criteriaQuery,
 			From<?, Card> card, List<Rarity> rarities, List<Set> sets, List<Type> types, Optional<String> search) {
+		Predicate predicate = getWhereQueryPart(criteriaBuilder, criteriaQuery, card, rarities, sets, types, search);
+		if (predicate != null)
+			criteriaQuery.where(predicate);
+	}
+
+	protected <T> Predicate getWhereQueryPart(CriteriaBuilder criteriaBuilder, CriteriaQuery<T> criteriaQuery,
+			From<?, Card> card, List<Rarity> rarities, List<Set> sets, List<Type> types, Optional<String> search) {
 		Predicate predicate = null;
 		Function<List<Rarity>, Predicate> raritiesMethod = rarity -> getRaritiesPredicate(criteriaBuilder, card,
 				rarity);
@@ -49,8 +56,7 @@ public abstract class RepositoryImpl {
 		predicate = getWhereQueryPartPredicate(criteriaBuilder, predicate, List::isEmpty, typesPredicate, types);
 		Function<Optional<String>, Predicate> searchMethod = s -> getSearchPredicate(criteriaBuilder, card, s.get());
 		predicate = getWhereQueryPartPredicate(criteriaBuilder, predicate, Optional::isEmpty, searchMethod, search);
-		if (predicate != null)
-			criteriaQuery.where(predicate);
+		return predicate;
 	}
 
 	private <T> Predicate getWhereQueryPartPredicate(CriteriaBuilder criteriaBuilder, Predicate predicate,
@@ -63,15 +69,16 @@ public abstract class RepositoryImpl {
 		return predicate;
 	}
 
-	private Predicate getRaritiesPredicate(CriteriaBuilder criteriaBuilder, From<?, Card> card, List<Rarity> rarities) {
+	protected Predicate getRaritiesPredicate(CriteriaBuilder criteriaBuilder, From<?, Card> card,
+			List<Rarity> rarities) {
 		return criteriaBuilder.in(card.get("rarity")).value(rarities);
 	}
 
-	private Predicate getSetsPredicate(CriteriaBuilder criteriaBuilder, From<?, Card> card, List<Set> sets) {
+	protected Predicate getSetsPredicate(CriteriaBuilder criteriaBuilder, From<?, Card> card, List<Set> sets) {
 		return criteriaBuilder.in(card.get("set")).value(sets);
 	}
 
-	private Predicate getTypesPredicate(CriteriaBuilder criteriaBuilder, From<?, Card> card, List<Type> types) {
+	protected Predicate getTypesPredicate(CriteriaBuilder criteriaBuilder, From<?, Card> card, List<Type> types) {
 		Predicate predicate = criteriaBuilder.disjunction();
 		Join<Card, Type> join = card.join("types");
 		for (Type type : types)
@@ -79,8 +86,25 @@ public abstract class RepositoryImpl {
 		return predicate;
 	}
 
-	private Predicate getSearchPredicate(CriteriaBuilder criteriaBuilder, From<?, Card> card, String search) {
-		return criteriaBuilder.like(criteriaBuilder.upper(card.get("name")), ("%" + search + "%").toUpperCase());
+	protected Predicate getSearchPredicate(CriteriaBuilder criteriaBuilder, From<?, Card> card, String search) {
+		search = search.replace("%", "\\%");
+		search = search.replace("_", "\\_");
+		if (search.startsWith("!"))
+			search = search.substring(1).toUpperCase();
+		else
+			search = ('%' + search + '%').toUpperCase();
+		Predicate predicate = criteriaBuilder.like(criteriaBuilder.upper(card.get("name")), search);
+		predicate = criteriaBuilder.or(predicate,
+				criteriaBuilder.like(criteriaBuilder.upper(card.get("rarity").get("id")), search));
+		predicate = criteriaBuilder.or(predicate,
+				criteriaBuilder.like(criteriaBuilder.upper(card.get("set").get("id")), search));
+		predicate = criteriaBuilder.or(predicate,
+				criteriaBuilder.like(criteriaBuilder.upper(card.get("evolvesFrom")), search));
+		predicate = criteriaBuilder.or(predicate,
+				criteriaBuilder.like(card.get("pokedexNumber").as(String.class), search));
+		predicate = criteriaBuilder.or(predicate,
+				criteriaBuilder.like(criteriaBuilder.upper(card.join("types", JoinType.LEFT).get("id")), search));
+		return predicate;
 	}
 
 	protected TypedQuery<Card> getOrderByQueryPart(CriteriaBuilder criteriaBuilder, CriteriaQuery<Card> criteriaQuery,

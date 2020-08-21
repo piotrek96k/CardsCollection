@@ -7,39 +7,44 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 @Entity
-public class Rarity implements Comparable<Rarity>, Identifiable<String>{
+public class Rarity implements Comparable<Rarity>, Identifiable<String> {
 
 	@Id
 	@NotNull
 	private String id;
-	
+
 	@NotNull
 	private int cost;
-	
+
 	@NotNull
 	@Column(name = "sell_cost")
 	private int sellCost;
-	
+
 	@Transient
 	private int quantity;
 
-	public Rarity(Rarity rarity, long quantity) {
-		this(rarity.id, rarity.cost);
-		this.quantity = (int)quantity;
-	}
-	
-	public Rarity(String id, int cost) {
+	public Rarity(String id, int cost, int sellCost) {
 		this.id = id;
 		this.cost = cost;
+		this.sellCost = sellCost;
 	}
-	
+
+	public Rarity(Rarity rarity, long quantity) {
+		this(rarity.id, rarity.cost);
+		this.quantity = (int) quantity;
+	}
+
+	public Rarity(String id, int cost) {
+		this(id, cost, 0);
+	}
+
 	public Rarity(String id) {
 		this(id, 0);
 	}
 
 	public Rarity() {
 	}
-	
+
 	@Override
 	public String getId() {
 		return id;
@@ -103,7 +108,7 @@ public class Rarity implements Comparable<Rarity>, Identifiable<String>{
 	public int compareTo(Rarity other) {
 		return id.compareTo(other.id);
 	}
-	
+
 	@Override
 	public String toString() {
 		return id;

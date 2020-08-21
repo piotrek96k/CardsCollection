@@ -32,6 +32,64 @@ function sellCard(id ,page, rarity, set, type, search) {
 	xhttp.send();
 }
 
+function setIndexSearch() {
+	var element = document.getElementById("search");
+	if(element.value != "") {
+		$.ajax({
+			type:"get",
+			headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
+			data: {search: element.value},
+			url: "/",
+			async: true,
+			dataType: "html",
+			success: function(response) {
+				setIndexCardsFragmentOnSuccess(response);
+				window.history.pushState({"html":document.html,"pageTitle":document.pageTitle},"", "?search=" + element.value);
+			},
+		});
+	}
+	else
+		resetIndexSearch(element);
+}
+
+function resetIndexSearch(element) {
+	$.ajax({
+		type:"get",
+		headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
+		url: "/",
+		async: true,
+		dataType: "html",
+		success: function(response) {
+			setIndexCardsFragmentOnSuccess(response);
+			window.history.pushState({"html":document.html,"pageTitle":document.pageTitle},"", "/");
+		},
+	});
+}
+
+function setIndexCardsFragment() {
+	var cards = document.getElementsByClassName("card-fragment");
+	var ids = new Array();
+	for(let i = 0; i < cards.length; i++) 
+		ids.push(cards[i].id);
+	$.ajax({
+		type:"get",
+		headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
+		data: {ids: ids},
+		url: window.location.href,
+		async: true,
+		dataType: "html",
+		success: function(response) {
+			setIndexCardsFragmentOnSuccess(response);
+		},
+	});
+}
+
+function setIndexCardsFragmentOnSuccess(response) {
+	var html = new DOMParser().parseFromString(response, "text/html");
+	document.getElementById("cards").innerHTML = html.getElementById("cards").innerHTML;
+	installTooltipListeners();
+}
+
 function setCardsFragment(path ,page, rarity, set, type, search) {
 	var url = getUrl(path ,page, rarity, set, type, search);
 	var xhttp = new XMLHttpRequest();
@@ -121,6 +179,7 @@ function installScrollListener(scroll) {
 		var scroll = verticalMenu.scrollTop;
 		$.ajax({
 			type:"post",
+			headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
 			data: {scroll : scroll},
 			url:"/scroll",
 			async: true,
@@ -150,6 +209,7 @@ function installExpandListeners() {
 function sendExpandData(id) {
 	$.ajax({
 		type:"post",
+		headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
 		data: {expand : id},
 		url:"/expand",
 		async: true,

@@ -54,10 +54,12 @@ public abstract class CardsController {
 
 	protected void addSelectedAttributes(Model model, Optional<Integer> page, Optional<String> rarities,
 			Optional<String> sets, Optional<String> types, Optional<String> search) {
+		handleVerticalMenu();
 		int currentPage = page.orElse(1);
 		List<Rarity> selectedRarities = getSelectedObjectsAsList(rarities, rarityRepository);
 		List<Set> selectedSets = getSelectedObjectsAsList(sets, setRepository);
 		List<Type> selectedTypes = getSelectedObjectsAsList(types, typeRepository);
+		model.addAttribute("accountId", accountService.getAccountId());
 		model.addAttribute("cards", getCards(currentPage, selectedRarities, selectedSets, selectedTypes, search));
 		model.addAttribute("link", getLink());
 		model.addAttribute("coins", accountService.getCoins());
@@ -72,7 +74,6 @@ public abstract class CardsController {
 		model.addAttribute("enteredSearch", search.orElse(""));
 		model.addAttribute("sortOptions", SortType.values());
 		model.addAttribute("sessionData", sessionData);
-		handleVerticalMenu();
 	}
 	
 	protected ModelAndView searchSelection(Optional<Integer> page, Optional<String> rarities,
@@ -85,7 +86,7 @@ public abstract class CardsController {
 
 	private void handleVerticalMenu() {
 		String page = getLink();
-		if (sessionData.getLastVisited() != page)
+		if (!sessionData.getLastVisited().equals(page))
 			sessionData.resetExpanders();
 		sessionData.setLastVisited(page);
 	}

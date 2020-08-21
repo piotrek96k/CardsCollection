@@ -3,13 +3,12 @@
   xmlns:th="http://www.thymeleaf.org"
   xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
-<meta charset="UTF-8">
 </head>
 <body>
 	<div id="pagination" th:fragment="pagination">
 		<div class="row justify-content-center" style="margin-top:50px; margin-bottom:75px;" th:if="${numberOfPages > 1}">
 			<div class="col-auto">
-				<table class="table table-responsive">
+				<table class="table table-responsive scroller">
 					<tr class="pagination page-table" th:with="start=${currentPage > 5 ? (currentPage < numberOfPages - 5 ? currentPage - 4 : numberOfPages - 9) : 1}">
   						<td class="px-2 page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
   							<a class="page-link" th:href="@{${link}(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}">

@@ -27,6 +27,7 @@ public class SessionData {
 		orderType = SortType.NAME.ASC;
 		expanders = new HashMap<String, Boolean>();
 		resetExpanders();
+		lastVisited="";
 	}
 	
 	public void resetExpanders() {

@@ -1,6 +1,5 @@
 package com.pokemoncards.controller;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,41 +8,36 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.pokemoncards.model.entity.Rarity;
-import com.pokemoncards.model.entity.Set;
-import com.pokemoncards.model.entity.Type;
+import com.pokemoncards.model.repository.CardRepository;
+import com.pokemoncards.model.repository.SetRepository;
 import com.pokemoncards.model.service.AccountService;
-import com.pokemoncards.model.service.SortType;
+import com.pokemoncards.model.service.CardService;
 
 @Controller
 public class IndexController {
 
 	@Autowired
+	private CardRepository cardRepository;
+
+	@Autowired
+	private SetRepository setRepository;
+
+	@Autowired
 	private AccountService accountService;
-	
+
+	@Autowired
+	private CardService cardService;
+
 	@GetMapping(value = "/")
-	public String indexPage(Model model, @RequestParam("page") Optional<Integer> page) {
-		int currentPage = page.orElse(1);
-		model.addAttribute("cards", accountService.getUserCards(currentPage,SortType.COST, SortType.COST.ASC, new ArrayList<Rarity>(), new ArrayList<Set>(), new ArrayList<Type>(), Optional.empty()));
-		model.addAttribute("numberOfPages", accountService.getUserCardsNumberOfPages(new ArrayList<Rarity>(), new ArrayList<Set>(), new ArrayList<Type>(), Optional.empty()));
+	public String indexPage(Model model, @RequestParam(value = "ids[]") Optional<String[]> ids,
+			@RequestParam(value = "search") Optional<String> search) {
+		model.addAttribute("accountId", accountService.getAccountId());
 		model.addAttribute("coins", accountService.getCoins());
-		model.addAttribute("currentPage", currentPage);
-		model.addAttribute("/link", "");
+		model.addAttribute("link", "/");
+		model.addAttribute("cards", cardService.getCards(ids, search));
+		model.addAttribute("numberOfCards", cardRepository.count());
+		model.addAttribute("numberOfSets", setRepository.count());
 		return "index";
 	}
 
-	@GetMapping(value = "/sold")
-	public String sellPage(Model model, @RequestParam("id") String id, @RequestParam("page") int page) {
-		model.addAttribute("card",accountService.getCardToSell(id));
-		model.addAttribute("coins", accountService.getCoins());
-		model.addAttribute("page", page);
-		return "sold";
-	}
-
-	@GetMapping(value = "/sold/sold")
-	public String boughtPage(@RequestParam("id") String id, @RequestParam("page") int page) {
-		accountService.removeCard(id);
-		return "redirect:/?page="+page;
-	}
-	
 }

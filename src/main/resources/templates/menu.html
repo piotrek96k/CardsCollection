@@ -5,7 +5,7 @@
 <head>
 </head>
 <body>
-	<div class="container scroller" th:fragment="menu">
+	<div class="container" th:fragment="menu">
 		<section>
 			<nav class="navbar navbar-expand-sm navigation navbar-dark fixed-top" style="overflow-x:auto;">
 				<ul class="navbar-nav">
@@ -21,10 +21,13 @@
 					<li class="nav-item" sec:authorize="isAuthenticated()">
 						<a class="px-2" th:classappend="${#strings.startsWith(#httpServletRequest.getRequestURI(), '/sell') ? 'navbar-brand active':'nav-link'}" href="/sell">Sell</a>
 					</li>
+					<li sec:authorize="!isAuthenticated()" class="nav-item">
+						<a class="px-2" th:classappend="${#httpServletRequest.getRequestURI() == '/register' ? 'navbar-brand active':'nav-link'}" href="/register">Register</a>
+					</li>
 				</ul>
 				<ul class="navbar-nav ml-auto navigation-right">
 					<li sec:authorize="isAuthenticated()" class="nav-item">
-						<a class="px-2 nav-link text-white" th:text="${#authentication.getPrincipal().getUsername()}"></a>
+						<a class="px-2 nav-link text-white" th:text="${accountId.getUsername()}"></a>
 					</li>
 					<li sec:authorize="isAuthenticated()" class="nav-item">
 						<a id="coins" class="px-2 nav-link text-white"  th:text="${#numbers.formatInteger(coins, 1, 'WHITESPACE')}"></a>
@@ -34,12 +37,6 @@
 					</li>
 					<li sec:authorize="isAuthenticated()" class = "nav-item">
 						<a class="px-2" th:classappend="${#httpServletRequest.getRequestURI() == '/logout' ? 'navbar-brand active':'nav-link'}" href="/logout">Log out</a>
-					</li>
-					<li sec:authorize="!isAuthenticated()" class="nav-item">
-						<a class="px-2" th:classappend="${#httpServletRequest.getRequestURI() == '/login' ? 'navbar-brand active':'nav-link'}" href="/login">Sign in</a>
-					</li>
-					<li sec:authorize="!isAuthenticated()" class="nav-item">
-						<a class="px-2" th:classappend="${#httpServletRequest.getRequestURI() == '/register' ? 'navbar-brand active':'nav-link'}" href="/register">Register</a>
 					</li>
 				</ul>
 			</nav>

@@ -33,9 +33,10 @@ public class MyCardsController extends CardsController {
 
 	@Override
 	@PostMapping(value = "/mycards")
-	public ModelAndView searchSelection(Optional<Integer> page, Optional<String> rarities,
-			Optional<String> sets, Optional<String> types,
-			String search) {
+	public ModelAndView searchSelection(@RequestParam(value = "page") Optional<Integer> page,
+			@RequestParam(value = "rarity") Optional<String> rarities,
+			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
+			@ModelAttribute(value = "search") String search) {
 		return super.searchSelection(page, rarities, sets, types, search);
 	}
 	

@@ -61,7 +61,7 @@ public class DatabaseInitializer implements InitializingBean {
 	private ApiService apiService;
 
 	private void loadData() {
-		if (apiService.getNumberOfCards() != cardRepository.count()) {
+		if (apiService.getNumberOfCards() > cardRepository.count()) {
 			LOGGER.log(Level.INFO, "Loading Data");
 			ApiService.ApiData data = apiService.getApiData();
 			loadObjects(data.getRarities(), rarityRepository, rarity -> rarity, Rarity::new);
@@ -175,7 +175,7 @@ public class DatabaseInitializer implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		loadData();
 		loadRoles();
-		createAdmin();
+		createAdmin();		
 //		for(int i =1; i<200; i++)
 //			cardRepository.getCards(i, SortType.NAME, SortType.NAME.ASC, new ArrayList<Rarity>(), new ArrayList<Set>(), new ArrayList<Type>(), Optional.empty()).forEach(card->accountRepository.addCard("admin", "cardsCollectorsAdmin@gmail.com", card.getId()));
 	}
