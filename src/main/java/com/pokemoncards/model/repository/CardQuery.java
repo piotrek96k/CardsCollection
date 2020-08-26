@@ -15,7 +15,7 @@ public interface CardQuery {
 	public int getNumberOfPages(List<Rarity> rarities, List<Set> sets, List<Type> types, Optional<String> search);
 
 	public List<Card> getCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities, List<Set> sets,
-			List<Type> types, Optional<String> search);
+			List<Type> types, Optional<String> search, Optional<String> username);
 	
 	public Card getCardByRowNumber(int row, Rarity rarity);
 

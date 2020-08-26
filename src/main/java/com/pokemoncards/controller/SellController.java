@@ -3,9 +3,6 @@ package com.pokemoncards.controller;
 import java.util.List;
 import java.util.Optional;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -36,12 +33,7 @@ public class SellController extends CardsController {
 
 		@GetMapping(value = "/sell/sold")
 		public String sold(@RequestParam(value = "id", required = true) String id) {
-			accountService.removeCard(id);
-			JsonObject json = Json.createObjectBuilder()
-					.add("coins", accountService.getFormattedInteger(accountService.getCoins()))
-					.add("quantity", accountService.getFormattedInteger(accountService.countUserCardsByCardId(id)))
-					.build();
-			return json.toString();
+			return accountService.removeCard(id);
 		}
 
 	}

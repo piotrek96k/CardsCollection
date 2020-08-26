@@ -3,9 +3,6 @@ package com.pokemoncards.controller;
 import java.util.List;
 import java.util.Optional;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -38,19 +35,14 @@ public class BuyController extends CardsController {
 		@Autowired
 		private AccountService accountService;
 
-		@GetMapping("/buy/bought")
+		@GetMapping(value = "/buy/bought")
 		public String bought(@RequestParam(value = "id", required = true) String id) {
-			accountService.addCard(id);
-			JsonObject json = Json.createObjectBuilder()
-					.add("coins", accountService.getFormattedInteger(accountService.getCoins()))
-					.add("quantity", accountService.getFormattedInteger(accountService.countUserCardsByCardId(id)))
-					.build();
-			return json.toString();
+			return accountService.addCard(id);
 		}
 
 	}
 
-	@GetMapping("/buy")
+	@GetMapping(value = "/buy")
 	public String buyPage(Model model, @RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
 			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
@@ -60,7 +52,7 @@ public class BuyController extends CardsController {
 	}
 
 	@Override
-	@PostMapping("/buy")
+	@PostMapping(value = "/buy")
 	public ModelAndView searchSelection(@RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
 			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,

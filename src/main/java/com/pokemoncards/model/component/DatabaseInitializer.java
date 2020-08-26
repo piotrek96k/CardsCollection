@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.pokemoncards.model.api.Cards;
@@ -28,10 +27,12 @@ import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
 import com.pokemoncards.model.repository.AccountRepository;
 import com.pokemoncards.model.repository.CardRepository;
+import com.pokemoncards.model.repository.CashRepository;
 import com.pokemoncards.model.repository.RarityRepository;
 import com.pokemoncards.model.repository.RoleRepository;
 import com.pokemoncards.model.repository.SetRepository;
 import com.pokemoncards.model.repository.TypeRepository;
+import com.pokemoncards.model.service.AccountService;
 import com.pokemoncards.model.service.ApiService;
 
 @Component
@@ -56,6 +57,12 @@ public class DatabaseInitializer implements InitializingBean {
 
 	@Autowired
 	private TypeRepository typeRepository;
+	
+	@Autowired
+	private CashRepository cashRepository;
+	
+	@Autowired
+	private AccountService accountService;
 
 	@Autowired
 	private ApiService apiService;
@@ -109,7 +116,7 @@ public class DatabaseInitializer implements InitializingBean {
 		Map<String, Integer> costs = getDefaultCosts();
 		List<Rarity> rarities = rarityRepository.findAllRaritiesOrderById();
 		for (Rarity rarity : rarities)
-			if (rarity.getCost() == 0) {
+			if (rarity.getCost() == null) {
 				int cost = costs.get(rarity.getId()) == null ? 25_000 : costs.get(rarity.getId());
 				rarityRepository.setRarityCost(rarity.getId(), cost);
 				rarityRepository.setRaritySellCost(rarity.getId(), cost/2);
@@ -154,20 +161,17 @@ public class DatabaseInitializer implements InitializingBean {
 		String adminString = "admin";
 		Account admin = accountRepository.findByUsername(adminString);
 		if (admin == null) {
-			LOGGER.log(Level.INFO, "Creating Admin");
+			LOGGER.log(Level.INFO, "Creating Admin");			
 			admin = new Account();
 			admin.setUsername(adminString);
-			admin.setEmail("cardsCollectorsAdmin@gmail.com");
+			admin.setEmail("pokemonCardsAdmin@gmail.com");
 			admin.setFirstName(adminString);
 			admin.setLastName(adminString);
-			admin.setPassword(new BCryptPasswordEncoder().encode(adminString));
+			admin.setPassword(adminString);
 			admin.setEnabled(true);
-			admin.setCoins(1_000_000);
-			List<Role> roles = new ArrayList<Role>();
-			for (RoleEnum roleEnum : RoleEnum.values())
-				roles.add(roleRepository.getOne(roleEnum.toString()));
-			admin.setRoles(roles);
-			accountRepository.save(admin);
+			accountService.addAccount(admin);
+			accountRepository.addRole(admin.getUsername(), admin.getEmail(), RoleEnum.ROLE_ADMIN.name());
+			cashRepository.updateCoins(admin.getUsername(), 100_000_000);
 		}
 	}
 
@@ -175,7 +179,7 @@ public class DatabaseInitializer implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		loadData();
 		loadRoles();
-		createAdmin();		
+		createAdmin();
 //		for(int i =1; i<200; i++)
 //			cardRepository.getCards(i, SortType.NAME, SortType.NAME.ASC, new ArrayList<Rarity>(), new ArrayList<Set>(), new ArrayList<Type>(), Optional.empty()).forEach(card->accountRepository.addCard("admin", "cardsCollectorsAdmin@gmail.com", card.getId()));
 	}

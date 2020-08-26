@@ -75,8 +75,4 @@ public class AccountRepositoryImpl extends RepositoryImpl implements AccountQuer
 			criteriaQuery.where(criteriaBuilder.and(userPredicate, predicate));
 	}
 
-	private Predicate getAccountPredicate(CriteriaBuilder criteriaBuilder, From<?, Account> account, String username) {
-		return criteriaBuilder.equal(account.get("username"), username);
-	}
-
 }

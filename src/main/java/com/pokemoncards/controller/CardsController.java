@@ -62,7 +62,7 @@ public abstract class CardsController {
 		model.addAttribute("accountId", accountService.getAccountId());
 		model.addAttribute("cards", getCards(currentPage, selectedRarities, selectedSets, selectedTypes, search));
 		model.addAttribute("link", getLink());
-		model.addAttribute("coins", accountService.getCoins());
+		model.addAttribute("cash", accountService.getCash());
 		model.addAttribute("numberOfPages", getNumberOfPages(selectedRarities, selectedSets, selectedTypes, search));
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("rarities", getSelectedObjectsMap(selectedRarities, rarityRepository));

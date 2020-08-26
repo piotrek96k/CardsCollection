@@ -3,6 +3,7 @@ package com.pokemoncards.model.entity;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -40,7 +41,7 @@ public class Card implements Identifiable<String> {
 
 	private Integer hp;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "card_types", joinColumns = @JoinColumn(referencedColumnName = "id", name = "card_id"), inverseJoinColumns = @JoinColumn(name = "type_id"))
 	@OrderBy("id ASC")
 	private List<Type> types;

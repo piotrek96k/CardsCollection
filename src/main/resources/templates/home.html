@@ -9,13 +9,14 @@
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="javascript/cards.js"></script>
+	<script src="javascript/collection.js"></script>
 	<link rel="icon" href="images/icon.png">
 </head>
-<body onload="installTooltipListeners(); setInterval(setIndexCardsFragment, 5000);">
+<body th:onload="|installTooltipListeners(); setInterval(setIndexCardsFragment, 5000);__${#authorization.expression('isAuthenticated()') ? 'getCash();' : ''}__|">
 	<div th:replace="menu :: menu"></div>
 	<div class="container-fluid">
 		<div class="row" style="margin-top:56px;">
-			<div class="col index-header">
+			<div class="col index-header shadow">
 				<div class="row">
 					<div class="col d-flex justify-content-center">
 						<h1 style="margin-bottom:0px;">Pokemon Cards</h1>
@@ -24,7 +25,7 @@
 				<div class="row">
 					<div class="col d-flex justify-content-center">
 						<p sec:authorize="!isAuthenticated()" th:text="'Join now and start building your deck with ' + ${#numbers.formatInteger(numberOfCards, 1, 'WHITESPACE') + ' different cards in ' + #numbers.formatInteger(numberOfSets, 1, 'WHITESPACE') + ' sets'}"></p>
-						<p sec:authorize="isAuthenticated()" th:text="'Welcome back ' + ${accountId.getUsername()} + ', now go catch them all'"></p>
+						<p sec:authorize="isAuthenticated()" th:text="'Welcome back ' + ${accountId.getUsername()} + ', now go and catch them all'"></p>
 					</div>
 				</div>
 				<div class="row">
@@ -48,7 +49,7 @@
  				</div>
 			</div>
 			<div class="col">
-				<div sec:authorize="!isAuthenticated()" style="margin:25px auto; width:300px; height:550px; border-radius:10px; background-size: contain; background-image:url('images/login-card.jpg');">
+				<div sec:authorize="!isAuthenticated()" class="card-shadow" style="margin:25px auto; width:300px; height:550px; border-radius:10px; background-size: contain; background-image:url('images/login-card.jpg');">
 					<form th:action="@{/}" method="post" class="was-validated mx-auto login-format" style="padding-top:318px;">
 						<div class="form-group mx-auto" style="max-width:250px; margin-top:-64px;" th:if="${param.error}">
 							<p>Username or Password is wrong, please check again!</p>
@@ -66,17 +67,26 @@
 						</div>
 					</form>
 				</div>
-			</div>
-		</div>
-		<div class="row overflow-hidden">
-			<div class="col">
-				<div class="row d-block justify-content-center">
-					<div id="cards" class="col d-flex justify-content-center">
-						<div th:with="addButton=false" th:each="card : ${cards}">
-							<div class="card mx-2 d-block" style="margin-bottom:25px;">
-								<div th:insert="cards :: card"></div>
+				<div sec:authorize="isAuthenticated()" style="margin:120px auto; text-align:center">
+					<div class="row justify-content-center">
+						<div class="card card-shadow mx-2" style="width:220px;">
+							<div class="card-header bg-primary">FREE COINS</div>
+							<div class="card-body justify-content-center">
+								<img id="chest" class="img-fluid image-responsive" alt="Chest" width="180px">
+							</div>
+							<div class="card-footer p-0">
+								<button onclick="collectCoins();" class="btn btn-block btn-success card-link" style="padding: 10px 10px;" id="coinsButton"></button>
 							</div>
 						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="cards" class="row d-flex justify-content-center overflow-hidden">
+			<div th:with="addButton=false" th:each="card : ${cards}">
+				<div class="col px-0 justify-content-center">
+					<div class="card mx-2" style="margin-bottom:25px;">
+						<div th:insert="cards :: card"></div>
 					</div>
 				</div>
 			</div>

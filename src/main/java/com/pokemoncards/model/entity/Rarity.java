@@ -14,16 +14,16 @@ public class Rarity implements Comparable<Rarity>, Identifiable<String> {
 	private String id;
 
 	@NotNull
-	private int cost;
+	private Integer cost;
 
 	@NotNull
 	@Column(name = "sell_cost")
-	private int sellCost;
+	private Integer sellCost;
 
 	@Transient
 	private int quantity;
 
-	public Rarity(String id, int cost, int sellCost) {
+	public Rarity(String id, Integer cost, Integer sellCost) {
 		this.id = id;
 		this.cost = cost;
 		this.sellCost = sellCost;
@@ -34,7 +34,7 @@ public class Rarity implements Comparable<Rarity>, Identifiable<String> {
 		this.quantity = (int) quantity;
 	}
 
-	public Rarity(String id, int cost) {
+	public Rarity(String id, Integer cost) {
 		this(id, cost, 0);
 	}
 
@@ -55,19 +55,19 @@ public class Rarity implements Comparable<Rarity>, Identifiable<String> {
 		this.id = id;
 	}
 
-	public int getCost() {
+	public Integer getCost() {
 		return cost;
 	}
 
-	public void setCost(int cost) {
+	public void setCost(Integer cost) {
 		this.cost = cost;
 	}
 
-	public int getSellCost() {
+	public Integer getSellCost() {
 		return sellCost;
 	}
 
-	public void setSellCost(int sellCost) {
+	public void setSellCost(Integer sellCost) {
 		this.sellCost = sellCost;
 	}
 

@@ -13,7 +13,7 @@
     	<div th:each="row : ${#numbers.sequence(0, cards.size(), counter)}"  class="row justify-content-left px-3">
        		<div th:each="column : ${#numbers.sequence(0, counter - 1)}">
        			<div class="card mx-2 my-3 d-block" th:if="${row + column < cards.size()}" th:with="card=${cards.get(row + column)}">
-  	     			<div th:id="${card.getId()}" class="card-fragment" th:fragment="card">
+  	     			<div th:id="${card.getId()}" class="card-fragment card-shadow" th:fragment="card">
     	   				<div class="tool-tip">
        						<img  class="card-img-top" th:alt="${card.getName()}" th:src="${card.getImageUrl()}"> 
        						<div class="tooltip-table">

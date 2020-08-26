@@ -8,42 +8,46 @@ import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.springframework.validation.annotation.Validated;
+
 import com.pokemoncards.annotation.Password;
+import com.pokemoncards.annotation.OnRegister;
 import com.pokemoncards.annotation.Unique;
 
 @Entity
 @IdClass(AccountId.class)
+@Validated
 public class Account {
 
 	@Id
-	@NotBlank(message = "Username can't be blank")
-	@Size(min = 4, message = "Username too short")
-	@Unique(message = "Username in use")
+	@NotBlank(message = "Username can't be blank", groups = OnRegister.class)
+	@Size(min = 4, message = "Username too short", groups = OnRegister.class)
+	@Unique(message = "Username in use", groups = OnRegister.class)
 	public String username;
 
 	@Id
-	@Email(message = "Entered e-mail must be correct")
-	@Unique(message = "E-mail in use")
+	@Email(message = "Entered e-mail must be correct", groups = OnRegister.class)
+	@Unique(message = "E-mail in use", groups = OnRegister.class)
 	public String email;
 
-	@NotBlank(message = "First name can't be blank")
+	@NotBlank(message = "First name can't be blank", groups = OnRegister.class)
 	public String firstName;
 
-	@NotBlank(message = "Lastname can't be blank")
+	@NotBlank(message = "Lastname can't be blank", groups = OnRegister.class)
 	public String lastName;
 
-	@Password
-	@NotBlank(message = "Password can't be blank")
-	@Size(min = 8, message = "Password too short")
+	@Password(groups = OnRegister.class)
+	@NotBlank(message = "Password can't be blank", groups = OnRegister.class)
+	@Size(min = 8, message = "Password too short", groups = OnRegister.class)
 	public String password;
 
-	@NotNull
-	public int coins;
+	@OneToOne(mappedBy = "account")
+	private Cash cash;
 
 	public boolean enabled;
 
@@ -107,12 +111,12 @@ public class Account {
 		this.enabled = enabled;
 	}
 
-	public int getCoins() {
-		return coins;
+	public Cash getCash() {
+		return cash;
 	}
 
-	public void setCoins(int coins) {
-		this.coins = coins;
+	public void setCash(Cash cash) {
+		this.cash = cash;
 	}
 
 	public List<Role> getRoles() {
@@ -133,7 +137,9 @@ public class Account {
 
 	@Override
 	public String toString() {
-		return "User [username=" + username + ", password=" + password + "]";
+		return "Account [username=" + username + ", email=" + email + ", firstName=" + firstName + ", lastName="
+				+ lastName + ", password=" + password + ", cash=" + cash + ", enabled=" + enabled + ", cards=" + cards
+				+ "]";
 	}
 
 }

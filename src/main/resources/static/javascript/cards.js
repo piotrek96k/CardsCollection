@@ -7,8 +7,8 @@ function buyCard(id) {
 			document.getElementById("coins").innerHTML = data.coins;
 			document.getElementById("quantity" + id).innerHTML = data.quantity;
 			disableButtonsIfNeed(parseInt(data.coins.replaceAll(" ", "")));
-    }
-  };
+  		}
+	};
 	xhttp.open("GET", url, true);
 	xhttp.send();
 }

@@ -94,7 +94,6 @@ hr {
 }
 .page-item.disabled .page-link{
 	background-color: #7afa73aa;
-	ede6e6
 }
 .page-item.active .page-link {
 	color: white;
@@ -327,4 +326,7 @@ hr {
 }
 .scroller {
 	scrollbar-width: thin;
+}
+.card-shadow {
+	box-shadow: 10px 10px 10px grey;
 }

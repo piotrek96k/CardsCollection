@@ -18,6 +18,7 @@ import javax.persistence.criteria.Predicate;
 
 import org.springframework.stereotype.Repository;
 
+import com.pokemoncards.model.entity.Account;
 import com.pokemoncards.model.entity.Card;
 import com.pokemoncards.model.entity.Rarity;
 import com.pokemoncards.model.entity.Set;
@@ -28,7 +29,7 @@ import com.pokemoncards.model.service.SortType.OrderType;
 @Repository
 public abstract class RepositoryImpl {
 
-	public static final int PAGE_SIZE = 50;
+	public static final int PAGE_SIZE = 25;
 
 	@PersistenceContext
 	protected EntityManager entityManager;
@@ -105,6 +106,10 @@ public abstract class RepositoryImpl {
 		predicate = criteriaBuilder.or(predicate,
 				criteriaBuilder.like(criteriaBuilder.upper(card.join("types", JoinType.LEFT).get("id")), search));
 		return predicate;
+	}
+	
+	protected Predicate getAccountPredicate(CriteriaBuilder criteriaBuilder, From<?, Account> account, String username) {
+		return criteriaBuilder.equal(account.get("username"), username);
 	}
 
 	protected TypedQuery<Card> getOrderByQueryPart(CriteriaBuilder criteriaBuilder, CriteriaQuery<Card> criteriaQuery,

@@ -7,11 +7,14 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.From;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
 
+import com.pokemoncards.model.entity.Account;
 import com.pokemoncards.model.entity.Card;
 import com.pokemoncards.model.entity.Rarity;
 import com.pokemoncards.model.entity.Set;
@@ -24,10 +27,11 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 
 	@Override
 	public List<Card> getCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities, List<Set> sets,
-			List<Type> types, Optional<String> search) {
+			List<Type> types, Optional<String> search, Optional<String> username) {
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Card> criteriaQuery = criteriaBuilder.createQuery(Card.class);
 		Root<Card> card = criteriaQuery.from(Card.class);
+		joinAccountIfUsernameNotEmpty(criteriaBuilder, criteriaQuery, card, username);
 		setWhereQueryPart(criteriaBuilder, criteriaQuery, card, rarities, sets, types, search);
 		return getOrderByQueryPart(criteriaBuilder, criteriaQuery, card, page, sortType, orderType).getResultList();
 	}
@@ -104,7 +108,7 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 		typedQuery.setMaxResults(1);
 		return typedQuery.getResultStream().count() > 0 ? typedQuery.getSingleResult() : getFirstCard(search);
 	}
-	
+
 	@Override
 	public Card getCardByRowNumber(int row, String search) {
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -126,6 +130,16 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 		criteriaQuery.select(criteriaBuilder.countDistinct(card));
 		criteriaQuery.where(getSearchPredicate(criteriaBuilder, card, search));
 		return entityManager.createQuery(criteriaQuery).getSingleResult().intValue();
+	}
+	
+	private void joinAccountIfUsernameNotEmpty(CriteriaBuilder criteriaBuilder, CriteriaQuery<Card> criteriaQuery,
+			From<?, Card> card, Optional<String> username) {
+		if (username.isPresent()) {
+			Join<Card, Account> account = card.join("accounts", JoinType.LEFT);
+			account.on(criteriaBuilder.equal(account.get("username"), username.get()));
+			criteriaQuery.multiselect(card, criteriaBuilder.count(account));
+			criteriaQuery.groupBy(card.get("id"));
+		}
 	}
 
 	private Predicate getRarityPredicate(CriteriaBuilder criteriaBuilder, From<?, Card> card, Rarity rarity) {

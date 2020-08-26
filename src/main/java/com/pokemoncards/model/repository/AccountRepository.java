@@ -26,15 +26,12 @@ public interface AccountRepository extends JpaRepository<Account, AccountId>, Ac
 	@Query(value = "delete from account_cards where ctid =(select ctid from account_cards where username=:username and card_id=:card_id limit(1))", nativeQuery = true)
 	public void removeCard(@Param("username") String username, @Param("card_id") String cardId);
 
-	@Query(value = "select count(card_id) from account_cards where username=:username and card_id = :card_id", nativeQuery = true)
-	public int countUserCardsByCardId(@Param("username") String username, @Param("card_id") String cardId);
-
-	@Query(value = "select coins from account where username=:username", nativeQuery = true)
-	public int getCoins(@Param("username") String username);
-
 	@Transactional
 	@Modifying
-	@Query(value = "update account set coins=:coins where username=:username", nativeQuery = true)
-	public void updateUserCoins(@Param("username") String username, @Param("coins") int coins);
-
+	@Query(value = "insert into account_roles(username, email, role_id) values (:username, :email, :role_id)", nativeQuery = true)
+	public void addRole(@Param("username") String username, @Param("email") String email, @Param("role_id") String roleId);
+	
+	@Query(value = "select count(card_id) from account_cards where username=:username and card_id = :card_id", nativeQuery = true)
+	public int countUserCardsByCardId(@Param("username") String username, @Param("card_id") String cardId);
+	
 }
