@@ -9,6 +9,7 @@ import javax.json.JsonObject;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
@@ -48,7 +49,7 @@ public class Cash {
 	@Column(name = "days_in_row")
 	private Integer daysInRow;
 
-	@OneToOne(cascade = CascadeType.ALL, optional = false)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
 	@JoinColumn(referencedColumnName = "username", name = "username")
 	@JoinColumn(referencedColumnName = "email", name = "email")
 	private Account account;

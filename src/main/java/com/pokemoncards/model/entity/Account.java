@@ -3,6 +3,7 @@ package com.pokemoncards.model.entity;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
@@ -46,18 +47,18 @@ public class Account {
 	@Size(min = 8, message = "Password too short", groups = OnRegister.class)
 	public String password;
 
-	@OneToOne(mappedBy = "account")
+	@OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
 	private Cash cash;
 
 	public boolean enabled;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "account_roles", joinColumns = {
 			@JoinColumn(referencedColumnName = "username", name = "username"),
 			@JoinColumn(referencedColumnName = "email", name = "email") }, inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private List<Role> roles;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "account_cards", joinColumns = {
 			@JoinColumn(referencedColumnName = "username", name = "username"),
 			@JoinColumn(referencedColumnName = "email", name = "email") }, inverseJoinColumns = @JoinColumn(name = "card_id"))

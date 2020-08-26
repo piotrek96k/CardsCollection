@@ -68,14 +68,23 @@
 					</form>
 				</div>
 				<div sec:authorize="isAuthenticated()" style="margin:120px auto; text-align:center">
-					<div class="row justify-content-center">
+					<div class="row">
+						<div class="card card-shadow mx-2 d-block" style="width:220px;">
+							<div class="card-header bg-primary">FREE CARD</div>
+							<div class="card-body justify-content-center">
+								<img class="img-fluid image-responsive" src="images/redPokeball.png" alt="Pokeball" width="180px">
+							</div>
+							<div class="card-footer p-0">
+								<button class="btn btn-block btn-success" style="padding: 10px 0px;">Text</button>
+							</div>
+						</div>
 						<div class="card card-shadow mx-2" style="width:220px;">
 							<div class="card-header bg-primary">FREE COINS</div>
 							<div class="card-body justify-content-center">
 								<img id="chest" class="img-fluid image-responsive" alt="Chest" width="180px">
 							</div>
 							<div class="card-footer p-0">
-								<button onclick="collectCoins();" class="btn btn-block btn-success card-link" style="padding: 10px 10px;" id="coinsButton"></button>
+								<button onclick="collectCoins();" class="btn btn-block btn-success" style="padding: 10px 10px;" id="coinsButton"></button>
 							</div>
 						</div>
 					</div>

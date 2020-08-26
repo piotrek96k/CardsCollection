@@ -3,6 +3,7 @@ package com.pokemoncards.model.entity;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotBlank;
@@ -14,7 +15,7 @@ public class Role implements Identifiable<String>{
 	@NotBlank
 	private String id;
 
-	@ManyToMany(mappedBy = "roles")
+	@ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
 	private List<Account> accounts;
 	
 	public Role() {}

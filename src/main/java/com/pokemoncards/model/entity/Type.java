@@ -3,6 +3,7 @@ package com.pokemoncards.model.entity;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotEmpty;
@@ -14,7 +15,7 @@ public class Type implements Comparable<Type>, Identifiable<String> {
 	@NotEmpty
 	private String id;
 
-	@ManyToMany(mappedBy = "types")
+	@ManyToMany(mappedBy = "types", fetch = FetchType.LAZY)
 	private List<Card> cards;
 
 	@Override

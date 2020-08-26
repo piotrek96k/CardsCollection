@@ -39,7 +39,7 @@ function setIndexSearch() {
 			type:"get",
 			headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
 			data: {search: element.value},
-			url: "/",
+			url: "/home",
 			async: true,
 			dataType: "html",
 			success: function(response) {
@@ -56,7 +56,7 @@ function resetIndexSearch(element) {
 	$.ajax({
 		type:"get",
 		headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
-		url: "/",
+		url: "/home",
 		async: true,
 		dataType: "html",
 		success: function(response) {

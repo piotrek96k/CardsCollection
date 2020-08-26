@@ -57,7 +57,6 @@ public class HomeController {
 			@RequestParam(value = "search") Optional<String> search) {
 		model.addAttribute("accountId", accountService.getAccountId());
 		model.addAttribute("cash", accountService.getCash());
-		model.addAttribute("link", "/");
 		model.addAttribute("cards", cardService.getCards(ids, search));
 		model.addAttribute("numberOfCards", cardRepository.count());
 		model.addAttribute("numberOfSets", setRepository.count());

@@ -59,7 +59,7 @@
        						</div>
   						</div>
  						<div class="card-body card-table">
- 							<table style="table-layout:fixed; width:100%;">
+ 							<table style="table-layout:fixed; width:100%;" th:with="condition=${#httpServletRequest.getRequestURI() != '/home'}">
  								<col width="10%">
  								<col width="10%">
         						<col width="10%">
@@ -84,13 +84,11 @@
   										<span th:text="${'Rarity '}"></span>
   									</td>
   									<td colspan="5" style="text-align:right;">
-  										<span class="float-right" th:with="condition=${link != '/'}">
-  											<span th:if="${condition}">
-  												<a class="card-link" th:if="${rarities.get(card.getRarity()) == false}" th:href="@{${link}(rarity=${card.getRarity()},__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${card.getRarity().getId()}"></a>
-  												<span th:text="${card.getRarity().getId()}" th:if="${rarities.get(card.getRarity()) == true}"></span>
-  											</span>
-  											<span th:unless="${condition}" th:text="${card.getRarity().getId()}"></span>
+  										<span class="float-right" th:if="${condition}">
+  											<a class="card-link" th:if="${rarities.get(card.getRarity()) == false}" th:href="@{${link}(rarity=${card.getRarity()},__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${card.getRarity().getId()}"></a>
+  											<span th:text="${card.getRarity().getId()}" th:if="${rarities.get(card.getRarity()) == true}"></span>
   										</span>
+  										<span th:unless="${condition}" th:text="${card.getRarity().getId()}"></span>
   									</td>
   								</tr>
   								<tr>
@@ -98,13 +96,11 @@
   										<span th:text="${'Set '}"></span>
   									<td>
   									<td colspan="8" style="text-align:right;">
-  										<span class="float-right" th:with="condition=${link != '/'}">
-  											<span th:if="${condition}">
-  												<a class="card-link" th:if="${sets.get(card.getSet()) == false}" th:text="${card.getSet().getId()}" th:href="@{${link}(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,set=${card.getSet()},__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}"></a>
-  												<span th:text="${card.getSet().getId()}" th:if="${sets.get(card.getSet()) == true}"></span>
-  											</span>
-  											<span th:unless=${condition} th:text="${card.getSet().getId()}"></span>
+  										<span class="float-right" th:if="${condition}">
+  											<a class="card-link" th:if="${sets.get(card.getSet()) == false}" th:text="${card.getSet().getId()}" th:href="@{${link}(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,set=${card.getSet()},__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}"></a>
+  											<span th:text="${card.getSet().getId()}" th:if="${sets.get(card.getSet()) == true}"></span>
   										</span>
+  										<span th:unless=${condition} th:text="${card.getSet().getId()}"></span>
   									</td>
   								</tr>
   							</table>

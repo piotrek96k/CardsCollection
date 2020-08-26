@@ -52,7 +52,7 @@ public class Card implements Identifiable<String> {
 	@Transient
 	private int quantity;
 
-	@ManyToMany(mappedBy = "cards")
+	@ManyToMany(mappedBy = "cards", fetch = FetchType.LAZY)
 	protected List<Account> accounts;
 
 	public Card() {
