@@ -32,6 +32,7 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 		CriteriaQuery<Card> criteriaQuery = criteriaBuilder.createQuery(Card.class);
 		Root<Card> card = criteriaQuery.from(Card.class);
 		joinAccountIfUsernameNotEmpty(criteriaBuilder, criteriaQuery, card, username);
+		criteriaQuery.groupBy(card.get("id"));
 		setWhereQueryPart(criteriaBuilder, criteriaQuery, card, rarities, sets, types, search);
 		return getOrderByQueryPart(criteriaBuilder, criteriaQuery, card, page, sortType, orderType).getResultList();
 	}
@@ -47,24 +48,28 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 	}
 
 	@Override
-	public Card getCardByRowNumber(int row, Rarity rarity) {
+	public Card getCardByRowNumber(int row, Rarity rarity, Optional<String> username) {
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Card> criteriaQuery = criteriaBuilder.createQuery(Card.class);
 		Root<Card> card = criteriaQuery.from(Card.class);
+		joinAccountIfUsernameNotEmpty(criteriaBuilder, criteriaQuery, card, username);
 		criteriaQuery.where(getRarityPredicate(criteriaBuilder, card, rarity));
+		criteriaQuery.groupBy(card.get("id"));
 		setOrderByIdQueryPart(criteriaBuilder, criteriaQuery, card);
 		TypedQuery<Card> typedQuery = entityManager.createQuery(criteriaQuery);
 		typedQuery.setFirstResult(row);
 		typedQuery.setMaxResults(1);
-		return typedQuery.getResultStream().count() > 0 ? typedQuery.getSingleResult() : getFirstCard(rarity);
+		return typedQuery.getResultStream().count() > 0 ? typedQuery.getSingleResult() : getFirstCard(rarity, username);
 	}
 
 	@Override
-	public Card getFirstCard(Rarity rarity) {
+	public Card getFirstCard(Rarity rarity, Optional<String> username) {
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Card> criteriaQuery = criteriaBuilder.createQuery(Card.class);
 		Root<Card> card = criteriaQuery.from(Card.class);
+		joinAccountIfUsernameNotEmpty(criteriaBuilder, criteriaQuery, card, username);
 		criteriaQuery.where(getRarityPredicate(criteriaBuilder, card, rarity));
+		criteriaQuery.groupBy(card.get("id"));
 		setOrderByIdQueryPart(criteriaBuilder, criteriaQuery, card);
 		TypedQuery<Card> typedQuery = entityManager.createQuery(criteriaQuery);
 		typedQuery.setMaxResults(1);
@@ -72,24 +77,28 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 	}
 
 	@Override
-	public Card getNextCard(Rarity rarity, String id) {
+	public Card getNextCard(Rarity rarity, String id, Optional<String> username) {
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Card> criteriaQuery = criteriaBuilder.createQuery(Card.class);
 		Root<Card> card = criteriaQuery.from(Card.class);
+		joinAccountIfUsernameNotEmpty(criteriaBuilder, criteriaQuery, card, username);
 		criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.greaterThan(card.get("id"), id),
 				getRarityPredicate(criteriaBuilder, card, rarity)));
+		criteriaQuery.groupBy(card.get("id"));
 		setOrderByIdQueryPart(criteriaBuilder, criteriaQuery, card);
 		TypedQuery<Card> typedQuery = entityManager.createQuery(criteriaQuery);
 		typedQuery.setMaxResults(1);
-		return typedQuery.getResultStream().count() > 0 ? typedQuery.getSingleResult() : getFirstCard(rarity);
+		return typedQuery.getResultStream().count() > 0 ? typedQuery.getSingleResult() : getFirstCard(rarity, username);
 	}
 
 	@Override
-	public Card getFirstCard(String search) {
+	public Card getFirstCard(String search, Optional<String> username) {
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Card> criteriaQuery = criteriaBuilder.createQuery(Card.class);
 		Root<Card> card = criteriaQuery.from(Card.class);
+		joinAccountIfUsernameNotEmpty(criteriaBuilder, criteriaQuery, card, username);
 		criteriaQuery.where(getSearchPredicate(criteriaBuilder, card, search));
+		criteriaQuery.groupBy(card.get("id"));
 		setOrderByIdQueryPart(criteriaBuilder, criteriaQuery, card);
 		TypedQuery<Card> typedQuery = entityManager.createQuery(criteriaQuery);
 		typedQuery.setMaxResults(1);
@@ -97,29 +106,33 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 	}
 
 	@Override
-	public Card getNextCard(String search, String id) {
+	public Card getNextCard(String search, String id, Optional<String> username) {
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Card> criteriaQuery = criteriaBuilder.createQuery(Card.class);
 		Root<Card> card = criteriaQuery.from(Card.class);
+		joinAccountIfUsernameNotEmpty(criteriaBuilder, criteriaQuery, card, username);
 		criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.greaterThan(card.get("id"), id),
 				getSearchPredicate(criteriaBuilder, card, search)));
+		criteriaQuery.groupBy(card.get("id"));
 		setOrderByIdQueryPart(criteriaBuilder, criteriaQuery, card);
 		TypedQuery<Card> typedQuery = entityManager.createQuery(criteriaQuery);
 		typedQuery.setMaxResults(1);
-		return typedQuery.getResultStream().count() > 0 ? typedQuery.getSingleResult() : getFirstCard(search);
+		return typedQuery.getResultStream().count() > 0 ? typedQuery.getSingleResult() : getFirstCard(search, username);
 	}
 
 	@Override
-	public Card getCardByRowNumber(int row, String search) {
+	public Card getCardByRowNumber(int row, String search, Optional<String> username) {
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Card> criteriaQuery = criteriaBuilder.createQuery(Card.class);
 		Root<Card> card = criteriaQuery.from(Card.class);
+		joinAccountIfUsernameNotEmpty(criteriaBuilder, criteriaQuery, card, username);
 		criteriaQuery.where(getSearchPredicate(criteriaBuilder, card, search));
+		criteriaQuery.groupBy(card.get("id"));
 		setOrderByIdQueryPart(criteriaBuilder, criteriaQuery, card);
 		TypedQuery<Card> typedQuery = entityManager.createQuery(criteriaQuery);
 		typedQuery.setFirstResult(row);
 		typedQuery.setMaxResults(1);
-		return typedQuery.getResultStream().count() > 0 ? typedQuery.getSingleResult() : getFirstCard(search);
+		return typedQuery.getResultStream().count() > 0 ? typedQuery.getSingleResult() : getFirstCard(search, username);
 	}
 
 	@Override
@@ -131,14 +144,13 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 		criteriaQuery.where(getSearchPredicate(criteriaBuilder, card, search));
 		return entityManager.createQuery(criteriaQuery).getSingleResult().intValue();
 	}
-	
+
 	private void joinAccountIfUsernameNotEmpty(CriteriaBuilder criteriaBuilder, CriteriaQuery<Card> criteriaQuery,
 			From<?, Card> card, Optional<String> username) {
 		if (username.isPresent()) {
 			Join<Card, Account> account = card.join("accounts", JoinType.LEFT);
 			account.on(criteriaBuilder.equal(account.get("username"), username.get()));
 			criteriaQuery.multiselect(card, criteriaBuilder.count(account));
-			criteriaQuery.groupBy(card.get("id"));
 		}
 	}
 
@@ -149,7 +161,18 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 	private void setOrderByIdQueryPart(CriteriaBuilder criteriaBuilder, CriteriaQuery<Card> criteriaQuery,
 			From<?, Card> card) {
 		criteriaQuery.orderBy(criteriaBuilder.asc(card.get("id")));
+	}
 
+	@Override
+	public Optional<Card> findById(String id, Optional<String> username) {
+		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Card> criteriaQuery = criteriaBuilder.createQuery(Card.class);
+		Root<Card> card = criteriaQuery.from(Card.class);
+		joinAccountIfUsernameNotEmpty(criteriaBuilder, criteriaQuery, card, username);
+		criteriaQuery.where(criteriaBuilder.equal(card.get("id"), id));
+		criteriaQuery.groupBy(card.get("id"));
+		TypedQuery<Card> typedQuery = entityManager.createQuery(criteriaQuery);
+		return typedQuery.getResultStream().count() > 0 ? Optional.of(typedQuery.getSingleResult()) : Optional.empty();
 	}
 
 }

@@ -17,7 +17,7 @@
 					</div>
 					<div onmouseover="changeDropdownColor();" onmouseout="returnDropdownColor();" class="dropdown">
   						<button id="dropdown">Order By
-  							<img src="images/expand.png">
+  							<img src="/images/expand.png">
   						</button>
 						<div class="dropdown-content">
  							<form th:action="@{${link + '/order'}(__${currentPage == 1 ? ',' : 'page=${currentPage}'}__,__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:each="orderType : ${sessionData.getSortType().orderTypeValues()}" method="post">
@@ -34,10 +34,10 @@
  								</div>
  							</form>
  							<button onclick="eraseSearch();" class="btn">
- 								<img th:src="@{images/cancel.png}" class="center" width="18" height="20" alt="C">
+ 								<img th:src="@{/images/cancel.png}" class="center" width="18" height="20" alt="C">
  							</button>
  							<button type="submit" form="search-form" class="btn">
-   								<img th:src="@{images/search.png}" class="center" width="18" height=20 alt="S">
+   								<img th:src="@{/images/search.png}" class="center" width="18" height=20 alt="S">
    							</button>
  						</div>
  					</div>

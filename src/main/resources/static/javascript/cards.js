@@ -44,7 +44,7 @@ function setIndexSearch() {
 			dataType: "html",
 			success: function(response) {
 				setIndexCardsFragmentOnSuccess(response);
-				window.history.pushState({"html":document.html,"pageTitle":document.pageTitle},"", "?search=" + element.value);
+				window.history.pushState({"html":document.html,"pageTitle":document.pageTitle},"", "?search=" + encodeURIComponent(element.value));
 			},
 		});
 	}
@@ -69,7 +69,7 @@ function resetIndexSearch(element) {
 function setIndexCardsFragment() {
 	var cards = document.getElementsByClassName("card-fragment");
 	var ids = new Array();
-	for(let i = 0; i < cards.length; i++) 
+	for(let i = 0; i < 5; i++) 
 		ids.push(cards[i].id);
 	$.ajax({
 		type:"get",
@@ -133,7 +133,7 @@ function appendUrl(url, name, data) {
 			url.path += "&";
 		else
 			url.path += "?";
-		var data = data.toString().replace("&", "%26");
+		var data = encodeURIComponent(data.toString());
 		url.added = true;
 		url.path += name;
 		url.path += "=";

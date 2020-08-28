@@ -21,6 +21,7 @@ import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
 import com.pokemoncards.model.repository.CardRepository;
 import com.pokemoncards.model.service.AccountService;
+import com.pokemoncards.model.service.CardService;
 
 @Controller
 @Scope(value = "session")
@@ -28,6 +29,9 @@ public class BuyController extends CardsController {
 
 	@Autowired
 	private CardRepository cardRepository;
+	
+	@Autowired
+	private CardService cardService;
 
 	@RestController
 	public static class BuyRestController {
@@ -93,7 +97,7 @@ public class BuyController extends CardsController {
 	@Override
 	protected List<Card> getCards(int page, List<Rarity> rarities, List<Set> sets, List<Type> types,
 			Optional<String> search) {
-		return accountService.getCards(page, sessionData.getSortType(), sessionData.getOrderType(), rarities, sets,
+		return cardService.getCards(page, sessionData.getSortType(), sessionData.getOrderType(), rarities, sets,
 				types, search);
 	}
 

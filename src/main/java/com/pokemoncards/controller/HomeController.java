@@ -35,18 +35,23 @@ public class HomeController {
 		@Autowired
 		private AccountService accountService;
 
-		@GetMapping(value = "home/get/cash")
+		@GetMapping(value = "/home/get/cash")
 		public String getCash() {
 			return accountService.getCashAsJson();
 		}
+		
+		@GetMapping(value = "/home/get/freecard")
+		public String getFreeCard() {
+			return accountService.getFreeCardAsJson();
+		}
 
-		@GetMapping(value = "home/collect/coins")
+		@GetMapping(value = "/home/collect/coins")
 		public String collectCoins() {
 			return accountService.collectCoins();
 		}
 
 	}
-	
+
 	@GetMapping(value = "/")
 	public String indexPage() {
 		return "redirect:/home";
@@ -61,6 +66,12 @@ public class HomeController {
 		model.addAttribute("numberOfCards", cardRepository.count());
 		model.addAttribute("numberOfSets", setRepository.count());
 		return "home";
+	}
+
+	@GetMapping(value = "/home/collect/freecard")
+	public String freeCard(Model model) {
+		model.addAttribute("card", accountService.collectFreeCard());
+		return "freecard";
 	}
 
 }

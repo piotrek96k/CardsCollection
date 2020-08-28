@@ -54,7 +54,7 @@ public class Cash {
 	@JoinColumn(referencedColumnName = "email", name = "email")
 	private Account account;
 
-	public String covertToJson() {
+	public String convertToJson() {
 		JsonObject json = Json.createObjectBuilder().add("coins", AccountService.formatInteger(coins))
 				.add("nextCoinsCollecting", getNextTimeCollectingInMilis())
 				.add("nextCoins", AccountService.formatInteger(COINS_PER_DAY * daysInRow)).build();
@@ -62,6 +62,8 @@ public class Cash {
 	}
 
 	public long getNextTimeCollectingInMilis() {
+		if (nextCoinsCollecting == null)
+			return 0;
 		return ZonedDateTime.of(nextCoinsCollecting, ZoneOffset.UTC).toInstant().toEpochMilli();
 	}
 

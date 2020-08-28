@@ -11,14 +11,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,24 +23,24 @@ import com.pokemoncards.model.entity.Account;
 import com.pokemoncards.model.entity.AccountId;
 import com.pokemoncards.model.entity.Card;
 import com.pokemoncards.model.entity.Cash;
+import com.pokemoncards.model.entity.FreeCard;
 import com.pokemoncards.model.entity.Rarity;
 import com.pokemoncards.model.entity.Role;
 import com.pokemoncards.model.entity.RoleEnum;
 import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
-import com.pokemoncards.model.repository.AccountRepository;
 import com.pokemoncards.model.repository.CardRepository;
 import com.pokemoncards.model.repository.CashRepository;
+import com.pokemoncards.model.repository.FreeCardRepository;
 import com.pokemoncards.model.repository.RoleRepository;
 import com.pokemoncards.model.service.SortType.OrderType;
 
 @Service
-public class AccountService {
+public class AccountService extends AbstractService{
 
 	private static DecimalFormat formatter;
 
-	@Autowired
-	private AccountRepository accountRepository;
+	private static BCryptPasswordEncoder passwordEncoder;
 
 	@Autowired
 	private RoleRepository roleRepository;
@@ -54,15 +51,19 @@ public class AccountService {
 	@Autowired
 	private CashRepository cashRepository;
 
+	@Autowired
+	private FreeCardRepository freeCardRepository;
+
 	public void addAccount(Account account) {
 		Role role = roleRepository.getOne(RoleEnum.ROLE_USER.toString());
 		List<Role> roles = new ArrayList<Role>();
 		roles.add(role);
 		account.setRoles(roles);
-		account.setPassword(new BCryptPasswordEncoder().encode(account.getPassword()));
+		account.setPassword(getPasswordEncoder().encode(account.getPassword()));
 		account.setEnabled(true);
 		accountRepository.save(account);
 		setCash(account);
+		setFreeCard(account);
 	}
 
 	private void setCash(Account account) {
@@ -71,9 +72,18 @@ public class AccountService {
 		cash.setAccount(account);
 		cash.setUsername(account.getUsername());
 		cash.setEmail(account.getEmail());
-		cash.setNextCoinsCollecting(LocalDateTime.now(ZoneOffset.UTC).plusDays(1));
+		cash.setNextCoinsCollecting(LocalDateTime.now(ZoneOffset.UTC));
 		cash.setDaysInRow(1);
 		cashRepository.save(cash);
+	}
+
+	private void setFreeCard(Account account) {
+		FreeCard freeCard = new FreeCard();
+		freeCard.setAccount(account);
+		freeCard.setUsername(account.getUsername());
+		freeCard.setEmail(account.getEmail());
+		freeCard.setNextFreeCard(LocalDateTime.now(ZoneOffset.UTC));
+		freeCardRepository.save(freeCard);
 	}
 
 	public AccountId getAccountId() {
@@ -94,14 +104,6 @@ public class AccountService {
 				() -> 1);
 	}
 
-	public List<Card> getCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities, List<Set> sets,
-			List<Type> types, Optional<String> search) {
-		Function<AccountId, List<Card>> function = accountId -> cardRepository.getCards(page, sortType, orderType,
-				rarities, sets, types, search, Optional.of(accountId.getUsername()));
-		return operateOnAccount(function, () -> cardRepository.getCards(page, sortType, orderType, rarities, sets,
-				types, search, Optional.empty()));
-	}
-
 	public Cash getCash() {
 		Function<AccountId, Cash> function = accountId -> {
 			Cash cash = cashRepository.getCash(accountId.getUsername());
@@ -117,7 +119,7 @@ public class AccountService {
 	}
 
 	public String getCashAsJson() {
-		return getCash().covertToJson();
+		return getCash().convertToJson();
 	}
 
 	public String collectCoins() {
@@ -135,9 +137,9 @@ public class AccountService {
 				cashRepository.updateCoinsCollect(accountId.getUsername(), cash.getCoins(),
 						cash.getNextCoinsCollecting(), cash.getDaysInRow());
 			}
-			return cash.covertToJson();
+			return cash.convertToJson();
 		};
-		return operateOnAccount(function, () -> new Cash().covertToJson());
+		return operateOnAccount(function, () -> new Cash().convertToJson());
 	}
 
 	public int countUserCardsByCardId(String id) {
@@ -145,10 +147,34 @@ public class AccountService {
 				() -> 0);
 	}
 
+	public String getFreeCardAsJson() {
+		return operateOnAccount(accountId -> freeCardRepository.findByUsername(accountId.getUsername()).convertToJson(),
+				() -> new FreeCard().convertToJson());
+	}
+
+	public Card collectFreeCard() {
+		Function<AccountId, Card> function = accountId -> {
+			FreeCard freeCard = freeCardRepository.findByUsername(accountId.getUsername());
+			LocalDateTime dateTime = LocalDateTime.now(ZoneOffset.UTC);
+			Duration duration = Duration.between(freeCard.getNextFreeCard(), dateTime);
+			if (duration.isNegative())
+				return new Card();
+			Card card = cardRepository.getRandomCard();
+			accountRepository.addCard(accountId.getUsername(), accountId.getEmail(), card.getId());
+			freeCardRepository.updateNextFreeCard(accountId.getUsername(), dateTime.plusDays(1));
+			card.setQuantity(accountRepository.countUserCardsByCardId(accountId.getUsername(), card.getId()));
+			return card;
+		};
+		return operateOnAccount(function, () -> new Card());
+	}
+
 	public String addCard(String id) {
 		Function<AccountId, String> function = accountId -> {
-			int cost = cardRepository.getCardCost(id);
+			Optional<Card> card = cardRepository.findById(id);
 			int coins = cashRepository.getCash(accountId.getUsername()).getCoins();
+			if (card.isEmpty())
+				return getCoinsJson(coins, 0);
+			int cost = card.get().getRarity().getCost();
 			int quantity = accountRepository.countUserCardsByCardId(accountId.getUsername(), id);
 			if (coins >= cost) {
 				accountRepository.addCard(accountId.getUsername(), accountId.getEmail(), id);
@@ -181,16 +207,6 @@ public class AccountService {
 		return json.toString();
 	}
 
-	private <T> T operateOnAccount(Function<AccountId, T> function, Supplier<T> supplier) {
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (principal instanceof UserDetails) {
-			UserDetails user = (UserDetails) principal;
-			AccountId accountId = accountRepository.getAccountId(user.getUsername());
-			return function.apply(accountId);
-		}
-		return supplier.get();
-	}
-
 	public static String formatInteger(int value) {
 		if (formatter == null)
 			formatter = getDecimalFormatter();
@@ -203,6 +219,12 @@ public class AccountService {
 		symbols.setGroupingSeparator(' ');
 		formatter.setDecimalFormatSymbols(symbols);
 		return formatter;
+	}
+
+	private static BCryptPasswordEncoder getPasswordEncoder() {
+		if (passwordEncoder == null)
+			passwordEncoder = new BCryptPasswordEncoder();
+		return passwordEncoder;
 	}
 
 }

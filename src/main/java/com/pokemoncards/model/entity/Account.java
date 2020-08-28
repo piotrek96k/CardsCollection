@@ -49,6 +49,9 @@ public class Account {
 
 	@OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
 	private Cash cash;
+	
+	@OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
+	private FreeCard freeCard;
 
 	public boolean enabled;
 
@@ -118,6 +121,14 @@ public class Account {
 
 	public void setCash(Cash cash) {
 		this.cash = cash;
+	}
+
+	public FreeCard getFreeCard() {
+		return freeCard;
+	}
+
+	public void setFreeCard(FreeCard freeCard) {
+		this.freeCard = freeCard;
 	}
 
 	public List<Role> getRoles() {

@@ -10,9 +10,9 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="javascript/cards.js"></script>
 	<script src="javascript/collection.js"></script>
-	<link rel="icon" href="images/icon.png">
+	<link rel="icon" href="/images/icon.png">
 </head>
-<body th:onload="|installTooltipListeners(); setInterval(setIndexCardsFragment, 5000);__${#authorization.expression('isAuthenticated()') ? 'getCash();' : ''}__|">
+<body th:onload="|installTooltipListeners(); setInterval(setIndexCardsFragment, 5000);__${#authorization.expression('isAuthenticated()') ? 'getCash(); getFreeCard()' : ''}__|">
 	<div th:replace="menu :: menu"></div>
 	<div class="container-fluid">
 		<div class="row" style="margin-top:56px;">
@@ -36,10 +36,10 @@
       								<form class="form-inline" action="/" id="search-form" method="get">
         								<input type="text" class="flex-fill mr-2 form-control" id="search" th:name="search" th:value="${enteredSearch == '' ? '' : enteredSearch}" placeholder="Search ...">
  										<button type="button" onclick="eraseSearch(); return false;" class="btn">
- 											<img th:src="@{images/cancel.png}" class="center" width="18" height="20" alt="C">
+ 											<img th:src="@{/images/cancel.png}" class="center" width="18" height="20" alt="C">
  										</button>
  										<button onclick="setIndexSearch(); return false;" id="search-submit" type="submit" class="btn">
-   											<img th:src="@{images/search.png}" class="center" width="18" height=20 alt="S">
+   											<img th:src="@{/images/search.png}" class="center" width="18" height=20 alt="S">
    										</button>
       								</form>
     							</div>
@@ -50,7 +50,7 @@
 			</div>
 			<div class="col">
 				<div sec:authorize="!isAuthenticated()" class="card-shadow" style="margin:25px auto; width:300px; height:550px; border-radius:10px; background-size: contain; background-image:url('images/login-card.jpg');">
-					<form th:action="@{/}" method="post" class="was-validated mx-auto login-format" style="padding-top:318px;">
+					<form th:action="@{/home}" method="post" class="was-validated mx-auto login-format" style="padding-top:318px;">
 						<div class="form-group mx-auto" style="max-width:250px; margin-top:-64px;" th:if="${param.error}">
 							<p>Username or Password is wrong, please check again!</p>
 						</div>
@@ -72,10 +72,10 @@
 						<div class="card card-shadow mx-2 d-block" style="width:220px;">
 							<div class="card-header bg-primary">FREE CARD</div>
 							<div class="card-body justify-content-center">
-								<img class="img-fluid image-responsive" src="images/redPokeball.png" alt="Pokeball" width="180px">
+								<img id="pokeball" class="img-fluid image-responsive" alt="Pokeball" width="180px">
 							</div>
 							<div class="card-footer p-0">
-								<button class="btn btn-block btn-success" style="padding: 10px 0px;">Text</button>
+								<button onclick="collectFreeCard();" id="freeCardButton" class="btn btn-block btn-success" style="padding: 10px;">Text</button>
 							</div>
 						</div>
 						<div class="card card-shadow mx-2" style="width:220px;">
@@ -84,7 +84,7 @@
 								<img id="chest" class="img-fluid image-responsive" alt="Chest" width="180px">
 							</div>
 							<div class="card-footer p-0">
-								<button onclick="collectCoins();" class="btn btn-block btn-success" style="padding: 10px 10px;" id="coinsButton"></button>
+								<button onclick="collectCoins();" class="btn btn-block btn-success" style="padding: 10px;" id="coinsButton"></button>
 							</div>
 						</div>
 					</div>

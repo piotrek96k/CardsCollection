@@ -8,7 +8,7 @@
 	<div th:fragment="verticalmenu" id="verticalmenu" class="col-pixel-width vertical-menu">
 		<div class="vertical-menu-top">
 			<button id="rarities" type="button" class="btn-block">Rarities
-				<img th:src="@{${sessionData.getExpanders().get('rarities') ? 'images/hide.png' : 'images/expand.png'}}">
+				<img th:src="@{${sessionData.getExpanders().get('rarities') ? '/images/hide.png' : '/images/expand.png'}}">
 			</button>
 		</div>
 		<div th:style="'display: ' + ${sessionData.getExpanders().get('rarities') ? 'block' : 'none;'}">
@@ -33,7 +33,7 @@
 		</div>
 		<div class="vertical-menu-top">
 			<button id="sets" type="button" class="btn-block">Sets
-				<img th:src="@{${sessionData.getExpanders().get('sets') ? 'images/hide.png' : 'images/expand.png'}}">
+				<img th:src="@{${sessionData.getExpanders().get('sets') ? '/images/hide.png' : '/images/expand.png'}}">
 			</button>
 		</div>
 		<div th:style="'display: ' + ${sessionData.getExpanders().get('sets') ? 'block' : 'none;'}">
@@ -58,7 +58,7 @@
 		</div>
 		<div class="vertical-menu-top">
 			<button id="types" type="button" class="btn-block">Types
-				<img th:src="@{${sessionData.getExpanders().get('types') ? 'images/hide.png' : 'images/expand.png'}}">
+				<img th:src="@{${sessionData.getExpanders().get('types') ? '/images/hide.png' : '/images/expand.png'}}">
 			</button>
 		</div>
 		<div th:style="'display: ' + ${sessionData.getExpanders().get('types') ? 'block' : 'none'}">

@@ -46,7 +46,7 @@ public class Card implements Identifiable<String> {
 	@OrderBy("id ASC")
 	private List<Type> types;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Type firstType;
 
 	@Transient

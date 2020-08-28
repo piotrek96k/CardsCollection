@@ -9,7 +9,7 @@
   		<button name="buybutton" th:id="${card.getId()}" class="btn btn-success btn-block card-link" th:onclick="buyCard([[${card.getId()}]])" th:classappend="${cash.getCoins() < card.getRarity().getCost() ? 'disabled' : ''}">
   			<span class="float-left">Buy</span>
   			<span th:id="${'cost' + card.getId()}" style="margin-left:5px;" th:text="${#numbers.formatInteger(card.getRarity().getCost(), 1, 'WHITESPACE')}"></span>
-  			<img style="margin-left:5px;" src="images/coins.png" width="30" alt="Coins">
+  			<img style="margin-left:5px;" src="/images/coins.png" width="30" alt="Coins">
   		</button>  
 	</div>
 </body>

@@ -12,12 +12,12 @@
 					<tr class="pagination page-table" th:with="start=${currentPage > 5 ? (currentPage < numberOfPages - 5 ? currentPage - 4 : numberOfPages - 9) : 1}">
   						<td class="px-2 page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
   							<a class="page-link" th:href="@{${link}(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}">
-  								<img th:alt="F" th:src="@{images/first.png}">
+  								<img th:alt="F" th:src="@{/images/first.png}">
   							</a>
   						</td>
   						<td class="px-2 page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
   							<a class="page-link" th:href="@{${link}(__${currentPage == 2 ? ',' : 'page = ${currentPage - 1}'}__,__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}">
-  								<img th:alt="P" th:src="@{images/previous.png}"> 
+  								<img th:alt="P" th:src="@{/images/previous.png}"> 
   							</a>
  		 				</td>
   						<td class="px-2 page-item" th:if="${numberOfPages > 1}" th:each="number : ${#numbers.sequence(numberOfPages > 11 ? start : 1, numberOfPages > 11 ? start + 9 : numberOfPages)}" th:classappend="${currentPage == number ? 'active' : ''}">
@@ -25,12 +25,12 @@
   						</td> 								
   						<td class="px-2 page-item" th:classappend="${currentPage == numberOfPages ? 'disabled' : ''}">
   							<a class="page-link" th:href="@{${link}(page = ${currentPage + 1},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}">
-  								<img th:alt="N" th:src="@{images/next.png}">
+  								<img th:alt="N" th:src="@{/images/next.png}">
   							</a>
   						</td>
   						<td class="px-2 page-item" th:classappend="${currentPage == numberOfPages ? 'disabled' : ''}">
   							<a class="page-link" th:href="@{${link}(page = ${numberOfPages},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}">
-  								<img th:alt="L" th:src="@{images/last.png}"> 
+  								<img th:alt="L" th:src="@{/images/last.png}"> 
   							</a>			
   						</td>
 					</tr>

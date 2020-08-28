@@ -2,12 +2,7 @@
 <html lang="en"
   xmlns:th="http://www.thymeleaf.org"
   xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
-<head>
-	<meta charset="UTF-8">
-	<title>Cards Collector's</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="css/style.css">
-</head>
+<head></head>
 <body>
 	<div id="cardpage" th:fragment="cards" style="margin-bottom:40px;" th:with="counter=${cards.size() == 0 ? 1 : cards.size()}">
     	<div th:each="row : ${#numbers.sequence(0, cards.size(), counter)}"  class="row justify-content-left px-3">
@@ -25,7 +20,7 @@
        								<tr>
        									<td>Type</td>
        									<td>
-       										<span th:text="'None'" th:if="${card.getTypes().isEmpty()}"></span>
+       										<span th:text="'None'" th:if="${card.getTypes() != null and card.getTypes().isEmpty()}"></span>
        										<span th:each="type : ${card.getTypes()}">
        											<span th:text="${type.getId() + ' '}"></span>
        										</span>
@@ -52,14 +47,14 @@
        									<td th:text="${card.getSet()}"></td>
        								</tr>
        								<tr>
-       									<td>Cost</td>
-       									<td th:text="${#numbers.formatInteger(card.getRarity().getCost(), 1, 'WHITESPACE')}"></td>
+       									<td>Value</td>
+       									<td th:if="${card.getRarity() != null}" th:text="${#numbers.formatInteger(card.getRarity().getCost(), 1, 'WHITESPACE')}"></td>
        								</tr>
     							</table>
        						</div>
   						</div>
  						<div class="card-body card-table">
- 							<table style="table-layout:fixed; width:100%;" th:with="condition=${#httpServletRequest.getRequestURI() != '/home'}">
+ 							<table style="table-layout:fixed; width:100%;" th:with="condition=${!#strings.startsWith(#httpServletRequest.getRequestURI(), '/home')}">
  								<col width="10%">
  								<col width="10%">
         						<col width="10%">
@@ -75,7 +70,7 @@
   										<span th:text="${card.getName()}"></span>
   									</td>
   									<td colspan="3" style="text-align:right;">
-  										<img class="float-right" src="images/card.png">
+  										<img class="float-right" src="/images/card.png">
   										<span sec:authorize="isAuthenticated()" th:id="'quantity' + ${card.getId()}" class="float-right" th:text="${#numbers.formatInteger(card.getQuantity(), 1, 'WHITESPACE')}"></span>
   									</td>
   								</tr>
@@ -88,7 +83,7 @@
   											<a class="card-link" th:if="${rarities.get(card.getRarity()) == false}" th:href="@{${link}(rarity=${card.getRarity()},__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}" th:text="${card.getRarity().getId()}"></a>
   											<span th:text="${card.getRarity().getId()}" th:if="${rarities.get(card.getRarity()) == true}"></span>
   										</span>
-  										<span th:unless="${condition}" th:text="${card.getRarity().getId()}"></span>
+  										<span th:unless="${condition or card.getRarity() == null}" th:text="${card.getRarity().getId()}"></span>
   									</td>
   								</tr>
   								<tr>
@@ -100,7 +95,7 @@
   											<a class="card-link" th:if="${sets.get(card.getSet()) == false}" th:text="${card.getSet().getId()}" th:href="@{${link}(__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,set=${card.getSet()},__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}"></a>
   											<span th:text="${card.getSet().getId()}" th:if="${sets.get(card.getSet()) == true}"></span>
   										</span>
-  										<span th:unless=${condition} th:text="${card.getSet().getId()}"></span>
+  										<span th:unless="${condition or card.getSet() == null}" th:text="${card.getSet().getId()}"></span>
   									</td>
   								</tr>
   							</table>

@@ -88,12 +88,7 @@ public abstract class RepositoryImpl {
 	}
 
 	protected Predicate getSearchPredicate(CriteriaBuilder criteriaBuilder, From<?, Card> card, String search) {
-		search = search.replace("%", "\\%");
-		search = search.replace("_", "\\_");
-		if (search.startsWith("!"))
-			search = search.substring(1).toUpperCase();
-		else
-			search = ('%' + search + '%').toUpperCase();
+		search = processSearchString(search);
 		Predicate predicate = criteriaBuilder.like(criteriaBuilder.upper(card.get("name")), search);
 		predicate = criteriaBuilder.or(predicate,
 				criteriaBuilder.like(criteriaBuilder.upper(card.get("rarity").get("id")), search));
@@ -107,8 +102,17 @@ public abstract class RepositoryImpl {
 				criteriaBuilder.like(criteriaBuilder.upper(card.join("types", JoinType.LEFT).get("id")), search));
 		return predicate;
 	}
-	
-	protected Predicate getAccountPredicate(CriteriaBuilder criteriaBuilder, From<?, Account> account, String username) {
+
+	private String processSearchString(String search) {
+		search = search.trim().replace("%", "\\%");
+		search = search.replace("_", "\\_");
+		if (search.startsWith("!"))
+			return search.substring(1).trim().toUpperCase();
+		return ('%' + search + '%').toUpperCase();
+	}
+
+	protected Predicate getAccountPredicate(CriteriaBuilder criteriaBuilder, From<?, Account> account,
+			String username) {
 		return criteriaBuilder.equal(account.get("username"), username);
 	}
 

@@ -9,12 +9,17 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.pokemoncards.model.entity.AccountId;
 import com.pokemoncards.model.entity.Card;
+import com.pokemoncards.model.entity.Rarity;
+import com.pokemoncards.model.entity.Set;
+import com.pokemoncards.model.entity.Type;
 import com.pokemoncards.model.repository.CardRepository;
 import com.pokemoncards.model.repository.RarityRepository;
+import com.pokemoncards.model.service.SortType.OrderType;
 
 @Service
-public class CardService {
+public class CardService extends AbstractService{
 
 	private static final String LEGEND_RARITY_ID;
 
@@ -27,30 +32,39 @@ public class CardService {
 
 	@Autowired
 	private RarityRepository rarityRepository;
-
-	public List<Card> getCards(Optional<String[]> ids, Optional<String> search) {
-		if (ids.isEmpty())
-			return getCardsWithEmptyIds(search);
-		Function<String, Card> cardGetter;
-		if (search.isEmpty() || cardRepository.countCardsBySearch(search.get()) == 0)
-			cardGetter = id -> cardRepository.getNextCard(rarityRepository.findById(LEGEND_RARITY_ID).get(), id);
-		else
-			cardGetter = id -> cardRepository.getNextCard(search.get(), id);
-		return getCards(cardGetter, ids.get());
+	
+	public List<Card> getCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities, List<Set> sets,
+			List<Type> types, Optional<String> search) {
+		Function<AccountId, List<Card>> function = accountId -> cardRepository.getCards(page, sortType, orderType,
+				rarities, sets, types, search, Optional.of(accountId.getUsername()));
+		return operateOnAccount(function, () -> cardRepository.getCards(page, sortType, orderType, rarities, sets,
+				types, search, Optional.empty()));
 	}
 
-	private List<Card> getCardsWithEmptyIds(Optional<String> search) {
+	public List<Card> getCards(Optional<String[]> ids, Optional<String> search) {
+		Optional<String> username = operateOnAccount(accountId->Optional.of(accountId.getUsername()), ()->Optional.empty());
+		if (ids.isEmpty())
+			return getCardsWithEmptyIds(search, username);
+		Function<String, Card> cardGetter;
+		if (search.isEmpty() || cardRepository.countCardsBySearch(search.get()) == 0)
+			cardGetter = id -> cardRepository.getNextCard(rarityRepository.findById(LEGEND_RARITY_ID).get(), id, username);
+		else
+			cardGetter = id -> cardRepository.getNextCard(search.get(), id, username);
+		return getCards(cardGetter, ids.get(), username);
+	}
+
+	private List<Card> getCardsWithEmptyIds(Optional<String> search, Optional<String> username) {
 		int cardsQuantity;
 		Function<Integer, Card> cardGetter;
 		if (search.isEmpty()) {
 			cardsQuantity = cardRepository.countCardsByRarity(LEGEND_RARITY_ID);
 			cardGetter = number -> cardRepository.getCardByRowNumber(number,
-					rarityRepository.findById(LEGEND_RARITY_ID).get());
+					rarityRepository.findById(LEGEND_RARITY_ID).get(), username);
 		} else {
 			cardsQuantity = cardRepository.countCardsBySearch(search.get());
 			if (cardsQuantity == 0)
-				return getCardsWithEmptyIds(Optional.empty());
-			cardGetter = number -> cardRepository.getCardByRowNumber(number, search.get());
+				return getCardsWithEmptyIds(Optional.empty(), username);
+			cardGetter = number -> cardRepository.getCardByRowNumber(number, search.get(), username);
 		}
 		return getCards(cardGetter, cardsQuantity);
 	}
@@ -66,10 +80,15 @@ public class CardService {
 		return cards;
 	}
 
-	private List<Card> getCards(Function<String, Card> cardGetter, String[] ids) {
+	private List<Card> getCards(Function<String, Card> cardGetter, String[] ids, Optional<String> username) {
 		List<Card> cards = new ArrayList<Card>();
-		for (int i = 1; i < ids.length; i++)
-			cards.add(cardRepository.findById(ids[i]).get());
+		for (int i = 1; i < ids.length; i++) {
+			Optional<Card> card = cardRepository.findById(ids[i], username);
+			if(card.isPresent())
+				cards.add(card.get());
+			else
+				cards.add(cardRepository.getRandomCard());
+		}
 		cards.add(cardGetter.apply(ids[ids.length - 1]));
 		return cards;
 	}
