@@ -21,17 +21,25 @@ public class Rarity implements Comparable<Rarity>, Identifiable<String> {
 	private Integer sellCost;
 
 	@Transient
-	private int quantity;
+	private long quantity;
+	
+	@Transient
+	private long userQuantity;
 
 	public Rarity(String id, Integer cost, Integer sellCost) {
 		this.id = id;
 		this.cost = cost;
 		this.sellCost = sellCost;
 	}
+	
+	public Rarity(Rarity rarity, long quantity, long userQuantity) {
+		this(rarity, quantity);
+		this.userQuantity = userQuantity;
+	}
 
 	public Rarity(Rarity rarity, long quantity) {
 		this(rarity.id, rarity.cost);
-		this.quantity = (int) quantity;
+		this.quantity =  quantity;
 	}
 
 	public Rarity(String id, Integer cost) {
@@ -71,12 +79,20 @@ public class Rarity implements Comparable<Rarity>, Identifiable<String> {
 		this.sellCost = sellCost;
 	}
 
-	public int getQuantity() {
+	public long getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(int quantity) {
+	public void setQuantity(long quantity) {
 		this.quantity = quantity;
+	}
+
+	public long getUserQuantity() {
+		return userQuantity;
+	}
+
+	public void setUserQuantity(long userQuantity) {
+		this.userQuantity = userQuantity;
 	}
 
 	@Override

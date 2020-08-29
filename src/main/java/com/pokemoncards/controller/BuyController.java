@@ -21,7 +21,6 @@ import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
 import com.pokemoncards.model.repository.CardRepository;
 import com.pokemoncards.model.service.AccountService;
-import com.pokemoncards.model.service.CardService;
 
 @Controller
 @Scope(value = "session")
@@ -30,9 +29,6 @@ public class BuyController extends CardsController {
 	@Autowired
 	private CardRepository cardRepository;
 	
-	@Autowired
-	private CardService cardService;
-
 	@RestController
 	public static class BuyRestController {
 

@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotEmpty;
 
 @Entity
@@ -17,6 +18,29 @@ public class Type implements Comparable<Type>, Identifiable<String> {
 
 	@ManyToMany(mappedBy = "types", fetch = FetchType.LAZY)
 	private List<Card> cards;
+	
+	@Transient
+	private long quantity;
+	
+	@Transient
+	private long userQuantity;
+	
+	public  Type() {
+	}
+	
+	public Type(String id) {
+		this.id = id;
+	}
+	
+	public Type(Type type,long quantity) {
+		this(type.getId());
+		this.quantity = quantity;
+	}
+	
+	public Type(Type type, long quantity, long userQuantity) {
+		this(type, quantity);
+		this.userQuantity = userQuantity;
+	}
 
 	@Override
 	public String getId() {
@@ -36,6 +60,22 @@ public class Type implements Comparable<Type>, Identifiable<String> {
 		this.cards = cards;
 	}
 	
+	public long getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(long quantity) {
+		this.quantity = quantity;
+	}
+
+	public long getUserQuantity() {
+		return userQuantity;
+	}
+
+	public void setUserQuantity(long userQuantity) {
+		this.userQuantity = userQuantity;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

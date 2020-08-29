@@ -23,6 +23,7 @@ import com.pokemoncards.model.repository.RarityRepository;
 import com.pokemoncards.model.repository.SetRepository;
 import com.pokemoncards.model.repository.TypeRepository;
 import com.pokemoncards.model.service.AccountService;
+import com.pokemoncards.model.service.CardService;
 import com.pokemoncards.model.service.SortType;
 
 @Controller
@@ -40,6 +41,9 @@ public abstract class CardsController {
 
 	@Autowired
 	protected AccountService accountService;
+	
+	@Autowired
+	protected CardService cardService;
 
 	@Autowired
 	protected SessionData sessionData;
@@ -54,7 +58,7 @@ public abstract class CardsController {
 
 	protected void addSelectedAttributes(Model model, Optional<Integer> page, Optional<String> rarities,
 			Optional<String> sets, Optional<String> types, Optional<String> search) {
-		handleVerticalMenu();
+//		handleVerticalMenu();
 		int currentPage = page.orElse(1);
 		List<Rarity> selectedRarities = getSelectedObjectsAsList(rarities, rarityRepository);
 		List<Set> selectedSets = getSelectedObjectsAsList(sets, setRepository);
@@ -65,12 +69,12 @@ public abstract class CardsController {
 		model.addAttribute("cash", accountService.getCash());
 		model.addAttribute("numberOfPages", getNumberOfPages(selectedRarities, selectedSets, selectedTypes, search));
 		model.addAttribute("currentPage", currentPage);
-		model.addAttribute("rarities", getSelectedObjectsMap(selectedRarities, rarityRepository));
+		model.addAttribute("rarities", getSelectedObjectsMap(selectedRarities, cardService.getAllRarities()));
 		model.addAttribute("selectedRarities", rarities.orElse(""));
-		model.addAttribute("sets", getSelectedObjectsMap(selectedSets, setRepository));
+		model.addAttribute("sets", getSelectedObjectsMap(selectedSets, cardService.getAllSets()));
 		model.addAttribute("selectedSets", sets.orElse(""));
 		model.addAttribute("selectedTypes", types.orElse(""));
-		model.addAttribute("types", getSelectedObjectsMap(selectedTypes, typeRepository));
+		model.addAttribute("types", getSelectedObjectsMap(selectedTypes, cardService.getAllTypes()));
 		model.addAttribute("enteredSearch", search.orElse(""));
 		model.addAttribute("sortOptions", SortType.values());
 		model.addAttribute("sessionData", sessionData);
@@ -84,12 +88,12 @@ public abstract class CardsController {
 		return redirectToCardsPage(new ModelMap(), page, rarities, sets, types, searchResult);
 	}
 
-	private void handleVerticalMenu() {
-		String page = getLink();
-		if (!sessionData.getLastVisited().equals(page))
-			sessionData.resetExpanders();
-		sessionData.setLastVisited(page);
-	}
+//	private void handleVerticalMenu() {
+//		String page = getLink();
+//		if (!sessionData.getLastVisited().equals(page))
+//			sessionData.resetExpanders();
+//		sessionData.setLastVisited(page);
+//	}
 
 	protected ModelAndView sortSelection(Optional<Integer> page, Optional<String> rarities, Optional<String> sets,
 			Optional<String> types, Optional<String> search, String selectedSort) {
@@ -141,15 +145,15 @@ public abstract class CardsController {
 		return selectedObjects;
 	}
 
-	private <T extends Comparable<? super T>, U extends JpaRepository<T, ?>> Map<T, Boolean> getSelectedObjectsMap(
-			List<T> selectedObjects, U repository) {
+	private <T extends Comparable<? super T>> Map<T, Boolean> getSelectedObjectsMap(
+			List<T> selectedObjects, List<T> list) {
 		Map<T, Boolean> result = new TreeMap<T, Boolean>();
 		if (selectedObjects.isEmpty()) {
-			for (T object : repository.findAll())
+			for (T object : list)
 				result.put(object, false);
 			return result;
 		}
-		for (T object : repository.findAll())
+		for (T object : list)
 			result.put(object, selectedObjects.contains(object));
 		return result;
 	}

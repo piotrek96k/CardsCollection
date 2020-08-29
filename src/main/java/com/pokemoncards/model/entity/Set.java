@@ -2,6 +2,7 @@ package com.pokemoncards.model.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotEmpty;
 
 @Entity
@@ -10,7 +11,30 @@ public class Set implements Comparable<Set>, Identifiable<String>{
 	@Id
 	@NotEmpty
 	private String id;
+	
+	@Transient
+	private long quantity;
+	
+	@Transient
+	private long userQuantity;
 
+	public Set() {
+	}
+	
+	public Set(String id) {
+		this.id = id;
+	}
+	
+	public Set(Set set, long quantity) {
+		this(set.getId());
+		this.quantity = quantity;
+	}
+	
+	public Set(Set set, long quantity, long userQuantity) {
+		this(set, quantity);
+		this.userQuantity = userQuantity;
+	}
+	
 	@Override
 	public String getId() {
 		return id;
@@ -19,6 +43,22 @@ public class Set implements Comparable<Set>, Identifiable<String>{
 	@Override
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public long getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(long quantity) {
+		this.quantity = quantity;
+	}
+
+	public long getUserQuantity() {
+		return userQuantity;
+	}
+
+	public void setUserQuantity(long userQuantity) {
+		this.userQuantity = userQuantity;
 	}
 
 	@Override

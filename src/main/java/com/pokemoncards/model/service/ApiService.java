@@ -103,7 +103,9 @@ public class ApiService {
 
 	private List<String> getAllTypes() {
 		ResponseEntity<Types> typesEntity = REST_TEMPLATE.getForEntity(RESOURCE_URL + TYPES, Types.class);
-		return typesEntity.getBody().getTypes();
+		List<String> types = typesEntity.getBody().getTypes();
+		types.add("None");
+		return types;
 	}
 
 	public List<Cards.Card> getCardsByPage(int page) {
@@ -121,6 +123,11 @@ public class ApiService {
 		for (Cards.Card card : cards) {
 			if (card.getRarity() == null || card.getRarity().isBlank())
 				card.setRarity("Common");
+			if(card.getTypes() == null || card.getTypes().isEmpty()) {
+				Set<String> types = new HashSet<String>();
+				types.add("None");
+				card.setTypes(types);
+			}
 			if (card.getEvolvesFrom() != null && (card.getEvolvesFrom().isEmpty() || card.getEvolvesFrom().isBlank()))
 				card.setEvolvesFrom(null);
 			if (card.getHp() != null

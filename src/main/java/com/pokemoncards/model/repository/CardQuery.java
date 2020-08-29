@@ -32,5 +32,5 @@ public interface CardQuery {
 	public int countCardsBySearch(String search);
 	
 	public Optional<Card> findById(String id, Optional<String> username);
-	
+		
 }

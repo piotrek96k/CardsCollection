@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -57,10 +59,10 @@ public class DatabaseInitializer implements InitializingBean {
 
 	@Autowired
 	private TypeRepository typeRepository;
-	
+
 	@Autowired
 	private CashRepository cashRepository;
-	
+
 	@Autowired
 	private AccountService accountService;
 
@@ -71,11 +73,12 @@ public class DatabaseInitializer implements InitializingBean {
 		if (apiService.getNumberOfCards() > cardRepository.count()) {
 			LOGGER.log(Level.INFO, "Loading Data");
 			ApiService.ApiData data = apiService.getApiData();
-			loadObjects(data.getRarities(), rarityRepository, rarity -> rarity, Rarity::new);
-			loadObjects(data.getSets(), setRepository, Sets.Set::getName, Set::new);
-			loadObjects(data.getTypes(), typeRepository, type -> type, Type::new);
+			Map<String, Integer> costs = getDefaultCosts();
+			loadObjects(data.getRarities(), rarityRepository, rarity -> rarity, Rarity::new,
+					Optional.of(rarity -> setRarityCost(rarity, costs)));
+			loadObjects(data.getSets(), setRepository, Sets.Set::getName, Set::new, Optional.empty());
+			loadObjects(data.getTypes(), typeRepository, type -> type, Type::new, Optional.empty());
 			loadCards(data.getCards());
-			setRaritiesCost();
 		}
 	}
 
@@ -92,9 +95,7 @@ public class DatabaseInitializer implements InitializingBean {
 				card.setEvolvesFrom(apiCard.getEvolvesFrom());
 				card.setHp(apiCard.getHp() == null ? null : Integer.valueOf(apiCard.getHp()));
 				List<Type> types = new ArrayList<Type>();
-				if (apiCard.getTypes() != null) {
-					apiCard.getTypes().forEach(type -> types.add(typeRepository.findById(type).get()));
-				}
+				apiCard.getTypes().forEach(type -> types.add(typeRepository.findById(type).get()));
 				Collections.sort(types);
 				card.setFirstType(types.isEmpty() ? null : types.get(0));
 				card.setTypes(types);
@@ -103,24 +104,21 @@ public class DatabaseInitializer implements InitializingBean {
 	}
 
 	private <T, U, V extends Identifiable<U>> void loadObjects(Iterable<T> objects, JpaRepository<V, U> repository,
-			Function<T, U> idExtractor, Supplier<V> constructor) {
+			Function<T, U> idExtractor, Supplier<V> constructor, Optional<Consumer<V>> setter) {
 		for (T object : objects)
 			if (repository.findById(idExtractor.apply(object)).isEmpty()) {
 				V entity = constructor.get();
 				entity.setId(idExtractor.apply(object));
+				if (setter.isPresent())
+					setter.get().accept(entity);
 				repository.save(entity);
 			}
 	}
 
-	private void setRaritiesCost() {
-		Map<String, Integer> costs = getDefaultCosts();
-		List<Rarity> rarities = rarityRepository.findAllRaritiesOrderById();
-		for (Rarity rarity : rarities)
-			if (rarity.getCost() == null) {
-				int cost = costs.get(rarity.getId()) == null ? 25_000 : costs.get(rarity.getId());
-				rarityRepository.setRarityCost(rarity.getId(), cost);
-				rarityRepository.setRaritySellCost(rarity.getId(), cost/2);
-			}
+	private void setRarityCost(Rarity rarity, Map<String, Integer> costs) {
+		int cost = costs.get(rarity.getId()) == null ? 25_000 : costs.get(rarity.getId());
+		rarity.setCost(cost);
+		rarity.setSellCost(cost / 2);
 	}
 
 	private Map<String, Integer> getDefaultCosts() {
@@ -161,7 +159,7 @@ public class DatabaseInitializer implements InitializingBean {
 		String adminString = "admin";
 		Account admin = accountRepository.findByUsername(adminString);
 		if (admin == null) {
-			LOGGER.log(Level.INFO, "Creating Admin");			
+			LOGGER.log(Level.INFO, "Creating Admin");
 			admin = new Account();
 			admin.setUsername(adminString);
 			admin.setEmail("pokemonCardsAdmin@gmail.com");
@@ -180,7 +178,7 @@ public class DatabaseInitializer implements InitializingBean {
 		loadData();
 		loadRoles();
 		createAdmin();
-//		for(int i =1; i<200; i++)
+//		for(int i =1; i<503; i++)
 //			cardRepository.getCards(i, SortType.NAME, SortType.NAME.ASC, new ArrayList<Rarity>(), new ArrayList<Set>(), new ArrayList<Type>(), Optional.empty(), Optional.empty()).forEach(card->accountRepository.addCard("admin", "pokemonCardsAdmin@gmail.com", card.getId()));
 	}
 

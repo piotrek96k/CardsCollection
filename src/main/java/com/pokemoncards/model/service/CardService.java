@@ -16,6 +16,8 @@ import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
 import com.pokemoncards.model.repository.CardRepository;
 import com.pokemoncards.model.repository.RarityRepository;
+import com.pokemoncards.model.repository.SetRepository;
+import com.pokemoncards.model.repository.TypeRepository;
 import com.pokemoncards.model.service.SortType.OrderType;
 
 @Service
@@ -33,6 +35,12 @@ public class CardService extends AbstractService{
 	@Autowired
 	private RarityRepository rarityRepository;
 	
+	@Autowired
+	private SetRepository setRepository;
+	
+	@Autowired
+	private TypeRepository typeRepository;
+	
 	public List<Card> getCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities, List<Set> sets,
 			List<Type> types, Optional<String> search) {
 		Function<AccountId, List<Card>> function = accountId -> cardRepository.getCards(page, sortType, orderType,
@@ -42,7 +50,7 @@ public class CardService extends AbstractService{
 	}
 
 	public List<Card> getCards(Optional<String[]> ids, Optional<String> search) {
-		Optional<String> username = operateOnAccount(accountId->Optional.of(accountId.getUsername()), ()->Optional.empty());
+		Optional<String> username = getUsername();
 		if (ids.isEmpty())
 			return getCardsWithEmptyIds(search, username);
 		Function<String, Card> cardGetter;
@@ -91,6 +99,22 @@ public class CardService extends AbstractService{
 		}
 		cards.add(cardGetter.apply(ids[ids.length - 1]));
 		return cards;
+	}
+	
+	public List<Rarity> getAllRarities(){
+		return rarityRepository.findAll(getUsername());
+	}
+	
+	public List<Set> getAllSets(){
+		return setRepository.findAll(getUsername());
+	}
+	
+	public List<Type> getAllTypes(){
+		return typeRepository.findAll(getUsername());
+	}
+	
+	private Optional<String> getUsername(){
+		return operateOnAccount(accountId->Optional.of(accountId.getUsername()), ()->Optional.empty());
 	}
 
 }

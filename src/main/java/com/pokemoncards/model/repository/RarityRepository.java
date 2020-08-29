@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pokemoncards.model.entity.Rarity;
 
-public interface RarityRepository extends JpaRepository<Rarity, String>{
+public interface RarityRepository extends JpaRepository<Rarity, String>, CardField<Rarity>{
 
 	@Query(value = "select * from rarity order by id asc", nativeQuery = true)
 	public List<Rarity> findAllRaritiesOrderById();
