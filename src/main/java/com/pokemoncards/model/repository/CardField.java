@@ -7,4 +7,6 @@ public interface CardField <T>{
 
 	public List<T> findAll(Optional<String> username);
 	
+	public Optional<T> findById(String id, Optional<String> username);
+	
 }

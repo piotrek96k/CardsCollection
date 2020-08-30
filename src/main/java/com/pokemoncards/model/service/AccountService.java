@@ -12,13 +12,15 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.pokemoncards.model.component.SortType;
+import com.pokemoncards.model.component.SortType.OrderType;
 import com.pokemoncards.model.entity.Account;
 import com.pokemoncards.model.entity.AccountId;
 import com.pokemoncards.model.entity.Card;
@@ -32,8 +34,10 @@ import com.pokemoncards.model.entity.Type;
 import com.pokemoncards.model.repository.CardRepository;
 import com.pokemoncards.model.repository.CashRepository;
 import com.pokemoncards.model.repository.FreeCardRepository;
+import com.pokemoncards.model.repository.RarityRepository;
 import com.pokemoncards.model.repository.RoleRepository;
-import com.pokemoncards.model.service.SortType.OrderType;
+import com.pokemoncards.model.repository.SetRepository;
+import com.pokemoncards.model.repository.TypeRepository;
 
 @Service
 public class AccountService extends AbstractService{
@@ -53,6 +57,18 @@ public class AccountService extends AbstractService{
 
 	@Autowired
 	private FreeCardRepository freeCardRepository;
+	
+	@Autowired
+	private RarityRepository rarityRepository;
+	
+	@Autowired
+	private SetRepository setRepository;
+	
+	@Autowired
+	private TypeRepository typeRepository;
+	
+	@Autowired
+	private ObjectMapper mapper;
 
 	public void addAccount(Account account) {
 		Role role = roleRepository.getOne(RoleEnum.ROLE_USER.toString());
@@ -174,14 +190,14 @@ public class AccountService extends AbstractService{
 			int coins = cashRepository.getCash(accountId.getUsername()).getCoins();
 			if (card.isEmpty())
 				return getCoinsJson(coins, 0);
-			int cost = card.get().getRarity().getCost();
+			int cost = card.get().getRarity().getValue();
 			int quantity = accountRepository.countUserCardsByCardId(accountId.getUsername(), id);
 			if (coins >= cost) {
 				accountRepository.addCard(accountId.getUsername(), accountId.getEmail(), id);
 				cashRepository.updateCoins(accountId.getUsername(), coins - cost);
-				return getCoinsJson(coins - cost, ++quantity);
+				return getCoinsJson(coins - cost, ++quantity, card.get(), accountId.getUsername());
 			}
-			return getCoinsJson(coins, quantity);
+			return getCoinsJson(coins, quantity, card.get(), accountId.getUsername());
 		};
 		return operateOnAccount(function, () -> getCoinsJson(0, 0));
 	}
@@ -189,22 +205,41 @@ public class AccountService extends AbstractService{
 	public String removeCard(String id) {
 		Function<AccountId, String> function = accountId -> {
 			int coins = cashRepository.getCash(accountId.getUsername()).getCoins();
+			Optional<Card> card = cardRepository.findById(id);
+			if(card.isEmpty())
+				return getCoinsJson(coins, 0);
 			int quantity = accountRepository.countUserCardsByCardId(accountId.getUsername(), id);
 			if (quantity > 0) {
 				int cost = cardRepository.getCardSellCost(id);
 				accountRepository.removeCard(accountId.getUsername(), id);
 				cashRepository.updateCoins(accountId.getUsername(), coins + cost);
-				return getCoinsJson(coins + cost, --quantity);
+				return getCoinsJson(coins + cost, --quantity, card.get(), accountId.getUsername());
 			}
-			return getCoinsJson(coins, quantity);
+			return getCoinsJson(coins, quantity, card.get(),accountId.getUsername());
 		};
 		return operateOnAccount(function, () -> getCoinsJson(0, 0));
 	}
+	
+	private String getCoinsJson(int coins, int quantity, Card card, String username) {
+		ObjectNode node = getCoinsObjectNode(coins, quantity);
+		node.putPOJO("rarity", rarityRepository.findById(card.getRarity().getId(), Optional.of(username)).get());
+		node.putPOJO("set",setRepository.findById(card.getSet().getId(), Optional.of(username)).get());
+		ArrayNode array = mapper.createArrayNode();
+		for(Type type: card.getTypes())
+			array.addPOJO(typeRepository.findById(type.getId(), Optional.of(username)).get());
+		node.putArray("types").addAll(array);
+		return node.toString();
+	}
 
 	private String getCoinsJson(int coins, int quantity) {
-		JsonObject json = Json.createObjectBuilder().add("coins", formatInteger(coins))
-				.add("quantity", formatInteger(quantity)).build();
-		return json.toString();
+		return getCoinsObjectNode(coins, quantity).toString();
+	}
+	
+	private ObjectNode getCoinsObjectNode(int coins, int quantity) {
+		ObjectNode node = mapper.createObjectNode();
+		node.put("coins", formatInteger(coins));
+		node.put("quantity", formatInteger(quantity));
+		return node;
 	}
 
 	public static String formatInteger(int value) {

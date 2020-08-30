@@ -4,8 +4,7 @@ function buyCard(id) {
 	xhttp.onreadystatechange = function() {
   		if (this.readyState == 4 && this.status == 200) {
 			var data = JSON.parse(this.responseText);
-			document.getElementById("coins").innerHTML = data.coins;
-			document.getElementById("quantity" + id).innerHTML = data.quantity;
+			setNewValuesFromJson(data, id);
 			disableButtonsIfNeed(parseInt(data.coins.replaceAll(" ", "")));
   		}
 	};
@@ -20,15 +19,44 @@ function sellCard(id ,page, rarity, set, type, search) {
 	xhttp.onreadystatechange = function() {
   		if (this.readyState == 4 && this.status == 200) {
 			var data = JSON.parse(this.responseText);
+			setNewValuesFromJson(data, id);
 			if (data.quantity == "0")
 				setCardsFragment(path, page, rarity, set, type, search);
-			else {
-				document.getElementById("coins").innerHTML = data.coins;
-				document.getElementById("quantity" + id).innerHTML = data.quantity;	
-			}		
     }
   };
 	xhttp.open("GET", url, true);
+	xhttp.send();
+}
+
+function setNewValuesFromJson(data, id) {
+	document.getElementById("coins").innerHTML = data.coins;
+	document.getElementById("quantity" + id).innerHTML = data.quantity;
+	document.getElementById(data.rarity.id + "userQuantity").innerHTML = data.rarity.userQuantity;
+	document.getElementById(data.set.id + "userQuantity").innerHTML = data.set.userQuantity;
+	for (let i = 0; i < data.types.length; i++)
+		document.getElementById(data.types[i].id + "userQuantity").innerHTML = data.types[i].userQuantity;
+}
+
+function setCardsFragment(path ,page, rarity, set, type, search) {
+	var url = getUrl(path ,page, rarity, set, type, search);
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+  		if (this.readyState == 4 && this.status == 200) {
+			var html = new DOMParser().parseFromString(this.responseText, "text/html");
+			var cards = html.getElementsByName("sellbutton").length;
+			if (cards > 0 || page == 1) {
+				document.getElementById("cardpage").innerHTML = html.getElementById("cardpage").innerHTML;
+				document.getElementById("pagination").innerHTML = html.getElementById("pagination").innerHTML;
+				installTooltipListeners();
+			}
+			else if (page > 1)
+				if (page == 2)
+					window.location.href = getUrl(path, null, rarity, set, type, search).path;
+				else
+					window.location.href = getUrl(path, page-1, rarity, set, type, search).path;
+		}
+  	};
+	xhttp.open("GET", url.path, true);
 	xhttp.send();
 }
 
@@ -88,30 +116,6 @@ function setIndexCardsFragmentOnSuccess(response) {
 	var html = new DOMParser().parseFromString(response, "text/html");
 	document.getElementById("cards").innerHTML = html.getElementById("cards").innerHTML;
 	installTooltipListeners();
-}
-
-function setCardsFragment(path ,page, rarity, set, type, search) {
-	var url = getUrl(path ,page, rarity, set, type, search);
-	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function() {
-  		if (this.readyState == 4 && this.status == 200) {
-			var html = new DOMParser().parseFromString(this.responseText, "text/html");
-			var cards = html.getElementsByName("sellbutton").length;
-			if (cards > 0 || page == 1) {
-				document.getElementById("cardpage").innerHTML = html.getElementById("cardpage").innerHTML;
-				document.getElementById("coins").innerHTML = html.getElementById("coins").innerHTML;
-				document.getElementById("pagination").innerHTML = html.getElementById("pagination").innerHTML;
-				installTooltipListeners();
-			}
-			else if (page > 1)
-				if (page == 2)
-					window.location.href = getUrl(path, null, rarity, set, type, search).path;
-				else
-					window.location.href = getUrl(path, page-1, rarity, set, type, search).path;
-		}
-  	};
-	xhttp.open("GET", url.path, true);
-	xhttp.send();
 }
 
 function getUrl(path ,page, rarity, set, type, search) {

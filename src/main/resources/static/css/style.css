@@ -140,6 +140,9 @@ hr {
 	text-align: left;
 	font-size:13px;
 }
+.vertical-menu span span {
+	font-size:13px;
+}
 .vertical-menu-selected a{
 	border: none;
 	background-color: #00d654;

@@ -1,4 +1,4 @@
-package com.pokemoncards.model.service;
+package com.pokemoncards.model.component;
 
 public enum SortType {
 
@@ -8,7 +8,7 @@ public enum SortType {
 	
 	SET("Set","id"), 
 	
-	COST("Cost","cost", "Low - High", "High - Low"), 
+	VALUE("Value","value", "Low - High", "High - Low"), 
 	
 	TYPE("Type", "id"),
 	

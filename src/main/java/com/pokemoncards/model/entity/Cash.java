@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-import javax.json.Json;
-import javax.json.JsonObject;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,11 +16,13 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.pokemoncards.model.service.AccountService;
 
 @Entity
 @IdClass(AccountId.class)
-public class Cash {
+public class Cash{
 
 	public static final int COINS_PER_DAY;
 
@@ -55,10 +55,12 @@ public class Cash {
 	private Account account;
 
 	public String convertToJson() {
-		JsonObject json = Json.createObjectBuilder().add("coins", AccountService.formatInteger(coins))
-				.add("nextCoinsCollecting", getNextTimeCollectingInMilis())
-				.add("nextCoins", AccountService.formatInteger(COINS_PER_DAY * daysInRow)).build();
-		return json.toString();
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode node = mapper.createObjectNode();
+		node.put("coins", AccountService.formatInteger(coins));
+		node.put("nextCoinsCollecting", getNextTimeCollectingInMilis());
+		node.put("nextCoins", AccountService.formatInteger(COINS_PER_DAY*daysInRow));
+		return node.toString();
 	}
 
 	public long getNextTimeCollectingInMilis() {

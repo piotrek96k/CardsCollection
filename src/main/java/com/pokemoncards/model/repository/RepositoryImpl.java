@@ -18,13 +18,13 @@ import javax.persistence.criteria.Predicate;
 
 import org.springframework.stereotype.Repository;
 
+import com.pokemoncards.model.component.SortType;
+import com.pokemoncards.model.component.SortType.OrderType;
 import com.pokemoncards.model.entity.Account;
 import com.pokemoncards.model.entity.Card;
 import com.pokemoncards.model.entity.Rarity;
 import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
-import com.pokemoncards.model.service.SortType;
-import com.pokemoncards.model.service.SortType.OrderType;
 
 @Repository
 public abstract class RepositoryImpl {
@@ -139,8 +139,8 @@ public abstract class RepositoryImpl {
 			return method.apply(card.get(sortType.getColumnName()));
 		if (sortType.equals(SortType.RARITY))
 			return joinToOrder(criteriaQuery, card, method, sortType, "rarity", "id");
-		if (sortType.equals(SortType.COST))
-			return joinToOrder(criteriaQuery, card, method, sortType, "rarity", "cost");
+		if (sortType.equals(SortType.VALUE))
+			return joinToOrder(criteriaQuery, card, method, sortType, "rarity", "value");
 		if (sortType.equals(SortType.SET))
 			return joinToOrder(criteriaQuery, card, method, sortType, "set", "id");
 		return joinToOrder(criteriaQuery, card, method, sortType, "firstType", "id");

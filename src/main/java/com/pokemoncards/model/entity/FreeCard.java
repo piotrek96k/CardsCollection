@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-import javax.json.Json;
-import javax.json.JsonObject;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,9 +16,12 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 @Entity
 @IdClass(AccountId.class)
-public class FreeCard {
+public class FreeCard{
 
 	@Id
 	@NotBlank
@@ -40,8 +41,10 @@ public class FreeCard {
 	private Account account;
 	
 	public String convertToJson() {
-		JsonObject json = Json.createObjectBuilder().add("nextFreeCard", getNextFreeCardInMilis()).build();
-		return json.toString();
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode node = mapper.createObjectNode();
+		node.put("nextFreeCard", getNextFreeCardInMilis());
+		return node.toString();
 	}
 	
 	public long getNextFreeCardInMilis() {

@@ -9,6 +9,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class Type implements Comparable<Type>, Identifiable<String> {
 
@@ -17,6 +19,7 @@ public class Type implements Comparable<Type>, Identifiable<String> {
 	private String id;
 
 	@ManyToMany(mappedBy = "types", fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<Card> cards;
 	
 	@Transient

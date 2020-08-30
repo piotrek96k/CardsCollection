@@ -15,6 +15,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.pokemoncards.model.component.SessionData;
+import com.pokemoncards.model.component.SortType;
 import com.pokemoncards.model.entity.Card;
 import com.pokemoncards.model.entity.Rarity;
 import com.pokemoncards.model.entity.Set;
@@ -24,7 +25,6 @@ import com.pokemoncards.model.repository.SetRepository;
 import com.pokemoncards.model.repository.TypeRepository;
 import com.pokemoncards.model.service.AccountService;
 import com.pokemoncards.model.service.CardService;
-import com.pokemoncards.model.service.SortType;
 
 @Controller
 @Scope(value = "session")

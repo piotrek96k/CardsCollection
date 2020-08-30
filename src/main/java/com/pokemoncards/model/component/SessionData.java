@@ -6,8 +6,6 @@ import java.util.Map;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.pokemoncards.model.service.SortType;
-
 @Component
 @Scope(value = "session")
 public class SessionData {

@@ -9,6 +9,8 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.pokemoncards.model.component.SortType;
+import com.pokemoncards.model.component.SortType.OrderType;
 import com.pokemoncards.model.entity.AccountId;
 import com.pokemoncards.model.entity.Card;
 import com.pokemoncards.model.entity.Rarity;
@@ -18,7 +20,6 @@ import com.pokemoncards.model.repository.CardRepository;
 import com.pokemoncards.model.repository.RarityRepository;
 import com.pokemoncards.model.repository.SetRepository;
 import com.pokemoncards.model.repository.TypeRepository;
-import com.pokemoncards.model.service.SortType.OrderType;
 
 @Service
 public class CardService extends AbstractService{

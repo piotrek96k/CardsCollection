@@ -6,6 +6,8 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class Rarity implements Comparable<Rarity>, Identifiable<String> {
 
@@ -14,11 +16,13 @@ public class Rarity implements Comparable<Rarity>, Identifiable<String> {
 	private String id;
 
 	@NotNull
-	private Integer cost;
+	@JsonIgnore
+	private Integer value;
 
 	@NotNull
-	@Column(name = "sell_cost")
-	private Integer sellCost;
+	@Column(name = "sell_price")
+	@JsonIgnore
+	private Integer sellPrice;
 
 	@Transient
 	private long quantity;
@@ -26,10 +30,10 @@ public class Rarity implements Comparable<Rarity>, Identifiable<String> {
 	@Transient
 	private long userQuantity;
 
-	public Rarity(String id, Integer cost, Integer sellCost) {
+	public Rarity(String id, Integer cost, Integer sellPrice) {
 		this.id = id;
-		this.cost = cost;
-		this.sellCost = sellCost;
+		this.value = cost;
+		this.sellPrice = sellPrice;
 	}
 	
 	public Rarity(Rarity rarity, long quantity, long userQuantity) {
@@ -38,7 +42,7 @@ public class Rarity implements Comparable<Rarity>, Identifiable<String> {
 	}
 
 	public Rarity(Rarity rarity, long quantity) {
-		this(rarity.id, rarity.cost);
+		this(rarity.id, rarity.value);
 		this.quantity =  quantity;
 	}
 
@@ -63,20 +67,20 @@ public class Rarity implements Comparable<Rarity>, Identifiable<String> {
 		this.id = id;
 	}
 
-	public Integer getCost() {
-		return cost;
+	public Integer getValue() {
+		return value;
 	}
 
-	public void setCost(Integer cost) {
-		this.cost = cost;
+	public void setValue(Integer value) {
+		this.value = value;
 	}
 
-	public Integer getSellCost() {
-		return sellCost;
+	public Integer getSellPrice() {
+		return sellPrice;
 	}
 
-	public void setSellCost(Integer sellCost) {
-		this.sellCost = sellCost;
+	public void setSellPrice(Integer sellPrice) {
+		this.sellPrice = sellPrice;
 	}
 
 	public long getQuantity() {

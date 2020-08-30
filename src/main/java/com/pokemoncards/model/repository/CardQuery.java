@@ -3,12 +3,12 @@ package com.pokemoncards.model.repository;
 import java.util.List;
 import java.util.Optional;
 
+import com.pokemoncards.model.component.SortType;
+import com.pokemoncards.model.component.SortType.OrderType;
 import com.pokemoncards.model.entity.Card;
 import com.pokemoncards.model.entity.Rarity;
 import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
-import com.pokemoncards.model.service.SortType;
-import com.pokemoncards.model.service.SortType.OrderType;
 
 public interface CardQuery {
 

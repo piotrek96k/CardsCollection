@@ -48,7 +48,7 @@
        								</tr>
        								<tr>
        									<td>Value</td>
-       									<td th:if="${card.getRarity() != null}" th:text="${#numbers.formatInteger(card.getRarity().getCost(), 1, 'WHITESPACE')}"></td>
+       									<td th:if="${card.getRarity() != null}" th:text="${#numbers.formatInteger(card.getRarity().getValue(), 1, 'WHITESPACE')}"></td>
        								</tr>
     							</table>
        						</div>

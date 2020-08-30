@@ -73,9 +73,9 @@ public class DatabaseInitializer implements InitializingBean {
 		if (apiService.getNumberOfCards() > cardRepository.count()) {
 			LOGGER.log(Level.INFO, "Loading Data");
 			ApiService.ApiData data = apiService.getApiData();
-			Map<String, Integer> costs = getDefaultCosts();
+			Map<String, Integer> values = getDefaultValues();
 			loadObjects(data.getRarities(), rarityRepository, rarity -> rarity, Rarity::new,
-					Optional.of(rarity -> setRarityCost(rarity, costs)));
+					Optional.of(rarity -> setRarityValue(rarity, values)));
 			loadObjects(data.getSets(), setRepository, Sets.Set::getName, Set::new, Optional.empty());
 			loadObjects(data.getTypes(), typeRepository, type -> type, Type::new, Optional.empty());
 			loadCards(data.getCards());
@@ -115,33 +115,33 @@ public class DatabaseInitializer implements InitializingBean {
 			}
 	}
 
-	private void setRarityCost(Rarity rarity, Map<String, Integer> costs) {
+	private void setRarityValue(Rarity rarity, Map<String, Integer> costs) {
 		int cost = costs.get(rarity.getId()) == null ? 25_000 : costs.get(rarity.getId());
-		rarity.setCost(cost);
-		rarity.setSellCost(cost / 2);
+		rarity.setValue(cost);
+		rarity.setSellPrice(cost / 2);
 	}
 
-	private Map<String, Integer> getDefaultCosts() {
-		Map<String, Integer> costs = new HashMap<String, Integer>();
-		costs.put("Common", 100);
-		costs.put("Uncommon", 150);
-		costs.put("Rare", 250);
-		costs.put("Rare Holo", 300);
-		costs.put("Rare Ultra", 500);
-		costs.put("Rare Holo EX", 750);
-		costs.put("Rare Secret", 1_000);
-		costs.put("Rare Holo GX", 1_500);
-		costs.put("Rare Holo Lv.X", 2_000);
-		costs.put("Rare BREAK", 2_500);
-		costs.put("Rare Prime", 3_000);
-		costs.put("LEGEND", 5_000);
-		costs.put("V", 7_500);
-		costs.put("Rare Promo", 10_000);
-		costs.put("Rare ACE", 12_500);
-		costs.put("Shining", 15_000);
-		costs.put("VM", 20_000);
-		costs.put("Rare Rainbow", 100_000);
-		return costs;
+	private Map<String, Integer> getDefaultValues() {
+		Map<String, Integer> values = new HashMap<String, Integer>();
+		values.put("Common", 100);
+		values.put("Uncommon", 150);
+		values.put("Rare", 250);
+		values.put("Rare Holo", 300);
+		values.put("Rare Ultra", 500);
+		values.put("Rare Holo EX", 750);
+		values.put("Rare Secret", 1_000);
+		values.put("Rare Holo GX", 1_500);
+		values.put("Rare Holo Lv.X", 2_000);
+		values.put("Rare BREAK", 2_500);
+		values.put("Rare Prime", 3_000);
+		values.put("LEGEND", 5_000);
+		values.put("V", 7_500);
+		values.put("Rare Promo", 10_000);
+		values.put("Rare ACE", 12_500);
+		values.put("Shining", 15_000);
+		values.put("VM", 20_000);
+		values.put("Rare Rainbow", 100_000);
+		return values;
 	}
 
 	private void loadRoles() {

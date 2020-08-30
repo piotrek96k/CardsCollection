@@ -12,14 +12,14 @@ import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
 
+import com.pokemoncards.model.component.SortType;
+import com.pokemoncards.model.component.SortType.OrderType;
 import com.pokemoncards.model.entity.Account;
 import com.pokemoncards.model.entity.AccountId;
 import com.pokemoncards.model.entity.Card;
 import com.pokemoncards.model.entity.Rarity;
 import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
-import com.pokemoncards.model.service.SortType;
-import com.pokemoncards.model.service.SortType.OrderType;
 
 @Repository
 public class AccountRepositoryImpl extends RepositoryImpl implements AccountQuery {
