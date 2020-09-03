@@ -1,7 +1,6 @@
 package com.pokemoncards.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -12,7 +11,6 @@ import com.pokemoncards.model.component.Expander;
 import com.pokemoncards.model.component.SessionData;
 
 @Controller
-@Scope(value = "session")
 public class SelectOptionController {
 	
 	@Autowired

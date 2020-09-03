@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -23,7 +22,6 @@ import com.pokemoncards.model.repository.CardRepository;
 import com.pokemoncards.model.service.AccountService;
 
 @Controller
-@Scope(value = "session")
 public class BuyController extends CardsController {
 
 	@Autowired

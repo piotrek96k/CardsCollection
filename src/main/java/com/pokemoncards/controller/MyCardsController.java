@@ -3,7 +3,6 @@ package com.pokemoncards.controller;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -19,7 +18,6 @@ import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
 
 @Controller
-@Scope(value = "session")
 public class MyCardsController extends CardsController {
 
 	@GetMapping(value = "/mycards")

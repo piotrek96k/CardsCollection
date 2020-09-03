@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,7 +26,6 @@ import com.pokemoncards.model.service.AccountService;
 import com.pokemoncards.model.service.CardService;
 
 @Controller
-@Scope(value = "session")
 public abstract class CardsController {
 
 	@Autowired

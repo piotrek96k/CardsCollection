@@ -5,9 +5,9 @@ import com.pokemoncards.annotation.PasswordRepeat;
 @PasswordRepeat
 public class PasswordRepeatData {
 
-	public String password;
+	private String password;
 
-	public String passwordRepeat;
+	private String passwordRepeat;
 
 	public PasswordRepeatData() {
 	}

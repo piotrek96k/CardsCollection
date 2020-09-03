@@ -196,7 +196,7 @@ function installExpandListeners() {
 	var coll = document.getElementsByClassName("vertical-menu-top");
 	for (let i = 0; i < coll.length; i++) {
 		let element = coll[i];
-		element.addEventListener("click", item=> {
+		element.addEventListener("click", item => {
 			var content = element.nextElementSibling;
 			if (content.style.display === "none") {
 				element.getElementsByTagName("img")[0].src = "images/hide.png";

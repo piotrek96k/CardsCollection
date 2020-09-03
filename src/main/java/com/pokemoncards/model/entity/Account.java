@@ -29,23 +29,23 @@ public class Account {
 	@NotBlank(message = "Username can't be blank", groups = OnRegister.class)
 	@Size(min = 4, message = "Username too short", groups = OnRegister.class)
 	@Unique(message = "Username in use", groups = OnRegister.class)
-	public String username;
+	private String username;
 
 	@Id
 	@Email(message = "Entered e-mail must be correct", groups = OnRegister.class)
 	@Unique(message = "E-mail in use", groups = OnRegister.class)
-	public String email;
+	private String email;
 
 	@NotBlank(message = "First name can't be blank", groups = OnRegister.class)
-	public String firstName;
+	private String firstName;
 
 	@NotBlank(message = "Lastname can't be blank", groups = OnRegister.class)
-	public String lastName;
+	private String lastName;
 
 	@Password(groups = OnRegister.class)
 	@NotBlank(message = "Password can't be blank", groups = OnRegister.class)
 	@Size(min = 8, message = "Password too short", groups = OnRegister.class)
-	public String password;
+	private String password;
 
 	@OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
 	private Cash cash;
@@ -53,7 +53,7 @@ public class Account {
 	@OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
 	private FreeCard freeCard;
 
-	public boolean enabled;
+	private boolean enabled;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "account_roles", joinColumns = {

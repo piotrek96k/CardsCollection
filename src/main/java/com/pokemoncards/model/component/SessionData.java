@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 @Component
-@Scope(value = "session")
+@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class SessionData {
 
 	private SortType sortType;
@@ -15,9 +17,9 @@ public class SessionData {
 	private SortType.OrderType orderType;
 
 	private Map<String, Boolean> expanders;
-	
+
 	private int scrollPosition;
-	
+
 	private String lastVisited;
 
 	{
@@ -25,9 +27,9 @@ public class SessionData {
 		orderType = SortType.NAME.ASC;
 		expanders = new HashMap<String, Boolean>();
 		resetExpanders();
-		lastVisited="";
+		lastVisited = "";
 	}
-	
+
 	public void resetExpanders() {
 		for (Expander expander : Expander.values())
 			expanders.put(expander.getExpand(), false);
@@ -78,5 +80,5 @@ public class SessionData {
 	public void setLastVisited(String lastVisited) {
 		this.lastVisited = lastVisited;
 	}
-	
+
 }
