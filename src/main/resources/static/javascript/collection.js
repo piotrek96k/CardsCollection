@@ -27,51 +27,53 @@ function collectFreeCard() {
 			getFreeCard();
 		}
 	};
-	getRequest(supplier);
+	getRequest(supplier, "html");
 }
 
 function getFreeCard() {
 	var supplier = {
 		url: "/home/get/freecard",
 		apply: function(responseText) {
-			freeCard = JSON.parse(responseText);
+			freeCard = responseText;
 			setFreeCardTimer();
 		}
 	};
-	getRequest(supplier);
+	getRequest(supplier, "json");
 }
 
 function collectCoins() {
 	var supplier = {
 		url: "/home/collect/coins",
 		apply: function(responseText) {
-			cash = JSON.parse(responseText);
+			cash = responseText;
 			document.getElementById("coins").innerHTML = cash.coins;
 			setCoinsTimer();
 		}
 	};
-	getRequest(supplier);
+	getRequest(supplier, "json");
 }
 
 function getCash() {
 	var supplier = {
 		url: "/home/get/cash",
 		apply: function(responseText) {
-			cash = JSON.parse(responseText);
+			cash = responseText;
 			setCoinsTimer();
 		}
 	};
-	getRequest(supplier);
+	getRequest(supplier, "json");
 }
 
-function getRequest(supplier) {
-	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function() {
-  		if (this.readyState == 4 && this.status == 200)
-			supplier.apply(this.responseText);
-  	};
-	xhttp.open("GET", supplier.url, true);
-	xhttp.send();
+function getRequest(supplier, dataType) {
+	$.ajax({
+		type:"get",
+		url: supplier.url,
+		async: true,
+		dataType: dataType,
+		success: function(response) {
+			supplier.apply(response);
+		},
+	});
 }
 
 function setCoinsTimer() {

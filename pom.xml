@@ -16,6 +16,8 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Pokemon Cards</name>
 	<description>pokemon cards collecting site</description>
+	
+	<packaging>war</packaging>
 
 	<properties>
 		<java.version>12</java.version>

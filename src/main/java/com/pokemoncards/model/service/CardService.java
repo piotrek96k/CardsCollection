@@ -7,11 +7,12 @@ import java.util.Random;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.pokemoncards.config.ExtendedUser;
 import com.pokemoncards.model.component.SortType;
 import com.pokemoncards.model.component.SortType.OrderType;
-import com.pokemoncards.model.entity.AccountId;
 import com.pokemoncards.model.entity.Card;
 import com.pokemoncards.model.entity.Rarity;
 import com.pokemoncards.model.entity.Set;
@@ -22,7 +23,7 @@ import com.pokemoncards.model.repository.SetRepository;
 import com.pokemoncards.model.repository.TypeRepository;
 
 @Service
-public class CardService extends AbstractService{
+public class CardService {
 
 	private static final String LEGEND_RARITY_ID;
 
@@ -35,19 +36,16 @@ public class CardService extends AbstractService{
 
 	@Autowired
 	private RarityRepository rarityRepository;
-	
+
 	@Autowired
 	private SetRepository setRepository;
-	
+
 	@Autowired
 	private TypeRepository typeRepository;
-	
+
 	public List<Card> getCards(int page, SortType sortType, OrderType orderType, List<Rarity> rarities, List<Set> sets,
 			List<Type> types, Optional<String> search) {
-		Function<AccountId, List<Card>> function = accountId -> cardRepository.getCards(page, sortType, orderType,
-				rarities, sets, types, search, Optional.of(accountId.getUsername()));
-		return operateOnAccount(function, () -> cardRepository.getCards(page, sortType, orderType, rarities, sets,
-				types, search, Optional.empty()));
+		return cardRepository.getCards(page, sortType, orderType, rarities, sets, types, search, getUsername());
 	}
 
 	public List<Card> getCards(Optional<String[]> ids, Optional<String> search) {
@@ -56,7 +54,8 @@ public class CardService extends AbstractService{
 			return getCardsWithEmptyIds(search, username);
 		Function<String, Card> cardGetter;
 		if (search.isEmpty() || cardRepository.countCardsBySearch(search.get()) == 0)
-			cardGetter = id -> cardRepository.getNextCard(rarityRepository.findById(LEGEND_RARITY_ID).get(), id, username);
+			cardGetter = id -> cardRepository.getNextCard(rarityRepository.findById(LEGEND_RARITY_ID).get(), id,
+					username);
 		else
 			cardGetter = id -> cardRepository.getNextCard(search.get(), id, username);
 		return getCards(cardGetter, ids.get(), username);
@@ -93,7 +92,7 @@ public class CardService extends AbstractService{
 		List<Card> cards = new ArrayList<Card>();
 		for (int i = 1; i < ids.length; i++) {
 			Optional<Card> card = cardRepository.findById(ids[i], username);
-			if(card.isPresent())
+			if (card.isPresent())
 				cards.add(card.get());
 			else
 				cards.add(cardRepository.getRandomCard());
@@ -101,21 +100,24 @@ public class CardService extends AbstractService{
 		cards.add(cardGetter.apply(ids[ids.length - 1]));
 		return cards;
 	}
-	
-	public List<Rarity> getAllRarities(){
+
+	public List<Rarity> getAllRarities() {
 		return rarityRepository.findAll(getUsername());
 	}
-	
-	public List<Set> getAllSets(){
+
+	public List<Set> getAllSets() {
 		return setRepository.findAll(getUsername());
 	}
-	
-	public List<Type> getAllTypes(){
+
+	public List<Type> getAllTypes() {
 		return typeRepository.findAll(getUsername());
 	}
-	
-	private Optional<String> getUsername(){
-		return operateOnAccount(accountId->Optional.of(accountId.getUsername()), ()->Optional.empty());
+
+	private Optional<String> getUsername() {
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if(principal instanceof ExtendedUser)
+			return Optional.of(((ExtendedUser)principal).getUsername());
+		return Optional.empty();
 	}
 
 }

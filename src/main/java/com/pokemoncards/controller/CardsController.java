@@ -61,7 +61,6 @@ public abstract class CardsController {
 		List<Rarity> selectedRarities = getSelectedObjectsAsList(rarities, rarityRepository);
 		List<Set> selectedSets = getSelectedObjectsAsList(sets, setRepository);
 		List<Type> selectedTypes = getSelectedObjectsAsList(types, typeRepository);
-		model.addAttribute("accountId", accountService.getAccountId());
 		model.addAttribute("cards", getCards(currentPage, selectedRarities, selectedSets, selectedTypes, search));
 		model.addAttribute("link", getLink());
 		model.addAttribute("cash", accountService.getCash());

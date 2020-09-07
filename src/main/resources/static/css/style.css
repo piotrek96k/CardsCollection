@@ -357,3 +357,22 @@ hr {
 .modal-content .card-shadow {
 	box-shadow: 0px 0px;
 }
+.regular-checkbox {
+	top:4px;
+	right:4px;
+	width:20px;
+	height:20px;
+	-webkit-appearance: none;
+	background-color: white;
+	padding: 0px;
+	border-radius: 3px;
+	display: inline-block;
+	position: relative;
+}
+.regular-checkbox:hover {
+	background-color: #ccc;
+}
+.regular-checkbox:checked {
+	background-size: 20px 20px;
+	background-image:url(/images/checkbox.png);
+}

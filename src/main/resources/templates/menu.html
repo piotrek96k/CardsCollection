@@ -12,30 +12,30 @@
 					<li class="nav-item">
 						<a class="px-2" th:classappend="${#httpServletRequest.getRequestURI() == '/home' ? 'navbar-brand active':'nav-link'}" href="/home">Home</a>
 					</li>
-					<li class="nav-item" sec:authorize="isAuthenticated()">
+					<li class="nav-item" sec:authorize="isFullyAuthenticated()">
 						<a class="px-2" th:classappend="${#strings.startsWith(#httpServletRequest.getRequestURI(), '/mycards') ? 'navbar-brand active':'nav-link'}" href="/mycards">My Cards</a>
 					</li>
-					<li class="nav-item" sec:authorize="isAuthenticated()">
+					<li class="nav-item" sec:authorize="isFullyAuthenticated()">
 						<a class="px-2" th:classappend="${#strings.startsWith(#httpServletRequest.getRequestURI(), '/buy') ? 'navbar-brand active':'nav-link'}" href="/buy">Buy</a>
 					</li>
-					<li class="nav-item" sec:authorize="isAuthenticated()">
+					<li class="nav-item" sec:authorize="isFullyAuthenticated()">
 						<a class="px-2" th:classappend="${#strings.startsWith(#httpServletRequest.getRequestURI(), '/sell') ? 'navbar-brand active':'nav-link'}" href="/sell">Sell</a>
 					</li>
-					<li sec:authorize="!isAuthenticated()" class="nav-item">
+					<li sec:authorize="!isFullyAuthenticated()" class="nav-item">
 						<a class="px-2" th:classappend="${#httpServletRequest.getRequestURI() == '/register' ? 'navbar-brand active':'nav-link'}" href="/register">Register</a>
 					</li>
 				</ul>
 				<ul class="navbar-nav ml-auto navigation-right">
-					<li sec:authorize="isAuthenticated()" class="nav-item">
-						<a class="px-2 nav-link text-white" th:text="${accountId.getUsername()}"></a>
+					<li sec:authorize="isFullyAuthenticated()" class="nav-item">
+						<a class="px-2 nav-link text-white" th:text="${#authentication.getPrincipal().getUsername()}"></a>
 					</li>
-					<li sec:authorize="isAuthenticated()" class="nav-item">
+					<li sec:authorize="isFullyAuthenticated()" class="nav-item">
 						<a id="coins" class="px-2 nav-link text-white"  th:text="${#numbers.formatInteger(cash.getCoins(), 1, 'WHITESPACE')}"></a>
 					</li>
-					<li sec:authorize="isAuthenticated()" class="nav-item">
+					<li sec:authorize="isFullyAuthenticated()" class="nav-item">
 						<a class="px-2 nav-link"><img th:src="@{/images/coins.png}" style="width:40px;"></a>
 					</li>
-					<li sec:authorize="isAuthenticated()" class = "nav-item">
+					<li sec:authorize="isFullyAuthenticated()" class = "nav-item">
 						<a class="px-2" th:classappend="${#httpServletRequest.getRequestURI() == '/logout' ? 'navbar-brand active':'nav-link'}" href="/logout">Log out</a>
 					</li>
 				</ul>

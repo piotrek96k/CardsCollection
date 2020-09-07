@@ -55,7 +55,7 @@ public class Account {
 
 	private boolean enabled;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "account_roles", joinColumns = {
 			@JoinColumn(referencedColumnName = "username", name = "username"),
 			@JoinColumn(referencedColumnName = "email", name = "email") }, inverseJoinColumns = @JoinColumn(name = "role_id"))

@@ -9,6 +9,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -18,9 +19,10 @@ import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
 
 @Controller
+@RequestMapping(value = "/mycards")
 public class MyCardsController extends CardsController {
 
-	@GetMapping(value = "/mycards")
+	@GetMapping
 	public String myCardsPage(Model model, @RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
 			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
@@ -30,7 +32,7 @@ public class MyCardsController extends CardsController {
 	}
 
 	@Override
-	@PostMapping(value = "/mycards")
+	@PostMapping
 	public ModelAndView searchSelection(@RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
 			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
@@ -39,7 +41,7 @@ public class MyCardsController extends CardsController {
 	}
 	
 	@Override
-	@PostMapping(value = "/mycards/sort")
+	@PostMapping(value = "/sort")
 	public ModelAndView sortSelection(@RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
 			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
@@ -49,7 +51,7 @@ public class MyCardsController extends CardsController {
 	}
 
 	@Override
-	@PostMapping(value = "/mycards/order")
+	@PostMapping(value = "/order")
 	public ModelAndView orderSelection(@RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
 			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,

@@ -1,31 +1,31 @@
 function buyCard(id) {
-	var xhttp = new XMLHttpRequest();
-	var url = "/buy/bought?id=" + id;
-	xhttp.onreadystatechange = function() {
-  		if (this.readyState == 4 && this.status == 200) {
-			var data = JSON.parse(this.responseText);
-			setNewValuesFromJson(data, id);
-			disableButtonsIfNeed(parseInt(data.coins.replaceAll(" ", "")));
-  		}
-	};
-	xhttp.open("GET", url, true);
-	xhttp.send();
+	$.ajax({
+		type:"post",
+		headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
+		url: "/buy/" + id,
+		async: true,
+		dataType: "json",
+		success: function(response) {
+			setNewValuesFromJson(response, id);
+			disableButtonsIfNeed(parseInt(response.coins.replaceAll(" ", "")));
+		},
+	});
 }
 
 function sellCard(id ,page, rarity, set, type, search) {
-	var xhttp = new XMLHttpRequest();
 	var path = "/sell";
-	var url = path + "/sold?id=" + id;
-	xhttp.onreadystatechange = function() {
-  		if (this.readyState == 4 && this.status == 200) {
-			var data = JSON.parse(this.responseText);
-			setNewValuesFromJson(data, id);
-			if (data.quantity == "0")
+	$.ajax({
+		type:"post",
+		headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
+		url: path + "/" + id,
+		async: true,
+		dataType: "json",
+		success: function(response) {
+			setNewValuesFromJson(response, id);
+			if (response.quantity == "0")
 				setCardsFragment(path, page, rarity, set, type, search);
-    }
-  };
-	xhttp.open("GET", url, true);
-	xhttp.send();
+		},
+	});
 }
 
 function setNewValuesFromJson(data, id) {

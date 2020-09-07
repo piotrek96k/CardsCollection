@@ -3,6 +3,8 @@ package com.pokemoncards.controller;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +41,7 @@ public class HomeController {
 		public String getCash() {
 			return accountService.getCashAsJson();
 		}
-		
+
 		@GetMapping(value = "/home/get/freecard")
 		public String getFreeCard() {
 			return accountService.getFreeCardAsJson();
@@ -60,8 +62,8 @@ public class HomeController {
 	@GetMapping(value = "/home")
 	public String homePage(Model model, @RequestParam(value = "ids[]") Optional<String[]> ids,
 			@RequestParam(value = "search") Optional<String> search) {
-		model.addAttribute("accountId", accountService.getAccountId());
-		model.addAttribute("cash", accountService.getCash());
+		if (SecurityContextHolder.getContext().getAuthentication() instanceof UsernamePasswordAuthenticationToken)
+			model.addAttribute("cash", accountService.getCash());
 		model.addAttribute("cards", cardService.getCards(ids, search));
 		model.addAttribute("numberOfCards", cardRepository.count());
 		model.addAttribute("numberOfSets", setRepository.count());

@@ -25,7 +25,7 @@
 				<div class="row">
 					<div class="col d-flex justify-content-center">
 						<p sec:authorize="!isAuthenticated()" th:text="'Join now and start building your deck with ' + ${#numbers.formatInteger(numberOfCards, 1, 'WHITESPACE') + ' different cards in ' + #numbers.formatInteger(numberOfSets, 1, 'WHITESPACE') + ' sets'}"></p>
-						<p sec:authorize="isAuthenticated()" th:text="'Welcome back ' + ${accountId.getUsername()} + ', now go and catch them all'"></p>
+						<p sec:authorize="isAuthenticated()" th:text="'Welcome back ' + ${#authentication.getPrincipal().getUsername()} + ', now go and catch them all'"></p>
 					</div>
 				</div>
 				<div class="row">
@@ -49,7 +49,7 @@
  				</div>
 			</div>
 			<div class="col">
-				<div sec:authorize="!isAuthenticated()" class="card-shadow" style="margin:25px auto; width:300px; height:550px; border-radius:10px; background-size: contain; background-image:url('images/login-card.jpg');">
+				<div sec:authorize="!isFullyAuthenticated()" class="card-shadow" style="margin:25px auto; width:300px; height:550px; border-radius:10px; background-size: contain; background-image:url('images/login-card.jpg');">
 					<form th:action="@{/home}" method="post" class="was-validated mx-auto login-format" style="padding-top:318px;">
 						<div class="form-group mx-auto" style="max-width:250px; margin-top:-64px;" th:if="${param.error}">
 							<p>Username or Password is wrong, please check again!</p>
@@ -64,10 +64,14 @@
 						</div>
 						<div class="form-group mx-auto" style="max-width:250px;">
 							<input type="submit" value="Login" class="btn btn-success">
+							<span class="float-right">
+								<input class="regular-checkbox" id="remember_me" name="remember-me" type="checkbox"/>
+								<label class="form-check-label" for="remember-me">Remember Me</label> 
+							</span>
 						</div>
 					</form>
 				</div>
-				<div sec:authorize="isAuthenticated()" style="margin:120px auto; text-align:center">
+				<div sec:authorize="isFullyAuthenticated()" style="margin:120px auto; text-align:center">
 					<div class="row">
 						<div class="card card-shadow mx-2 d-block" style="width:220px;">
 							<div class="card-header bg-primary">FREE CARD</div>

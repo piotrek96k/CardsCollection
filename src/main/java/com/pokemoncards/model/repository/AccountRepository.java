@@ -14,6 +14,9 @@ public interface AccountRepository extends JpaRepository<Account, AccountId>, Ac
 	public Account findByUsername(String username);
 
 	public Account findByEmail(String email);
+	
+	@Query(value = "select account from Account account where username=:id or email=:id")
+	public Account findByUsernameOrEmail(String id);
 
 	@Transactional
 	@Modifying

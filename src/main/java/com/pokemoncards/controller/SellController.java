@@ -9,7 +9,9 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
@@ -21,6 +23,7 @@ import com.pokemoncards.model.entity.Type;
 import com.pokemoncards.model.service.AccountService;
 
 @Controller
+@RequestMapping(value = "/sell")
 public class SellController extends CardsController {
 
 	@RestController
@@ -29,14 +32,14 @@ public class SellController extends CardsController {
 		@Autowired
 		private AccountService accountService;
 
-		@GetMapping(value = "/sell/sold")
-		public String sold(@RequestParam(value = "id", required = true) String id) {
+		@PostMapping(value = "/sell/{id}")
+		public String sold(@PathVariable(value = "id", required = true) String id) {
 			return accountService.removeCard(id);
 		}
 
 	}
 
-	@GetMapping("/sell")
+	@GetMapping
 	public String sellPage(Model model, @RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
 			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
@@ -46,7 +49,7 @@ public class SellController extends CardsController {
 	}
 
 	@Override
-	@PostMapping("/sell")
+	@PostMapping
 	public ModelAndView searchSelection(@RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
 			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
@@ -55,7 +58,7 @@ public class SellController extends CardsController {
 	}
 
 	@Override
-	@PostMapping(value = "/sell/sort")
+	@PostMapping(value = "/sort")
 	public ModelAndView sortSelection(@RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
 			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
@@ -65,7 +68,7 @@ public class SellController extends CardsController {
 	}
 
 	@Override
-	@PostMapping(value = "/sell/order")
+	@PostMapping(value = "/order")
 	public ModelAndView orderSelection(@RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
 			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,

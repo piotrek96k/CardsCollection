@@ -40,7 +40,11 @@ import com.pokemoncards.model.service.ApiService;
 @Component
 public class DatabaseInitializer implements InitializingBean {
 
-	private static final Logger LOGGER = Logger.getLogger(DatabaseInitializer.class.getName());
+	private static final String ADMIN_EMAIL;
+
+	private static final String ADMIN;
+
+	private static final Logger LOGGER;
 
 	@Autowired
 	private AccountRepository accountRepository;
@@ -68,6 +72,12 @@ public class DatabaseInitializer implements InitializingBean {
 
 	@Autowired
 	private ApiService apiService;
+
+	static {
+		ADMIN_EMAIL = "pokemonCardsAdmin@gmail.com";
+		ADMIN = "admin";
+		LOGGER = Logger.getLogger(DatabaseInitializer.class.getName());
+	}
 
 	private void loadData() {
 		if (apiService.getNumberOfCards() > cardRepository.count()) {
@@ -156,16 +166,15 @@ public class DatabaseInitializer implements InitializingBean {
 	}
 
 	private void createAdmin() {
-		String adminString = "admin";
-		Account admin = accountRepository.findByUsername(adminString);
+		Account admin = accountRepository.findByUsername(ADMIN);
 		if (admin == null) {
 			LOGGER.log(Level.INFO, "Creating Admin");
 			admin = new Account();
-			admin.setUsername(adminString);
-			admin.setEmail("pokemonCardsAdmin@gmail.com");
-			admin.setFirstName(adminString);
-			admin.setLastName(adminString);
-			admin.setPassword(adminString);
+			admin.setUsername(ADMIN);
+			admin.setEmail(ADMIN_EMAIL);
+			admin.setFirstName(ADMIN);
+			admin.setLastName(ADMIN);
+			admin.setPassword(ADMIN);
 			admin.setEnabled(true);
 			accountService.addAccount(admin);
 			accountRepository.addRole(admin.getUsername(), admin.getEmail(), RoleEnum.ROLE_ADMIN.name());

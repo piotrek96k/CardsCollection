@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+	<meta charset="UTF-8">
+	<title>Pokemon Cards</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/css/style.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="javascript/cards.js"></script>
+	<script src="javascript/collection.js"></script>
+	<link rel="icon" href="/images/icon.png">
+</head>
+<body>
+	<div th:replace="menu :: menu"></div>
+	<div class = "container-fluid">
+		<div class="row" style="margin-top:56px;">
+			<div class ="col px-4 header">
+				<h1 th:text="'Error ' + ${errorCode} + ' ' + ${errorMessage}"></h1>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col">
+				<img src="/images/sadPikachu.png" alt="Sad Pickachu">
+			</div>
+		</div>
+	</div>
+</body>
+</html>
