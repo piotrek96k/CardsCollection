@@ -8,11 +8,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pokemoncards.model.repository.CardRepository;
-import com.pokemoncards.model.repository.SetRepository;
+import com.pokemoncards.model.repository.card.CardRepository;
+import com.pokemoncards.model.repository.card.SetRepository;
 import com.pokemoncards.model.service.AccountService;
 import com.pokemoncards.model.service.CardService;
 
@@ -47,7 +48,7 @@ public class HomeController {
 			return accountService.getFreeCardAsJson();
 		}
 
-		@GetMapping(value = "/home/collect/coins")
+		@PostMapping(value = "/home/collect/coins")
 		public String collectCoins() {
 			return accountService.collectCoins();
 		}
@@ -70,7 +71,7 @@ public class HomeController {
 		return "home";
 	}
 
-	@GetMapping(value = "/home/collect/freecard")
+	@PostMapping(value = "/home/collect/freecard")
 	public String freeCard(Model model) {
 		model.addAttribute("card", accountService.collectFreeCard());
 		return "freecard";

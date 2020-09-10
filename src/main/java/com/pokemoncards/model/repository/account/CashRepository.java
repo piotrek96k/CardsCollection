@@ -1,4 +1,4 @@
-package com.pokemoncards.model.repository;
+package com.pokemoncards.model.repository.account;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +14,10 @@ import com.pokemoncards.model.entity.Cash;
 public interface CashRepository extends JpaRepository<Cash, AccountId> {
 
 	@Query(value = "select cash from Cash cash where cash.username=:username")
-	public Cash getCash(String username);
+	public Cash getCash(@Param(value = "username") String username);
+	
+	@Query(value = "select cash.coins from Cash cash where cash.username=:username")
+	public int getCoins(@Param(value = "username") String username);
 
 	@Transactional
 	@Modifying(clearAutomatically = true)

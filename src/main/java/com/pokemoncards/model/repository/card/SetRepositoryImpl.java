@@ -1,4 +1,4 @@
-package com.pokemoncards.model.repository;
+package com.pokemoncards.model.repository.card;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +30,8 @@ public class SetRepositoryImpl extends CardFieldRepositoryImpl<Set>{
 		joinAccountIfUsernameNotEmpty(criteriaBuilder, criteriaQuery, card, username, card.get("set"));
 		criteriaQuery.where(criteriaBuilder.equal(card.get("set").get("id"), id));
 		TypedQuery<Set> typedQuery = entityManager.createQuery(criteriaQuery);
-		return typedQuery.getResultList().size() > 0 ? Optional.of(typedQuery.getSingleResult()) : Optional.empty();
+		List<Set> result = typedQuery.getResultList();
+		return result.size() > 0 ? Optional.of(result.get(0)) : Optional.empty();
 	}
 
 }

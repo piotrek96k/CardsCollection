@@ -11,7 +11,7 @@
 				<img th:src="@{${sessionData.getExpanders().get('rarities') ? '/images/hide.png' : '/images/expand.png'}}">
 			</button>
 		</div>
-		<div th:style="'display: ' + ${sessionData.getExpanders().get('rarities') ? 'block' : 'none;'}">
+		<div th:style="'display: ' + ${sessionData.getExpanders().get('rarities') ? 'block;' : 'none;'}">
 			<div th:each="rarity : ${rarities}">
 				<div th:if="${rarity.value}" th:with="start=${#strings.startsWith(selectedRarities, rarity.key.getId())}, end=${#strings.endsWith(selectedRarities, rarity.key.getId())}">
 					<div th:if="${start or end}">
@@ -64,7 +64,7 @@
 				<img th:src="@{${sessionData.getExpanders().get('sets') ? '/images/hide.png' : '/images/expand.png'}}">
 			</button>
 		</div>
-		<div th:style="'display: ' + ${sessionData.getExpanders().get('sets') ? 'block' : 'none;'}">
+		<div th:style="'display: ' + ${sessionData.getExpanders().get('sets') ? 'block;' : 'none;'}">
 			<div th:each="set : ${sets}">
 				<div th:if="${set.value}" th:with="start=${#strings.startsWith(selectedSets, set.key.getId())}, end=${#strings.endsWith(selectedSets, set.key.getId())}">
 					<div th:if="${start or end}">
@@ -117,7 +117,7 @@
 				<img th:src="@{${sessionData.getExpanders().get('types') ? '/images/hide.png' : '/images/expand.png'}}">
 			</button>
 		</div>
-		<div th:style="'display: ' + ${sessionData.getExpanders().get('types') ? 'block' : 'none'}">
+		<div th:style="'display: ' + ${sessionData.getExpanders().get('types') ? 'block;' : 'none'}">
 			<div th:each="type : ${types}">
 				<div th:if="${type.value}" th:with="start=${#strings.startsWith(selectedTypes, type.key.getId())}, end=${#strings.endsWith(selectedTypes, type.key.getId())}">
 					<div th:if="${start or end}">

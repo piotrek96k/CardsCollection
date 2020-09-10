@@ -2,7 +2,7 @@ function buyCard(id) {
 	$.ajax({
 		type:"post",
 		headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
-		url: "/buy/" + id,
+		url: "/buy/one/" + id,
 		async: true,
 		dataType: "json",
 		success: function(response) {
@@ -12,27 +12,63 @@ function buyCard(id) {
 	});
 }
 
+function buyAll(page, rarity, set, type, search) {
+	$.ajax({
+		type:"post",
+		headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
+		url: getUrl("/buy/all" ,page, rarity, set, type, search).path,
+		async: true,
+		dataType: "html",
+		success: function(response) {
+			switchCardsPageBody(response);
+		},
+	});
+}
+
 function sellCard(id ,page, rarity, set, type, search) {
 	var path = "/sell";
 	$.ajax({
 		type:"post",
 		headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
-		url: path + "/" + id,
+		url: getUrl(path + "/one/" + id, page, rarity, set, type, search).path,
 		async: true,
 		dataType: "json",
 		success: function(response) {
 			setNewValuesFromJson(response, id);
-			if (response.quantity == "0")
+			document.getElementById("sellAllCoins").innerHTML = response.totalValue;
+			if (response.quantity == "0"){
+				document.getElementById(id).disabled = true;
 				setCardsFragment(path, page, rarity, set, type, search);
+			}
 		},
 	});
+}
+
+function sellAll(page, rarity, set, type, search) {
+	$.ajax({
+		type:"post",
+		headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
+		url: getUrl("/sell/all", page, rarity, set, type, search).path,
+		async: true,
+		dataType: "html",
+		success: function(response) {
+			switchCardsPageBody(response);
+		},
+	});
+}
+
+function switchCardsPageBody(response) {
+	var html = new DOMParser().parseFromString(response, "text/html");
+	var scroll = document.getElementById("verticalmenu").scrollTop;
+	document.body = html.body; 
+	installListeners(document.getElementById("verticalmenu").scrollTop = scroll);
 }
 
 function setNewValuesFromJson(data, id) {
 	document.getElementById("coins").innerHTML = data.coins;
 	document.getElementById("quantity" + id).innerHTML = data.quantity;
 	document.getElementById(data.rarity.id + "userQuantity").innerHTML = data.rarity.userQuantity;
-	document.getElementById(data.set.id + "userQuantity").innerHTML = data.set.userQuantity;
+	document.getElementById(data.set.id + "userQuantity").innerHTML = data.set.userQuantity;	
 	for (let i = 0; i < data.types.length; i++)
 		document.getElementById(data.types[i].id + "userQuantity").innerHTML = data.types[i].userQuantity;
 }
@@ -47,6 +83,11 @@ function setCardsFragment(path ,page, rarity, set, type, search) {
 			if (cards > 0 || page == 1) {
 				document.getElementById("cardpage").innerHTML = html.getElementById("cardpage").innerHTML;
 				document.getElementById("pagination").innerHTML = html.getElementById("pagination").innerHTML;
+				document.getElementById("numberOfCards").innerHTML = html.getElementById("numberOfCards").innerHTML;
+				if(document.getElementById("numberOfCards").innerHTML === "1")
+					document.getElementById("cardsFound").innerHTML = "Card Found";
+				else
+					document.getElementById("cardsFound").innerHTML = "Cards Found";
 				installTooltipListeners();
 			}
 			else if (page > 1)
@@ -60,7 +101,7 @@ function setCardsFragment(path ,page, rarity, set, type, search) {
 	xhttp.send();
 }
 
-function setIndexSearch() {
+function setHomeSearch() {
 	var element = document.getElementById("search");
 	if(element.value != "") {
 		$.ajax({
@@ -71,7 +112,7 @@ function setIndexSearch() {
 			async: true,
 			dataType: "html",
 			success: function(response) {
-				setIndexCardsFragmentOnSuccess(response);
+				setHomeCardsFragmentOnSuccess(response);
 				window.history.pushState({"html":document.html,"pageTitle":document.pageTitle},"", "?search=" + encodeURIComponent(element.value));
 			},
 		});
@@ -80,7 +121,7 @@ function setIndexSearch() {
 		resetIndexSearch(element);
 }
 
-function resetIndexSearch(element) {
+function resetHomeSearch(element) {
 	$.ajax({
 		type:"get",
 		headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
@@ -88,17 +129,17 @@ function resetIndexSearch(element) {
 		async: true,
 		dataType: "html",
 		success: function(response) {
-			setIndexCardsFragmentOnSuccess(response);
+			setHomeCardsFragmentOnSuccess(response);
 			window.history.pushState({"html":document.html,"pageTitle":document.pageTitle},"", "/");
 		},
 	});
 }
 
-function setIndexCardsFragment() {
+function setHomeCardsFragment() {
 	var cards = document.getElementsByClassName("card-fragment");
 	var ids = new Array();
 	for(let i = 0; i < 5; i++) 
-		ids.push(cards[i].id);
+		ids.push(String(cards[i].id).substring(3));
 	$.ajax({
 		type:"get",
 		headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
@@ -107,12 +148,12 @@ function setIndexCardsFragment() {
 		async: true,
 		dataType: "html",
 		success: function(response) {
-			setIndexCardsFragmentOnSuccess(response);
+			setHomeCardsFragmentOnSuccess(response);
 		},
 	});
 }
 
-function setIndexCardsFragmentOnSuccess(response) {
+function setHomeCardsFragmentOnSuccess(response) {
 	var html = new DOMParser().parseFromString(response, "text/html");
 	document.getElementById("cards").innerHTML = html.getElementById("cards").innerHTML;
 	installTooltipListeners();

@@ -22,7 +22,18 @@
 				<div class = "container-fluid" style="margin-top:44px; overflow:hidden;">
 					<div class="row">
 						<div class ="col px-4 header">
-							<h1>My Cards</h1>
+							<table class="header-table">
+								<tr>
+									<td><h1>My Cards</h1></td>
+									<td>
+										<h2 style="margin-top:10px; margin-left:10px;">
+											<span id="numberOfCards" th:text="${numberOfCards}"></span>
+											<span th:if="${numberOfCards != '1'}">Cards Found</span>
+											<span th:unless="${numberOfCards != '1'}">Card Found</span>
+										</h2>
+									</td>
+								</tr>
+							</table>
 						</div>
 					</div>
 					<div class="px-1 mx-2" th:insert="cards :: cards"></div>

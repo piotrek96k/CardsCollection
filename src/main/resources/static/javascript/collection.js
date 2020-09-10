@@ -27,7 +27,7 @@ function collectFreeCard() {
 			getFreeCard();
 		}
 	};
-	getRequest(supplier, "html");
+	postRequest(supplier, "html");
 }
 
 function getFreeCard() {
@@ -50,7 +50,7 @@ function collectCoins() {
 			setCoinsTimer();
 		}
 	};
-	getRequest(supplier, "json");
+	postRequest(supplier, "json");
 }
 
 function getCash() {
@@ -67,6 +67,19 @@ function getCash() {
 function getRequest(supplier, dataType) {
 	$.ajax({
 		type:"get",
+		url: supplier.url,
+		async: true,
+		dataType: dataType,
+		success: function(response) {
+			supplier.apply(response);
+		},
+	});
+}
+
+function postRequest(supplier, dataType) {
+	$.ajax({
+		type:"post",
+		headers: {"X-CSRF-TOKEN": $("input[name='_csrf']").val()},
 		url: supplier.url,
 		async: true,
 		dataType: dataType,

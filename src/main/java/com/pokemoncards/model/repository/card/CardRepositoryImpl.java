@@ -1,4 +1,4 @@
-package com.pokemoncards.model.repository;
+package com.pokemoncards.model.repository.card;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,13 +14,14 @@ import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
 
-import com.pokemoncards.model.component.SortType;
-import com.pokemoncards.model.component.SortType.OrderType;
 import com.pokemoncards.model.entity.Account;
 import com.pokemoncards.model.entity.Card;
 import com.pokemoncards.model.entity.Rarity;
 import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
+import com.pokemoncards.model.repository.RepositoryImpl;
+import com.pokemoncards.model.session.SortType;
+import com.pokemoncards.model.session.SortType.OrderType;
 
 @Repository
 public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
@@ -38,13 +39,13 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 	}
 
 	@Override
-	public int getNumberOfPages(List<Rarity> rarities, List<Set> sets, List<Type> types, Optional<String> search) {
+	public int getNumberOfCards(List<Rarity> rarities, List<Set> sets, List<Type> types, Optional<String> search) {
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 		Root<Card> card = criteriaQuery.from(Card.class);
 		criteriaQuery.select(criteriaBuilder.countDistinct(card));
 		setWhereQueryPart(criteriaBuilder, criteriaQuery, card, rarities, sets, types, search);
-		return getNumberOfPagesFromNumberOfCards(entityManager.createQuery(criteriaQuery).getSingleResult());
+		return entityManager.createQuery(criteriaQuery).getSingleResult().intValue();
 	}
 
 	@Override
@@ -59,7 +60,8 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 		TypedQuery<Card> typedQuery = entityManager.createQuery(criteriaQuery);
 		typedQuery.setFirstResult(row);
 		typedQuery.setMaxResults(1);
-		return typedQuery.getResultStream().count() > 0 ? typedQuery.getSingleResult() : getFirstCard(rarity, username);
+		List<Card> result = typedQuery.getResultList();
+		return result.size() > 0 ? result.get(0) : getFirstCard(rarity, username);
 	}
 
 	@Override
@@ -88,7 +90,8 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 		setOrderByIdQueryPart(criteriaBuilder, criteriaQuery, card);
 		TypedQuery<Card> typedQuery = entityManager.createQuery(criteriaQuery);
 		typedQuery.setMaxResults(1);
-		return typedQuery.getResultStream().count() > 0 ? typedQuery.getSingleResult() : getFirstCard(rarity, username);
+		List<Card> result = typedQuery.getResultList();
+		return result.size() > 0 ? result.get(0) : getFirstCard(rarity, username);
 	}
 
 	@Override
@@ -102,7 +105,8 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 		setOrderByIdQueryPart(criteriaBuilder, criteriaQuery, card);
 		TypedQuery<Card> typedQuery = entityManager.createQuery(criteriaQuery);
 		typedQuery.setMaxResults(1);
-		return typedQuery.getResultStream().count() > 0 ? typedQuery.getSingleResult() : null;
+		List<Card> result = typedQuery.getResultList();
+		return result.size() > 0 ? result.get(0) : null;
 	}
 
 	@Override
@@ -117,7 +121,8 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 		setOrderByIdQueryPart(criteriaBuilder, criteriaQuery, card);
 		TypedQuery<Card> typedQuery = entityManager.createQuery(criteriaQuery);
 		typedQuery.setMaxResults(1);
-		return typedQuery.getResultStream().count() > 0 ? typedQuery.getSingleResult() : getFirstCard(search, username);
+		List<Card> result = typedQuery.getResultList();
+		return result.size() > 0 ? result.get(0) : getFirstCard(search, username);
 	}
 
 	@Override
@@ -132,7 +137,8 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 		TypedQuery<Card> typedQuery = entityManager.createQuery(criteriaQuery);
 		typedQuery.setFirstResult(row);
 		typedQuery.setMaxResults(1);
-		return typedQuery.getResultStream().count() > 0 ? typedQuery.getSingleResult() : getFirstCard(search, username);
+		List<Card> result = typedQuery.getResultList();
+		return result.size() > 0 ? result.get(0) : getFirstCard(search, username);
 	}
 
 	@Override
@@ -172,7 +178,32 @@ public class CardRepositoryImpl extends RepositoryImpl implements CardQuery {
 		criteriaQuery.where(criteriaBuilder.equal(card.get("id"), id));
 		criteriaQuery.groupBy(card.get("id"));
 		TypedQuery<Card> typedQuery = entityManager.createQuery(criteriaQuery);
-		return typedQuery.getResultStream().count() > 0 ? Optional.of(typedQuery.getSingleResult()) : Optional.empty();
+		List<Card> result = typedQuery.getResultList();
+		return result.size() > 0 ? Optional.of(result.get(0)) : Optional.empty();
 	}
+
+	@Override
+	public int getCardsValue(List<Rarity> rarities, List<Set> sets, List<Type> types, Optional<String> search) {
+		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Integer> criteriaQuery = criteriaBuilder.createQuery(Integer.class);
+		Root<Card> card = criteriaQuery.from(Card.class);
+		criteriaQuery.select(criteriaBuilder.sum(card.get("rarity").get("value")));
+		setWhereQueryPart(criteriaBuilder, criteriaQuery, card, rarities, sets, types, search);
+		TypedQuery<Integer> typedQuery = entityManager.createQuery(criteriaQuery);
+		List<Integer> result = typedQuery.getResultList();
+		return result.get(0) != null ? result.get(0) : 0;
+	}
+
+//	@Override
+//	public List<String> getCardsIds(int page, SortType sortType, OrderType orderType, List<Rarity> rarities,
+//			List<Set> sets, List<Type> types, Optional<String> search) {
+//		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+//		CriteriaQuery<String> criteriaQuery = criteriaBuilder.createQuery(String.class);
+//		Root<Card> card = criteriaQuery.from(Card.class);
+//		criteriaQuery.select(card.get("id"));
+//		criteriaQuery.groupBy(card.get("id"));
+//		setWhereQueryPart(criteriaBuilder, criteriaQuery, card, rarities, sets, types, search);
+//		return entityManager.createQuery(criteriaQuery).getResultList();
+//	}
 
 }

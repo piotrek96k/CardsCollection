@@ -1,4 +1,4 @@
-package com.pokemoncards.model.repository;
+package com.pokemoncards.model.repository.card;
 
 import java.util.List;
 import java.util.Optional;

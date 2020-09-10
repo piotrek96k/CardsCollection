@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.pokemoncards.model.service.AccountService;
+import com.pokemoncards.model.service.NumbersService;
 
 @Entity
 @IdClass(AccountId.class)
@@ -57,9 +57,9 @@ public class Cash{
 	public String convertToJson() {
 		ObjectMapper mapper = new ObjectMapper();
 		ObjectNode node = mapper.createObjectNode();
-		node.put("coins", AccountService.formatInteger(coins));
+		node.put("coins", NumbersService.formatInteger(coins));
 		node.put("nextCoinsCollecting", getNextTimeCollectingInMilis());
-		node.put("nextCoins", AccountService.formatInteger(COINS_PER_DAY*daysInRow));
+		node.put("nextCoins", NumbersService.formatInteger(COINS_PER_DAY*daysInRow));
 		return node.toString();
 	}
 

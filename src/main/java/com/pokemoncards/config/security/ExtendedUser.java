@@ -1,4 +1,4 @@
-package com.pokemoncards.config;
+package com.pokemoncards.config.security;
 
 import java.util.List;
 

@@ -10,8 +10,11 @@ body {
 }
 h1 {
 	font-size: 50px;
-	margin-top: 25px;
-	margin-bottom: 20px;
+	padding-top: 25px;
+	padding-bottom: 20px;
+}
+h2 {
+	font-size:30px;
 }
 hr {
 	background-color:#565656;
@@ -375,4 +378,7 @@ hr {
 .regular-checkbox:checked {
 	background-size: 20px 20px;
 	background-image:url(/images/checkbox.png);
+}
+.header-table td {
+	padding:0px 10px;
 }

@@ -7,6 +7,7 @@ import java.util.function.Function;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.AbstractQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
@@ -18,34 +19,28 @@ import javax.persistence.criteria.Predicate;
 
 import org.springframework.stereotype.Repository;
 
-import com.pokemoncards.model.component.SortType;
-import com.pokemoncards.model.component.SortType.OrderType;
 import com.pokemoncards.model.entity.Account;
 import com.pokemoncards.model.entity.Card;
 import com.pokemoncards.model.entity.Rarity;
 import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
+import com.pokemoncards.model.session.SortType;
+import com.pokemoncards.model.session.SortType.OrderType;
 
 @Repository
-public abstract class RepositoryImpl {
-
-	public static final int PAGE_SIZE = 25;
+public abstract class RepositoryImpl implements Paginable{
 
 	@PersistenceContext
 	protected EntityManager entityManager;
 
-	public int getNumberOfPagesFromNumberOfCards(long cards) {
-		return (int) cards / PAGE_SIZE + (cards % PAGE_SIZE == 0 ? 0 : 1);
-	}
-
-	protected <T> void setWhereQueryPart(CriteriaBuilder criteriaBuilder, CriteriaQuery<T> criteriaQuery,
+	protected <T> void setWhereQueryPart(CriteriaBuilder criteriaBuilder, AbstractQuery<T> criteriaQuery,
 			From<?, Card> card, List<Rarity> rarities, List<Set> sets, List<Type> types, Optional<String> search) {
 		Predicate predicate = getWhereQueryPart(criteriaBuilder, criteriaQuery, card, rarities, sets, types, search);
 		if (predicate != null)
 			criteriaQuery.where(predicate);
 	}
 
-	protected <T> Predicate getWhereQueryPart(CriteriaBuilder criteriaBuilder, CriteriaQuery<T> criteriaQuery,
+	protected <T> Predicate getWhereQueryPart(CriteriaBuilder criteriaBuilder, AbstractQuery<T> criteriaQuery,
 			From<?, Card> card, List<Rarity> rarities, List<Set> sets, List<Type> types, Optional<String> search) {
 		Predicate predicate = null;
 		Function<List<Rarity>, Predicate> raritiesMethod = rarity -> getRaritiesPredicate(criteriaBuilder, card,

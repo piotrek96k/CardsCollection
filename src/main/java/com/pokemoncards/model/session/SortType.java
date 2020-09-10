@@ -1,4 +1,4 @@
-package com.pokemoncards.model.component;
+package com.pokemoncards.model.session;
 
 public enum SortType {
 

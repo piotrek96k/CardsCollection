@@ -1,7 +1,5 @@
 package com.pokemoncards.model.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +24,8 @@ public class ApiService {
 	private static final String SETS;
 
 	private static final String TYPES;
+	
+	public static final int PAGE_SIZE;
 
 	private static int numberOfCards;
 
@@ -36,72 +36,16 @@ public class ApiService {
 		CARDS = "cards";
 		SETS = "sets";
 		TYPES = "types";
+		PAGE_SIZE = 100;
 		REST_TEMPLATE = new RestTemplate();
 	}
 
-	public class ApiData {
-
-		private List<Cards.Card> cards;
-
-		private Set<String> rarities;
-
-		private List<Sets.Set> sets;
-
-		private List<String> types;
-
-		private ApiData(List<Cards.Card> cards, Set<String> rarities, List<Sets.Set> sets, List<String> types) {
-			this.cards = cards;
-			this.rarities = rarities;
-			this.sets = sets;
-			this.types = types;
-		}
-
-		public List<Cards.Card> getCards() {
-			return Collections.unmodifiableList(cards);
-		}
-
-		public Set<String> getRarities() {
-			return Collections.unmodifiableSet(rarities);
-		}
-
-		public List<Sets.Set> getSets() {
-			return Collections.unmodifiableList(sets);
-		}
-
-		public List<String> getTypes() {
-			return Collections.unmodifiableList(types);
-		}
-
-	}
-
-	public ApiData getApiData() {
-		List<Cards.Card> cards = getAllCards();
-		Set<String> rarities = getAllRarities(cards);
-		List<Sets.Set> sets = getAllSets();
-		List<String> types = getAllTypes();
-		return new ApiData(cards, rarities, sets, types);
-	}
-
-	private List<Cards.Card> getAllCards() {
-		List<Cards.Card> cards = new ArrayList<Cards.Card>(getNumberOfCards());
-		for (int i = 1; i <= getNumberOfPages(); i++)
-			cards.addAll(getCardsByPage(i));
-		return cards;
-	}
-
-	private Set<String> getAllRarities(List<Cards.Card> cards) {
-		Set<String> rarities = new HashSet<String>();
-		for (Cards.Card card : cards)
-			rarities.add(card.getRarity());
-		return rarities;
-	}
-
-	private List<Sets.Set> getAllSets() {
+	public List<Sets.Set> getAllSets() {
 		ResponseEntity<Sets> setsEntity = REST_TEMPLATE.getForEntity(RESOURCE_URL + SETS, Sets.class);
 		return setsEntity.getBody().getSets();
 	}
 
-	private List<String> getAllTypes() {
+	public List<String> getAllTypes() {
 		ResponseEntity<Types> typesEntity = REST_TEMPLATE.getForEntity(RESOURCE_URL + TYPES, Types.class);
 		List<String> types = typesEntity.getBody().getTypes();
 		types.add("None");
@@ -151,7 +95,7 @@ public class ApiService {
 	private void readNumberOfCardsAndPages() {
 		ResponseEntity<Cards> cardsEntity = REST_TEMPLATE.getForEntity(RESOURCE_URL + CARDS, Cards.class);
 		numberOfCards = Integer.parseInt(cardsEntity.getHeaders().get("Total-Count").get(0));
-		numberOfPages = numberOfCards / 100 + (numberOfCards % 100 == 0 ? 0 : 1);
+		numberOfPages = numberOfCards / PAGE_SIZE + (numberOfCards % PAGE_SIZE == 0 ? 0 : 1);
 	}
 
 }

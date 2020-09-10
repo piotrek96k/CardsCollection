@@ -1,4 +1,4 @@
-package com.pokemoncards.model.component;
+package com.pokemoncards.model.session;
 
 import java.util.HashMap;
 import java.util.Map;

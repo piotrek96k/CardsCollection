@@ -5,7 +5,7 @@ import javax.validation.ConstraintValidatorContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.pokemoncards.model.repository.AccountRepository;
+import com.pokemoncards.model.repository.account.AccountRepository;
 
 public class UniqueValidator implements ConstraintValidator<Unique, String> {
 

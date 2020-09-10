@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.pokemoncards.model.component.Expander;
-import com.pokemoncards.model.component.SessionData;
+import com.pokemoncards.model.session.Expander;
+import com.pokemoncards.model.session.SessionData;
 
 @Controller
 public class SelectOptionController {
@@ -18,7 +18,7 @@ public class SelectOptionController {
 
 	@PostMapping(value = "/expand")
 	@ResponseStatus(value = HttpStatus.OK)
-	public void expandSelection(@ModelAttribute(value = "expand") String expand) {
+	private void expandSelection(@ModelAttribute(value = "expand") String expand) {
 		for (Expander expander : Expander.values())
 			if (expander.getExpand().equals(expand))
 				sessionData.switchExpander(expander);
@@ -26,7 +26,7 @@ public class SelectOptionController {
 
 	@PostMapping(value = "/scroll")
 	@ResponseStatus(value = HttpStatus.OK)
-	public void scrollPosition(@ModelAttribute(value = "scroll") int scroll) {
+	private void scrollPosition(@ModelAttribute(value = "scroll") int scroll) {
 		sessionData.setScrollPosition(scroll);
 	}
 	

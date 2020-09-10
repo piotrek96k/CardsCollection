@@ -1,4 +1,4 @@
-package com.pokemoncards.model.repository;
+package com.pokemoncards.model.repository.card;
 
 import java.util.Optional;
 
@@ -11,6 +11,7 @@ import javax.persistence.criteria.JoinType;
 
 import com.pokemoncards.model.entity.Account;
 import com.pokemoncards.model.entity.Card;
+import com.pokemoncards.model.repository.RepositoryImpl;
 
 public abstract class CardFieldRepositoryImpl <T> extends RepositoryImpl implements CardField<T>{
 	

@@ -12,7 +12,7 @@
 	<script src="javascript/collection.js"></script>
 	<link rel="icon" href="/images/icon.png">
 </head>
-<body th:onload="|installTooltipListeners(); setInterval(setIndexCardsFragment, 5000);__${#authorization.expression('isAuthenticated()') ? 'getCash(); getFreeCard()' : ''}__|">
+<body th:onload="|installTooltipListeners(); setInterval(setHomeCardsFragment, 5000);__${#authorization.expression('isFullyAuthenticated()') ? 'getCash(); getFreeCard()' : ''}__|">
 	<div th:replace="menu :: menu"></div>
 	<div class="container-fluid">
 		<div class="row" style="margin-top:56px;">
@@ -24,8 +24,8 @@
 				</div>
 				<div class="row">
 					<div class="col d-flex justify-content-center">
-						<p sec:authorize="!isAuthenticated()" th:text="'Join now and start building your deck with ' + ${#numbers.formatInteger(numberOfCards, 1, 'WHITESPACE') + ' different cards in ' + #numbers.formatInteger(numberOfSets, 1, 'WHITESPACE') + ' sets'}"></p>
-						<p sec:authorize="isAuthenticated()" th:text="'Welcome back ' + ${#authentication.getPrincipal().getUsername()} + ', now go and catch them all'"></p>
+						<p sec:authorize="!isFullyAuthenticated()" th:text="'Join now and start building your deck with ' + ${#numbers.formatInteger(numberOfCards, 1, 'WHITESPACE') + ' different cards in ' + #numbers.formatInteger(numberOfSets, 1, 'WHITESPACE') + ' sets'}"></p>
+						<p sec:authorize="isFullyAuthenticated()" th:text="'Welcome back ' + ${#authentication.getPrincipal().getUsername()} + ', now go and catch them all'"></p>
 					</div>
 				</div>
 				<div class="row">
@@ -33,12 +33,12 @@
 						<div class="container-fluid">
  							<div class="row">
     							<div class="col search-container">
-      								<form class="form-inline" action="/" id="search-form" method="get">
+      								<form class="form-inline" action="/home" id="search-form" method="get">
         								<input type="text" class="flex-fill mr-2 form-control" id="search" th:name="search" th:value="${enteredSearch == '' ? '' : enteredSearch}" placeholder="Search ...">
  										<button type="button" onclick="eraseSearch(); return false;" class="btn">
  											<img th:src="@{/images/cancel.png}" class="center" width="18" height="20" alt="C">
  										</button>
- 										<button onclick="setIndexSearch(); return false;" id="search-submit" type="submit" class="btn">
+ 										<button onclick="setHomeSearch(); return false;" id="search-submit" type="submit" class="btn">
    											<img th:src="@{/images/search.png}" class="center" width="18" height=20 alt="S">
    										</button>
       								</form>
@@ -73,6 +73,7 @@
 				</div>
 				<div sec:authorize="isFullyAuthenticated()" style="margin:120px auto; text-align:center">
 					<div class="row">
+						<input type="hidden" name="_csrf" th:value="${_csrf.token}"></input>
 						<div class="card card-shadow mx-2 d-block" style="width:220px;">
 							<div class="card-header bg-primary">FREE CARD</div>
 							<div class="card-body justify-content-center">

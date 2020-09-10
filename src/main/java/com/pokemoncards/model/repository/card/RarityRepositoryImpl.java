@@ -1,4 +1,4 @@
-package com.pokemoncards.model.repository;
+package com.pokemoncards.model.repository.card;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +11,7 @@ import javax.persistence.criteria.Root;
 import com.pokemoncards.model.entity.Card;
 import com.pokemoncards.model.entity.Rarity;
 
-public class RarityRepositoryImpl extends CardFieldRepositoryImpl<Rarity> {
+public class RarityRepositoryImpl extends CardFieldRepositoryImpl<Rarity>{
 
 	@Override
 	public List<Rarity> findAll(Optional<String> username) {
@@ -30,7 +30,8 @@ public class RarityRepositoryImpl extends CardFieldRepositoryImpl<Rarity> {
 		joinAccountIfUsernameNotEmpty(criteriaBuilder, criteriaQuery, card, username, card.get("rarity"));
 		criteriaQuery.where(criteriaBuilder.equal(card.get("rarity").get("id"), id));
 		TypedQuery<Rarity> typedQuery = entityManager.createQuery(criteriaQuery);
-		return typedQuery.getResultList().size() > 0 ? Optional.of(typedQuery.getSingleResult()) : Optional.empty();
+		List<Rarity> result = typedQuery.getResultList();
+		return result.size() > 0 ? Optional.of(result.get(0)) : Optional.empty();
 	}
 
 }

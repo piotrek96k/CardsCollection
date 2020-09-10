@@ -1,4 +1,4 @@
-package com.pokemoncards.model.repository;
+package com.pokemoncards.model.repository.account;
 
 import java.time.LocalDateTime;
 

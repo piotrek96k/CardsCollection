@@ -10,17 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.pokemoncards.config.ExtendedUser;
-import com.pokemoncards.model.component.SortType;
-import com.pokemoncards.model.component.SortType.OrderType;
+import com.pokemoncards.config.security.ExtendedUser;
 import com.pokemoncards.model.entity.Card;
 import com.pokemoncards.model.entity.Rarity;
 import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
-import com.pokemoncards.model.repository.CardRepository;
-import com.pokemoncards.model.repository.RarityRepository;
-import com.pokemoncards.model.repository.SetRepository;
-import com.pokemoncards.model.repository.TypeRepository;
+import com.pokemoncards.model.repository.card.CardRepository;
+import com.pokemoncards.model.repository.card.RarityRepository;
+import com.pokemoncards.model.repository.card.SetRepository;
+import com.pokemoncards.model.repository.card.TypeRepository;
+import com.pokemoncards.model.session.SortType;
+import com.pokemoncards.model.session.SortType.OrderType;
 
 @Service
 public class CardService {

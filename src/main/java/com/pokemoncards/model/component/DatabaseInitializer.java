@@ -27,13 +27,13 @@ import com.pokemoncards.model.entity.Role;
 import com.pokemoncards.model.entity.RoleEnum;
 import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
-import com.pokemoncards.model.repository.AccountRepository;
-import com.pokemoncards.model.repository.CardRepository;
-import com.pokemoncards.model.repository.CashRepository;
-import com.pokemoncards.model.repository.RarityRepository;
-import com.pokemoncards.model.repository.RoleRepository;
-import com.pokemoncards.model.repository.SetRepository;
-import com.pokemoncards.model.repository.TypeRepository;
+import com.pokemoncards.model.repository.account.AccountRepository;
+import com.pokemoncards.model.repository.account.CashRepository;
+import com.pokemoncards.model.repository.account.RoleRepository;
+import com.pokemoncards.model.repository.card.CardRepository;
+import com.pokemoncards.model.repository.card.RarityRepository;
+import com.pokemoncards.model.repository.card.SetRepository;
+import com.pokemoncards.model.repository.card.TypeRepository;
 import com.pokemoncards.model.service.AccountService;
 import com.pokemoncards.model.service.ApiService;
 
@@ -82,13 +82,21 @@ public class DatabaseInitializer implements InitializingBean {
 	private void loadData() {
 		if (apiService.getNumberOfCards() > cardRepository.count()) {
 			LOGGER.log(Level.INFO, "Loading Data");
-			ApiService.ApiData data = apiService.getApiData();
+			loadObjects(apiService.getAllSets(), setRepository, Sets.Set::getName, Set::new, Optional.empty());
+			loadObjects(apiService.getAllTypes(), typeRepository, type -> type, Type::new, Optional.empty());
 			Map<String, Integer> values = getDefaultValues();
-			loadObjects(data.getRarities(), rarityRepository, rarity -> rarity, Rarity::new,
-					Optional.of(rarity -> setRarityValue(rarity, values)));
-			loadObjects(data.getSets(), setRepository, Sets.Set::getName, Set::new, Optional.empty());
-			loadObjects(data.getTypes(), typeRepository, type -> type, Type::new, Optional.empty());
-			loadCards(data.getCards());
+			List<String> rarities = new ArrayList<String>();
+			for (int i = 1; i <= apiService.getNumberOfPages(); i++) {
+				List<Cards.Card> cards = apiService.getCardsByPage(i);
+				for (Cards.Card card : cards) {
+					if (!rarities.contains(card.getRarity())) {
+						rarities.add(card.getRarity());
+						loadObjects(Collections.singletonList(card.getRarity()), rarityRepository, rarity -> rarity,
+								Rarity::new, Optional.of(rarity -> setRarityValue(rarity, values)));
+					}
+				}
+				loadCards(cards);
+			}
 		}
 	}
 
