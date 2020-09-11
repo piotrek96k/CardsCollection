@@ -23,7 +23,7 @@ import com.pokemoncards.model.service.AccountService;
 
 @Controller
 public class BuyController extends CardsController {
-	
+
 	@RestController
 	public static class BuyRestController {
 
@@ -36,7 +36,7 @@ public class BuyController extends CardsController {
 		}
 
 	}
-	
+
 	@GetMapping(value = "/buy")
 	public String buyPage(Model model, @RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
@@ -54,9 +54,9 @@ public class BuyController extends CardsController {
 			@ModelAttribute(value = "search") String search) {
 		return super.searchSelection(page, rarities, sets, types, search);
 	}
-	
+
 	@PostMapping(value = "/buy/all")
-	public ModelAndView buyAll(ModelMap model,@RequestParam(value = "page") Optional<Integer> page,
+	public ModelAndView buyAll(ModelMap model, @RequestParam(value = "page") Optional<Integer> page,
 			@RequestParam(value = "rarity") Optional<String> rarities,
 			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
 			@RequestParam(value = "search") Optional<String> search) {
@@ -66,7 +66,7 @@ public class BuyController extends CardsController {
 		accountService.addCards(selectedRarities, selectedSets, selectedTypes, search);
 		return redirectToCardsPage(model, page, rarities, sets, types, search);
 	}
-	
+
 	@Override
 	@PostMapping(value = "/buy/sort")
 	public ModelAndView sortSelection(@RequestParam(value = "page") Optional<Integer> page,
@@ -88,12 +88,22 @@ public class BuyController extends CardsController {
 	}
 
 	@Override
+	@PostMapping(value = "/buy/selectedpage")
+	public ModelAndView pageSelection(@RequestParam(value = "page") Optional<Integer> page,
+			@RequestParam(value = "rarity") Optional<String> rarities,
+			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
+			@RequestParam(value = "search") Optional<String> search, @ModelAttribute(value = "selectedPage")String selectedPage) {
+		return super.pageSelection(page, rarities, sets, types, search, selectedPage);
+	}
+
+	@Override
 	protected int getNumberOfCards(List<Rarity> rarities, List<Set> sets, List<Type> types, Optional<String> search) {
 		return cardRepository.getNumberOfCards(rarities, sets, types, search);
 	}
-	
+
 	@Override
-	protected Optional<Integer> getCardsValue(List<Rarity> rarities, List<Set> sets, List<Type> types, Optional<String> search) {
+	protected Optional<Integer> getCardsValue(List<Rarity> rarities, List<Set> sets, List<Type> types,
+			Optional<String> search) {
 		return Optional.of(cardRepository.getCardsValue(rarities, sets, types, search));
 	}
 
@@ -105,8 +115,8 @@ public class BuyController extends CardsController {
 	@Override
 	protected List<Card> getCards(int page, List<Rarity> rarities, List<Set> sets, List<Type> types,
 			Optional<String> search) {
-		return cardService.getCards(page, sessionData.getSortType(), sessionData.getOrderType(), rarities, sets,
-				types, search);
+		return cardService.getCards(page, sessionData.getSortType(), sessionData.getOrderType(), rarities, sets, types,
+				search);
 	}
 
 	@Override

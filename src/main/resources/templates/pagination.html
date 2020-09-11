@@ -33,6 +33,16 @@
   								<img th:alt="L" th:src="@{/images/last.png}"> 
   							</a>			
   						</td>
+  						<td class="px-2 page-item">
+  							<form id="goToPageForm" method="post" th:action="@{${link + '/selectedpage'}(page = ${currentPage},__${selectedRarities == '' ? ',' : 'rarity=${selectedRarities}'}__,__${selectedSets == '' ? ',' : 'set=${selectedSets}'}__,__${selectedTypes == '' ? ',' : 'type=${selectedTypes}'}__,__${enteredSearch == '' ? ',' : 'search=${enteredSearch}'}__)}">
+  								<input id="goToPageInput" oninput="changeGoToPageButton();" class="page-link" name="selectedPage" type="text" placeholder="...">
+  							</form>
+  						</td>
+  						<td class="px-2 page-item">
+  							<button id="goToPageButton" class="page-link" type="submit" form="goToPageForm" disabled>
+  								<img alt="Go To" src="/images/goToPage.png"> 
+  							</button>
+  						</td>
 					</tr>
 				</table>
 			</div>

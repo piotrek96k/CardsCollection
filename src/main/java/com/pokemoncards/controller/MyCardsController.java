@@ -57,6 +57,15 @@ public class MyCardsController extends CardsController {
 			@ModelAttribute(value = "order") String selectedOrder) {
 		return super.orderSelection(page, rarities, sets, types, search, selectedOrder);
 	}
+	
+	@Override
+	@PostMapping(value = "/mycards/selectedpage")
+	public ModelAndView pageSelection(@RequestParam(value = "page") Optional<Integer> page,
+			@RequestParam(value = "rarity") Optional<String> rarities,
+			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
+			@RequestParam(value = "search") Optional<String> search, @ModelAttribute(value = "selectedPage")String selectedPage) {
+		return super.pageSelection(page, rarities, sets, types, search, selectedPage);
+	}
 
 	@Override
 	protected String getLink() {

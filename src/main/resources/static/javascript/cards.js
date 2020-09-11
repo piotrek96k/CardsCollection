@@ -273,3 +273,11 @@ function returnDropdownColor() {
 function eraseSearch() {
 	document.getElementById("search").value = "";
 }
+function changeGoToPageButton() {
+	var input = document.getElementById("goToPageInput");
+	var button = document.getElementById("goToPageButton");
+	if(input.value === "")
+		button.disabled = true;
+	else
+		button.disabled = false;
+}

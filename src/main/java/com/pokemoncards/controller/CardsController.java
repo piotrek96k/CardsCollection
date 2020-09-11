@@ -11,8 +11,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.pokemoncards.model.entity.Card;
@@ -60,9 +58,9 @@ public abstract class CardsController {
 
 	abstract protected int getNumberOfCards(List<Rarity> rarities, List<Set> sets, List<Type> types,
 			Optional<String> search);
-	
-	protected Optional<Integer>getCardsValue(List<Rarity> rarities, List<Set> sets, List<Type> types,
-			Optional<String> search){
+
+	protected Optional<Integer> getCardsValue(List<Rarity> rarities, List<Set> sets, List<Type> types,
+			Optional<String> search) {
 		return Optional.empty();
 	}
 
@@ -89,8 +87,8 @@ public abstract class CardsController {
 		model.addAttribute("enteredSearch", search.orElse(""));
 		model.addAttribute("sortOptions", SortType.values());
 		model.addAttribute("sessionData", sessionData);
-		if(cardsValue.isPresent())
-			model.addAttribute("cardsValue",cardsValue.get());
+		if (cardsValue.isPresent())
+			model.addAttribute("cardsValue", cardsValue.get());
 	}
 
 	protected ModelAndView searchSelection(Optional<Integer> page, Optional<String> rarities, Optional<String> sets,
@@ -107,11 +105,34 @@ public abstract class CardsController {
 //		sessionData.setLastVisited(page);
 //	}
 
-	protected ModelAndView sortSelection(@RequestParam(value = "page") Optional<Integer> page,
-			@RequestParam(value = "rarity") Optional<String> rarities,
-			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
-			@RequestParam(value = "search") Optional<String> search,
-			@ModelAttribute(value = "sort") String selectedSort) {
+	protected ModelAndView pageSelection(Optional<Integer> page, Optional<String> rarities, Optional<String> sets,
+			Optional<String> types, Optional<String> search, String selectedPage) {
+		try {
+			Optional<Integer> parsedPage = getCorrectPage(page, rarities, sets, types, search, selectedPage);
+			return redirectToCardsPage(new ModelMap(), parsedPage, rarities, sets, types, search);
+		} catch (NumberFormatException exception) {
+			return redirectToCardsPage(new ModelMap(), page.isPresent() && page.get() == 1 ? Optional.empty() : page,
+					rarities, sets, types, search);
+		}
+	}
+
+	private Optional<Integer> getCorrectPage(Optional<Integer> page, Optional<String> rarities, Optional<String> sets,
+			Optional<String> types, Optional<String> search, String selectedPage) {
+		int parsedPage = Integer.parseInt(selectedPage);
+		if (parsedPage < 2)
+			return Optional.empty();
+		List<Rarity> selectedRarities = getSelectedObjectsAsList(rarities, rarityRepository);
+		List<Set> selectedSets = getSelectedObjectsAsList(sets, setRepository);
+		List<Type> selectedTypes = getSelectedObjectsAsList(types, typeRepository);
+		int numberOfPages = cardRepository.getNumberOfPagesFromNumberOfCards(
+				getNumberOfCards(selectedRarities, selectedSets, selectedTypes, search));
+		if (parsedPage > numberOfPages)
+			return Optional.of(numberOfPages);
+		return Optional.of(parsedPage);
+	}
+
+	protected ModelAndView sortSelection(Optional<Integer> page, Optional<String> rarities, Optional<String> sets,
+			Optional<String> types, Optional<String> search, String selectedSort) {
 		if (selectedSort != null)
 			try {
 				SortType sortType = SortType.valueOf(selectedSort);
@@ -122,11 +143,8 @@ public abstract class CardsController {
 		return redirectToCardsPage(new ModelMap(), page, rarities, sets, types, search);
 	}
 
-	protected ModelAndView orderSelection(@RequestParam(value = "page") Optional<Integer> page,
-			@RequestParam(value = "rarity") Optional<String> rarities,
-			@RequestParam(value = "set") Optional<String> sets, @RequestParam(value = "type") Optional<String> types,
-			@RequestParam(value = "search") Optional<String> search,
-			@ModelAttribute(value = "order") String selectedOrder) {
+	protected ModelAndView orderSelection(Optional<Integer> page, Optional<String> rarities, Optional<String> sets,
+			Optional<String> types, Optional<String> search, String selectedOrder) {
 		if (selectedOrder != null) {
 			SortType.OrderType orderType = sessionData.getSortType().getOrderType(selectedOrder);
 			if (orderType != null)

@@ -6,7 +6,6 @@ import java.util.Map;
 import javax.servlet.http.HttpSessionListener;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -22,7 +21,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import com.pokemoncards.model.repository.account.AccountRepository;
 
 @Configuration
-@EnableAutoConfiguration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -38,11 +36,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new HashMap<UserDetails, Object>();
 	}
 
-	@Bean 
+	@Bean
 	public SecurityUserDetails getSecurityUserDetails() {
 		return new SecurityUserDetails(accountRepository, getUsersLockers());
 	}
-	
+
 	@Bean
 	public HttpSessionListener getHttpSessionListener() {
 		return new SessionListener();
@@ -50,8 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder authentication) throws Exception {
-		authentication.userDetailsService(getSecurityUserDetails())
-				.passwordEncoder(new BCryptPasswordEncoder());
+		authentication.userDetailsService(getSecurityUserDetails()).passwordEncoder(new BCryptPasswordEncoder());
 	}
 
 	@Override
