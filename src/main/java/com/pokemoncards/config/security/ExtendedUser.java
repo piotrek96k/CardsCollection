@@ -11,8 +11,8 @@ public class ExtendedUser extends User {
 	
 	private String email;
 
-	public ExtendedUser(String username, String email, String password, List<GrantedAuthority> authorities) {
-		super(username, password, authorities);
+	public ExtendedUser(String username, String email, String password, boolean enabled, List<GrantedAuthority> authorities) {
+		super(username, password, enabled, true, true, true, authorities);
 		this.email = email;
 	}
 

@@ -3,13 +3,11 @@ package com.pokemoncards.model.service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,19 +18,15 @@ import com.pokemoncards.config.security.SecurityUserDetails;
 import com.pokemoncards.exception.IllegalPurchaseException;
 import com.pokemoncards.exception.NotAuthenticatedException;
 import com.pokemoncards.exception.NotFoundException;
-import com.pokemoncards.model.entity.Account;
 import com.pokemoncards.model.entity.Card;
 import com.pokemoncards.model.entity.Cash;
 import com.pokemoncards.model.entity.FreeCard;
 import com.pokemoncards.model.entity.Rarity;
-import com.pokemoncards.model.entity.Role;
-import com.pokemoncards.model.entity.RoleEnum;
 import com.pokemoncards.model.entity.Set;
 import com.pokemoncards.model.entity.Type;
 import com.pokemoncards.model.repository.account.AccountRepository;
 import com.pokemoncards.model.repository.account.CashRepository;
 import com.pokemoncards.model.repository.account.FreeCardRepository;
-import com.pokemoncards.model.repository.account.RoleRepository;
 import com.pokemoncards.model.repository.card.CardRepository;
 import com.pokemoncards.model.repository.card.RarityRepository;
 import com.pokemoncards.model.repository.card.SetRepository;
@@ -43,13 +37,8 @@ import com.pokemoncards.model.session.SortType.OrderType;
 @Service
 public class AccountService {
 
-	private static BCryptPasswordEncoder passwordEncoder;
-
 	@Autowired
-	protected AccountRepository accountRepository;
-
-	@Autowired
-	private RoleRepository roleRepository;
+	private AccountRepository accountRepository;
 
 	@Autowired
 	private CardRepository cardRepository;
@@ -74,38 +63,6 @@ public class AccountService {
 
 	@Autowired
 	private ObjectMapper mapper;
-
-	public void addAccount(Account account) {
-		Role role = roleRepository.getOne(RoleEnum.ROLE_USER.toString());
-		List<Role> roles = new ArrayList<Role>();
-		roles.add(role);
-		account.setRoles(roles);
-		account.setPassword(getPasswordEncoder().encode(account.getPassword()));
-		account.setEnabled(true);
-		accountRepository.save(account);
-		setCash(account);
-		setFreeCard(account);
-	}
-
-	private void setCash(Account account) {
-		Cash cash = new Cash();
-		cash.setCoins(3_000);
-		cash.setAccount(account);
-		cash.setUsername(account.getUsername());
-		cash.setEmail(account.getEmail());
-		cash.setNextCoinsCollecting(LocalDateTime.now(ZoneOffset.UTC));
-		cash.setDaysInRow(1);
-		cashRepository.save(cash);
-	}
-
-	private void setFreeCard(Account account) {
-		FreeCard freeCard = new FreeCard();
-		freeCard.setAccount(account);
-		freeCard.setUsername(account.getUsername());
-		freeCard.setEmail(account.getEmail());
-		freeCard.setNextFreeCard(LocalDateTime.now(ZoneOffset.UTC));
-		freeCardRepository.save(freeCard);
-	}
 
 	private ExtendedUser getUser() {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -259,12 +216,6 @@ public class AccountService {
 		if (totalValue.isPresent())
 			node.put("totalValue", NumbersService.formatInteger(totalValue.get()));
 		return node.toString();
-	}
-
-	private static BCryptPasswordEncoder getPasswordEncoder() {
-		if (passwordEncoder == null)
-			passwordEncoder = new BCryptPasswordEncoder();
-		return passwordEncoder;
 	}
 
 }

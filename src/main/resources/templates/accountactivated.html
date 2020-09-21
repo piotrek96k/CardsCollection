@@ -12,14 +12,8 @@
 <body>
 	<div th:replace="menu :: menu"></div>
 	<div class = "container" style="margin-top:80px;">
-		<h2>Account has been created successfully</h2>
-		<div class="register-div">Activation link has been sent</div>
-		<div class="register-div">You did not receive the email, send a new one</div>
-		<form th:action="@{/register/generate}" method="post">
-			<input type="hidden" name="username" th:value="${username}">
-			<button  class="btn btn-success register-div" type="submit">Send</button>
-		</form>
-		<a href="/home" class="redirect register-div"> Sign in</a>
+		<h2>Account has been activated</h2>
+		<a href="/home" class="redirect"> Sign in</a>
 	</div>
 </body>
 </html>

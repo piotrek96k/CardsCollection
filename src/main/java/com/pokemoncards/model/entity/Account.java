@@ -36,12 +36,6 @@ public class Account {
 	@Unique(message = "E-mail in use", groups = OnRegister.class)
 	private String email;
 
-	@NotBlank(message = "First name can't be blank", groups = OnRegister.class)
-	private String firstName;
-
-	@NotBlank(message = "Lastname can't be blank", groups = OnRegister.class)
-	private String lastName;
-
 	@Password(groups = OnRegister.class)
 	@NotBlank(message = "Password can't be blank", groups = OnRegister.class)
 	@Size(min = 8, message = "Password too short", groups = OnRegister.class)
@@ -81,22 +75,6 @@ public class Account {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
 	}
 
 	public String getPassword() {
@@ -149,9 +127,8 @@ public class Account {
 
 	@Override
 	public String toString() {
-		return "Account [username=" + username + ", email=" + email + ", firstName=" + firstName + ", lastName="
-				+ lastName + ", password=" + password + ", cash=" + cash + ", enabled=" + enabled + ", cards=" + cards
-				+ "]";
+		return "Account [username=" + username + ", email=" + email + ", password=" + password + ", cash=" + cash
+				+ ", freeCard=" + freeCard + ", enabled=" + enabled + ", roles=" + roles + ", cards=" + cards + "]";
 	}
 
 }

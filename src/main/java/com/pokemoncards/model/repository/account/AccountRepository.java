@@ -14,7 +14,7 @@ public interface AccountRepository extends JpaRepository<Account, AccountId>, Ac
 	public Account findByUsername(String username);
 
 	public Account findByEmail(String email);
-	
+
 	@Query(value = "select account from Account account where username=:id or email=:id")
 	public Account findByUsernameOrEmail(String id);
 
@@ -32,9 +32,15 @@ public interface AccountRepository extends JpaRepository<Account, AccountId>, Ac
 	@Transactional
 	@Modifying
 	@Query(value = "insert into account_roles(username, email, role_id) values (:username, :email, :role_id)", nativeQuery = true)
-	public void addRole(@Param("username") String username, @Param("email") String email, @Param("role_id") String roleId);
-	
+	public void addRole(@Param("username") String username, @Param("email") String email,
+			@Param("role_id") String roleId);
+
 	@Query(value = "select count(card_id) from account_cards where username=:username and card_id = :card_id", nativeQuery = true)
 	public int countUserCardsByCardId(@Param("username") String username, @Param("card_id") String cardId);
-	
+
+	@Transactional
+	@Modifying
+	@Query(value = "update Account account set account.enabled=true where username=:username")
+	public void activateAccount(@Param(value = "username") String username);
+
 }

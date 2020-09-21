@@ -16,7 +16,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Pokemon Cards</name>
 	<description>pokemon cards collecting site</description>
-	
+
 	<packaging>war</packaging>
 
 	<properties>
@@ -47,6 +47,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 
 		<dependency>

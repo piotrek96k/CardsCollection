@@ -34,13 +34,12 @@ import com.pokemoncards.model.repository.card.CardRepository;
 import com.pokemoncards.model.repository.card.RarityRepository;
 import com.pokemoncards.model.repository.card.SetRepository;
 import com.pokemoncards.model.repository.card.TypeRepository;
-import com.pokemoncards.model.service.AccountService;
 import com.pokemoncards.model.service.ApiService;
+import com.pokemoncards.model.service.EmailService;
+import com.pokemoncards.model.service.RegisterService;
 
 @Component
 public class DatabaseInitializer implements InitializingBean {
-
-	private static final String ADMIN_EMAIL;
 
 	private static final String ADMIN;
 
@@ -66,15 +65,14 @@ public class DatabaseInitializer implements InitializingBean {
 
 	@Autowired
 	private CashRepository cashRepository;
-
+	
 	@Autowired
-	private AccountService accountService;
+	private RegisterService registerService;
 
 	@Autowired
 	private ApiService apiService;
 
 	static {
-		ADMIN_EMAIL = "pokemonCardsAdmin@gmail.com";
 		ADMIN = "admin";
 		LOGGER = Logger.getLogger(DatabaseInitializer.class.getName());
 	}
@@ -179,13 +177,11 @@ public class DatabaseInitializer implements InitializingBean {
 			LOGGER.log(Level.INFO, "Creating Admin");
 			admin = new Account();
 			admin.setUsername(ADMIN);
-			admin.setEmail(ADMIN_EMAIL);
-			admin.setFirstName(ADMIN);
-			admin.setLastName(ADMIN);
+			admin.setEmail(EmailService.ADMIN_EMAIL);
 			admin.setPassword(ADMIN);
-			admin.setEnabled(true);
-			accountService.addAccount(admin);
+			registerService.addAccount(admin);
 			accountRepository.addRole(admin.getUsername(), admin.getEmail(), RoleEnum.ROLE_ADMIN.name());
+			accountRepository.activateAccount(ADMIN);
 			cashRepository.updateCoins(admin.getUsername(), 100_000_000);
 		}
 	}

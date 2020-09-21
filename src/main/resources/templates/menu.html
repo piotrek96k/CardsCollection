@@ -22,7 +22,7 @@
 						<a class="px-2" th:classappend="${#strings.startsWith(#httpServletRequest.getRequestURI(), '/sell') ? 'navbar-brand active':'nav-link'}" href="/sell">Sell</a>
 					</li>
 					<li sec:authorize="!isFullyAuthenticated()" class="nav-item">
-						<a class="px-2" th:classappend="${#httpServletRequest.getRequestURI() == '/register' ? 'navbar-brand active':'nav-link'}" href="/register">Register</a>
+						<a class="px-2" th:classappend="${#strings.startsWith(#httpServletRequest.getRequestURI(), '/register') ? 'navbar-brand active':'nav-link'}" href="/register">Register</a>
 					</li>
 				</ul>
 				<ul class="navbar-nav ml-auto navigation-right">
