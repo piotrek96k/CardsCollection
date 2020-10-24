@@ -18,7 +18,7 @@ public class SessionData {
 
 	private Map<String, Boolean> expanders;
 
-	private int scrollPosition;
+	private double scrollPosition;
 
 	private String lastVisited;
 
@@ -33,7 +33,7 @@ public class SessionData {
 	public void resetExpanders() {
 		for (Expander expander : Expander.values())
 			expanders.put(expander.getExpand(), false);
-		scrollPosition = 0;
+		scrollPosition = 0.0;
 	}
 
 	public SortType getSortType() {
@@ -61,11 +61,11 @@ public class SessionData {
 		expanders.put(expander.getExpand(), !expanders.get(expander.getExpand()));
 	}
 
-	public int getScrollPosition() {
+	public double getScrollPosition() {
 		return scrollPosition;
 	}
 
-	public void setScrollPosition(int scrollPosition) {
+	public void setScrollPosition(double scrollPosition) {
 		this.scrollPosition = scrollPosition;
 	}
 

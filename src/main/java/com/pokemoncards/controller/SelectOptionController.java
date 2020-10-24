@@ -26,7 +26,7 @@ public class SelectOptionController {
 
 	@PostMapping(value = "/scroll")
 	@ResponseStatus(value = HttpStatus.OK)
-	private void scrollPosition(@ModelAttribute(value = "scroll") int scroll) {
+	private void scrollPosition(@ModelAttribute(value = "scroll") double scroll) {
 		sessionData.setScrollPosition(scroll);
 	}
 	

@@ -27,3 +27,16 @@ Dodać wyjątek bezpieczeństwa
 Zarejestrować użytkownika lub zalogować się za pomocą konta administratora  
 nazwa użytkownika: admin  
 hasło: admin  
+
+Jeżeli próba wysłania maila nie będzie działać:  
+  
+Kontem wykorzystanym do wysyłania maili z aplikacji jest Google, niestety czasem Google sam wyłącza dostęp
+do konta aplikacjom zewnętrznym, jeżeli tak się wydarzy należy:  
+  
+Zalogować się na konto Google:  
+nazwa użytkownika: PokemonCardsAdm@gmail.com  
+hasło: PokemonCards  
+Otworzyć:  
+https://myaccount.google.com/lesssecureapps?pli=1&rapt=AEjHL4PAtCBs733DVyoVX_mkj5LekVaryHIfCtqlMIEw3WDZ0n7WFXUkKkm61S62qlIJrdLu2-Kc-FjX74dM8u6y7MJZKVZpnA  
+
+Włączyć opcję: Zezwalaj na mniej bezpieczne aplikacje  
