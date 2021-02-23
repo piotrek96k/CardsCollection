@@ -65,7 +65,7 @@ public class DatabaseInitializer implements InitializingBean {
 
 	@Autowired
 	private CashRepository cashRepository;
-	
+
 	@Autowired
 	private RegisterService registerService;
 
@@ -191,8 +191,6 @@ public class DatabaseInitializer implements InitializingBean {
 		loadData();
 		loadRoles();
 		createAdmin();
-//		for(int i =1; i<503; i++)
-//			cardRepository.getCards(i, SortType.NAME, SortType.NAME.ASC, new ArrayList<Rarity>(), new ArrayList<Set>(), new ArrayList<Type>(), Optional.empty(), Optional.empty()).forEach(card->accountRepository.addCard("admin", "pokemonCardsAdmin@gmail.com", card.getId()));
 	}
 
 }

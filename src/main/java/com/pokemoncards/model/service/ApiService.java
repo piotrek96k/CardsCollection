@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -17,19 +18,20 @@ public class ApiService {
 
 	private static final String RESOURCE_URL;
 
-	private static final RestTemplate REST_TEMPLATE;
-
 	private static final String CARDS;
 
 	private static final String SETS;
 
 	private static final String TYPES;
-	
+
 	public static final int PAGE_SIZE;
 
 	private static int numberOfCards;
 
 	private static int numberOfPages;
+
+	@Autowired
+	private RestTemplate restTemplate;
 
 	static {
 		RESOURCE_URL = "https://api.pokemontcg.io/v1/";
@@ -37,16 +39,17 @@ public class ApiService {
 		SETS = "sets";
 		TYPES = "types";
 		PAGE_SIZE = 100;
-		REST_TEMPLATE = new RestTemplate();
 	}
 
 	public List<Sets.Set> getAllSets() {
-		ResponseEntity<Sets> setsEntity = REST_TEMPLATE.getForEntity(RESOURCE_URL + SETS, Sets.class);
-		return setsEntity.getBody().getSets();
+		ResponseEntity<Sets> setsEntity = restTemplate.getForEntity(RESOURCE_URL + SETS, Sets.class);
+		List<Sets.Set> sets = setsEntity.getBody().getSets();
+		sets.add(new Sets.Set("None"));
+		return sets;
 	}
 
 	public List<String> getAllTypes() {
-		ResponseEntity<Types> typesEntity = REST_TEMPLATE.getForEntity(RESOURCE_URL + TYPES, Types.class);
+		ResponseEntity<Types> typesEntity = restTemplate.getForEntity(RESOURCE_URL + TYPES, Types.class);
 		List<String> types = typesEntity.getBody().getTypes();
 		types.add("None");
 		return types;
@@ -57,7 +60,7 @@ public class ApiService {
 		builder.append(CARDS);
 		builder.append("?page=");
 		builder.append(page);
-		ResponseEntity<Cards> cardsEntity = REST_TEMPLATE.getForEntity(builder.toString(), Cards.class);
+		ResponseEntity<Cards> cardsEntity = restTemplate.getForEntity(builder.toString(), Cards.class);
 		List<Cards.Card> cards = cardsEntity.getBody().getCards();
 		correctCards(cards);
 		return cards;
@@ -67,11 +70,13 @@ public class ApiService {
 		for (Cards.Card card : cards) {
 			if (card.getRarity() == null || card.getRarity().isBlank())
 				card.setRarity("Common");
-			if(card.getTypes() == null || card.getTypes().isEmpty()) {
+			if (card.getTypes() == null || card.getTypes().isEmpty()) {
 				Set<String> types = new HashSet<String>();
 				types.add("None");
 				card.setTypes(types);
 			}
+			if (card.getSet() == null || card.getSet().isBlank())
+				card.setSet("None");
 			if (card.getEvolvesFrom() != null && (card.getEvolvesFrom().isEmpty() || card.getEvolvesFrom().isBlank()))
 				card.setEvolvesFrom(null);
 			if (card.getHp() != null
@@ -93,7 +98,7 @@ public class ApiService {
 	}
 
 	private void readNumberOfCardsAndPages() {
-		ResponseEntity<Cards> cardsEntity = REST_TEMPLATE.getForEntity(RESOURCE_URL + CARDS, Cards.class);
+		ResponseEntity<Cards> cardsEntity = restTemplate.getForEntity(RESOURCE_URL + CARDS, Cards.class);
 		numberOfCards = Integer.parseInt(cardsEntity.getHeaders().get("Total-Count").get(0));
 		numberOfPages = numberOfCards / PAGE_SIZE + (numberOfCards % PAGE_SIZE == 0 ? 0 : 1);
 	}

@@ -8,10 +8,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Sets {
 
 	private List<Set> sets;
-	
-	public static class Set{
-		
+
+	public static class Set {
+
 		private String name;
+
+		public Set() {
+		}
+
+		public Set(String name) {
+			this.name = name;
+		}
 
 		public String getName() {
 			return name;
@@ -20,7 +27,7 @@ public class Sets {
 		public void setName(String name) {
 			this.name = name;
 		}
-		
+
 	}
 
 	public List<Set> getSets() {
@@ -30,5 +37,5 @@ public class Sets {
 	public void setSets(List<Set> sets) {
 		this.sets = sets;
 	}
-	
+
 }
